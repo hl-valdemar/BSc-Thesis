@@ -1,0 +1,299 @@
+{
+  "version": "0.8.0-alpha.8.1",
+  "pan": {
+    "X": 956.0948,
+    "Y": 524.0972
+  },
+  "zoom": 1.067725658416748,
+  "currentPage": 0,
+  "properties": {
+    "CacheDirectory": ""
+  },
+  "pages": [
+    {
+      "id": 0,
+      "pan": {
+        "X": 956.09467,
+        "Y": 524.0971
+      },
+      "zoom": 1.067725658416748,
+      "cards": [
+        {
+          "id": 7,
+          "rect": {
+            "X": 0,
+            "Y": 0,
+            "W": 288,
+            "H": 32
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 288,
+          "uncollapsedSizeY": 32,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": false,
+            "description": "Getting started",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 11,
+          "rect": {
+            "X": 480,
+            "Y": 0,
+            "W": 768,
+            "H": 192
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 768,
+          "uncollapsedSizeY": 192,
+          "contents": "Note",
+          "properties": {
+            "description": "Q-learning\n\n- Works but suffers from diminishing returns as training progresses.\n- Takes a long time to converge.\n",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 3,
+          "rect": {
+            "X": 32,
+            "Y": 32,
+            "W": 352,
+            "H": 32
+          },
+          "collapsed": "CollapsedShade",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 32,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": true,
+            "description": "Get GridWorld working",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 4,
+          "rect": {
+            "X": 32,
+            "Y": 64,
+            "W": 352,
+            "H": 160
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 160,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": false,
+            "description": "Implement basic Q-learning to find an optimal policy for navigating the state-space",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 6,
+          "rect": {
+            "X": 0,
+            "Y": 224,
+            "W": 352,
+            "H": 96
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 96,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": false,
+            "description": "Experiment with an implementation of GFlowNets",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 22,
+          "rect": {
+            "X": 480,
+            "Y": 256,
+            "W": 576,
+            "H": 128
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 576,
+          "uncollapsedSizeY": 128,
+          "contents": "Note",
+          "properties": {
+            "description": "GFlowNets\n\n- Generates a trajectory one step at a time\n",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 9,
+          "rect": {
+            "X": 32,
+            "Y": 320,
+            "W": 352,
+            "H": 32
+          },
+          "collapsed": "CollapsedShade",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 32,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": true,
+            "description": "Read up on GFlowNets",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 13,
+          "rect": {
+            "X": 32,
+            "Y": 352,
+            "W": 352,
+            "H": 64
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 64,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": true,
+            "description": "Implement basic GFlowNets learning",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 15,
+          "rect": {
+            "X": 32,
+            "Y": 416,
+            "W": 352,
+            "H": 64
+          },
+          "collapsed": "CollapsedShade",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 64,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": false,
+            "description": "GFlowNets implementation",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 20,
+          "rect": {
+            "X": 1120,
+            "Y": 448,
+            "W": 768,
+            "H": 544
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 768,
+          "uncollapsedSizeY": 544,
+          "contents": "Note",
+          "properties": {
+            "description": "Forward-Looking GFlowNet for Long Trajectories\n\nhttps://milayb.notion.site/The-GFlowNet-Tutorial-95434ef0e2d94c24aab90e69b30be9b3#5f25727d1b10427a9b271e68a68193fb\n\n- Extends energy function to all states, not just terminal ones\n- Allows training with incomplete trajectories\n- Reparametrizes flow function using accrued energy and forward-looking flow\n- Accelerates training by providing local credit information\n- Compatible with Detailed Balance and SubTrajectory Balance objectives\n- Not compatible with Trajectory Balance objective\n- Related to Modified DB training objective\n- Useful when termination possible from all intermediate states\n",
+            "filepath": ""
+          },
+          "links": [
+            {
+              "start": 20,
+              "end": 22,
+              "joints": []
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "rect": {
+            "X": 64,
+            "Y": 480,
+            "W": 352,
+            "H": 32
+          },
+          "collapsed": "CollapsedShade",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 32,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": false,
+            "description": "Fix the reward function",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 16,
+          "rect": {
+            "X": 64,
+            "Y": 512,
+            "W": 352,
+            "H": 64
+          },
+          "collapsed": "CollapsedShade",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 64,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": false,
+            "description": "Enforce flow balance / flow matching",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 17,
+          "rect": {
+            "X": 64,
+            "Y": 576,
+            "W": 352,
+            "H": 96
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 96,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": false,
+            "description": "Research more suitable methods of exploration than Epsilon-Greedy",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 18,
+          "rect": {
+            "X": 64,
+            "Y": 672,
+            "W": 352,
+            "H": 96
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 96,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": false,
+            "description": "Maybe add a learning rate decay for better convergence",
+            "filepath": ""
+          }
+        },
+        {
+          "id": 8,
+          "rect": {
+            "X": 0,
+            "Y": 768,
+            "W": 352,
+            "H": 128
+          },
+          "collapsed": "CollapsedNone",
+          "uncollapsedSizeX": 352,
+          "uncollapsedSizeY": 128,
+          "contents": "Checkbox",
+          "properties": {
+            "checked": false,
+            "description": "Experiment with an implementation of Bayesian Exploration Networks",
+            "filepath": ""
+          }
+        }
+      ]
+    }
+  ],
+  "savedimages": {}
+}
