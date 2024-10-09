@@ -4,12 +4,14 @@ import numpy as np
 from numpy.typing import NDArray
 from lib.gridworld import Action, Cell, GridWorld
 
-def q_learning(
+def trainer(
     world: GridWorld,
     num_episodes: int,
     learning_rate: float = 0.1,
     discount_factor: float = 0.9,
     epsilon: float = 0.1,
+    follow_agent: bool = False,
+    show_policy: bool = False,
 ) -> tuple[np.ndarray, np.ndarray]:
     Q = np.zeros((world.height, world.width, world.action_size))
 
@@ -68,47 +70,53 @@ def q_learning(
 
             x, y = next_x, next_y
 
-            # Extract policy from Q-table
-            policy = np.argmax(Q, axis=2)
-            world.set_policy(policy, render_policy=True)
+            if show_policy:
+                # Extract policy from Q-table
+                policy = np.argmax(Q, axis=2)
+                world.set_policy(policy, render_policy=True)
+
+            if follow_agent:
+                # Allow time for the policy updates to be seen one at a time
+                time.sleep(0.1)
 
     # Extract policy from Q-table
     policy = np.argmax(Q, axis=2)
 
     return Q, policy
 
-# Setup GridWorld
-# description = """
-# ##########
-# #s #     #
-# #  #  #  #
-# #  #  o  #
-# #     # g#
-# ##########
-# """
-description = """
-###################
-#s #     #g #     #
-#  #  #  #  #  #  #
-#  #  o  #  #  o  #
-#     #  #     #  #
-#oo####  #oo####  #
-#g #     #  #     #
-#  #  #  #  #  #  #
-#  #  o     #  o  #
-#     #  #     #  #
-###################
-"""
-world = GridWorld(
-    description,
-    font_size=40,
-    font_path="/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Regular.ttf",
-    render=True,
-)
+if __name__ == "__main__":
+    world_small = """
+    ##########
+    #s #     #
+    #  #  #  #
+    #  #  o  #
+    #     # g#
+    ##########
+    """
 
-# Run Q-learning
-num_episodes = 20000
-Q, policy = world.run_training(lambda w: q_learning(w, num_episodes))
-print("Q-learning Policy:")
-for row in policy:
-    print(' '.join([Action(action).name[0] for action in row]))
+    world_large = """
+    ###################
+    #s #     #g #     #
+    #  #  #  #  #  #  #
+    #  #  o  #  #  o  #
+    #     #  #     #  #
+    #oo####  #oo####  #
+    #g #     #  #     #
+    #  #  #  #  #  #  #
+    #  #  o     #  o  #
+    #     #  #     #  #
+    ###################
+    """
+    world = GridWorld(
+        world_large,
+        font_size=40,
+        font_path="/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Regular.ttf",
+        render=True,
+    )
+
+    # Run Q-learning
+    num_episodes = 20000
+    Q, policy = world.run_training(lambda w: trainer(w, num_episodes))
+    print("Q-learning Policy:")
+    for row in policy:
+        print(' '.join([Action(action).name[0] for action in row]))

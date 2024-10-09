@@ -111,6 +111,12 @@ class GridWorld:
             print("Training finished. Press 'Q' or ESC to close the window.")
             self.finished_training = True
 
+            # Wait for the user to exit the renderer
+            while self.renderer_running and not rl.WindowShouldClose():
+                pass
+
+            self._stop()
+
         return result
 
     # +------------------------------------------- +
@@ -128,9 +134,15 @@ class GridWorld:
         """Stop the GridWorld simulation and rendering."""
         self.renderer_running = False
         if hasattr(self, "render_thread"):
-            self.render_thread.join()
+            # Wait for up to 5 seconds for the thread to join
+            self.render_thread.join(timeout=5)
+            if self.render_thread.is_alive():
+                print("Render thread did not exit cleanly. Forcing window closure.")
+                self._force_close_window()
 
-        # rl.UnloadFont(self.font)
+    def _force_close_window(self):
+        """Force close the window from the main thread."""
+        rl.CloseWindow()
 
     def _render_loop(self):
         rl.InitWindow(self.width * self.font_size, self.height * self.font_size, b"BSc :: GridWorld")
@@ -141,6 +153,7 @@ class GridWorld:
         while self.renderer_running and not rl.WindowShouldClose():
             if rl.IsKeyPressed(rl.KEY_Q) or rl.IsKeyPressed(rl.KEY_ESCAPE):
                 self.renderer_running = False
+                break
 
             rl.BeginDrawing()
             rl.ClearBackground(colors.BLACK)
@@ -150,16 +163,16 @@ class GridWorld:
                 grid_copy = self.grid.copy()
 
             # Draw grid (doesn't need to be locked since it's read-only)
-            self._draw_grid(font)
+            self._draw_grid(grid_copy, font)
 
             rl.EndDrawing()
 
         rl.CloseWindow()
 
-    def _draw_grid(self, font):
+    def _draw_grid(self, grid, font):
         for y in range(self.height):
             for x in range(self.width):
-                cell = self.grid[y, x]
+                cell = grid[y, x]
                 color = colors.DARKGRAY
                 texture = b"."
 
