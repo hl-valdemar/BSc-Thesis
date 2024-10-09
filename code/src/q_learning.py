@@ -43,8 +43,8 @@ def trainer(
                 valid_actions[y, x, Action.DOWN.value] = False
 
     for episode in range(num_episodes):
-        if (episode + 1) % 1000 == 0:
-            print(f"Episode {episode+1}/{num_episodes}")
+        if (episode) % 1000 == 0:
+            print(f"Episode {episode}/{num_episodes}")
 
         state = world.reset()
         x, y = state
@@ -85,7 +85,7 @@ def trainer(
     return Q, policy
 
 if __name__ == "__main__":
-    world_small = """
+    description = """
     ##########
     #s #     #
     #  #  #  #
@@ -93,22 +93,8 @@ if __name__ == "__main__":
     #     # g#
     ##########
     """
-
-    world_large = """
-    ###################
-    #s #     #g #     #
-    #  #  #  #  #  #  #
-    #  #  o  #  #  o  #
-    #     #  #     #  #
-    #oo####  #oo####  #
-    #g #     #  #     #
-    #  #  #  #  #  #  #
-    #  #  o     #  o  #
-    #     #  #     #  #
-    ###################
-    """
     world = GridWorld(
-        world_large,
+        description,
         font_size=40,
         font_path="/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Regular.ttf",
         render=True,

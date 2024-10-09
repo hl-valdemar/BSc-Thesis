@@ -146,6 +146,7 @@ class GridWorld:
 
     def _render_loop(self):
         rl.InitWindow(self.width * self.font_size, self.height * self.font_size, b"BSc :: GridWorld")
+        rl.SetTraceLogLevel(rl.RL_LOG_NONE)
         rl.SetTargetFPS(30)
 
         font = rl.LoadFont(self.font_path.encode())
@@ -206,7 +207,6 @@ class GridWorld:
                             policy_texture = "v"
 
                     rl.DrawTextEx(font, policy_texture.encode(), [x * self.font_size, y * self.font_size], self.font_size, 0, colors.ORANGE)
-                    # rl.DrawText(policy_texture.encode(),  x * self.font_size + self.font_size // 4,  y * self.font_size + self.font_size // 4,  self.font_size // 2, colors.ORANGE)
 
         agent_x, agent_y = self.state
         rl.DrawTextEx(font, b"A", [agent_x * self.font_size, agent_y * self.font_size], self.font_size, 0, colors.BLUE)

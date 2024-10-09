@@ -27,6 +27,8 @@ def setup_world(descriptor: str = "small", render: bool = False) -> GridWorld:
         #     #  #     #  #
         ###################
         """
+    else:
+        raise ValueError(f"Unsupported world descriptor: {descriptor}")
 
     world = GridWorld(
         description,
