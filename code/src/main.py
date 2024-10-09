@@ -1,6 +1,6 @@
 import argparse
 from lib.gridworld import GridWorld, Action
-import q_learning
+import q_learn
 
 def setup_world(descriptor: str = "small", render: bool = False) -> GridWorld:
     description = ""
@@ -55,11 +55,13 @@ def main():
 
     # Run the specified algorithm
     if args.algorithm == "qlearn":
-        Q, policy = world.run_training(lambda w: q_learning.trainer(w, num_episodes=20000, follow_agent=args.follow_agent, show_policy=args.show_policy))
+        Q, policy, metrics = world.run_training(lambda w: q_learn.trainer(w, num_episodes=20000, follow_agent=args.follow_agent, show_policy=args.show_policy))
 
         print("Q-learning Policy:")
         for row in policy:
             print(' '.join([Action(action).name[0] for action in row]))
+
+        q_learn.plot_metrics(metrics)
     else:
         raise ValueError(f"Unsupported algorithm: {args.algorithm}")
 
