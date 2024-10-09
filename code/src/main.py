@@ -55,7 +55,13 @@ def main():
 
     # Run the specified algorithm
     if args.algorithm == "qlearn":
-        Q, policy, metrics = world.run_training(lambda w: q_learn.trainer(w, num_episodes=20000, follow_agent=args.follow_agent, show_policy=args.show_policy))
+        Q, policy, metrics = world.run_training(
+            lambda w: q_learn.trainer(
+                w,
+                num_episodes=20000,
+                follow_agent=args.follow_agent,
+                show_policy=args.show_policy
+            ))
 
         print("Q-learning Policy:")
         for row in policy:
