@@ -6,12 +6,13 @@ import time
 import random
 
 def train(world: GridWorld):
-    while world.running:
+    while not world.finished_training:
+        print("running")
         actions = world.get_actions()
         action = random.choice(actions)
-        new_state, done = world.step(action)
+        new_state, goal_reached = world.step(action)
         time.sleep(0.1)
-        if done:
+        if goal_reached:
             break
 
 description = """
