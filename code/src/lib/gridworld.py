@@ -67,9 +67,25 @@ class GridWorld:
         self.renderer_running = False
         self.finished_training = False
         self.lock = threading.Lock()
+        self.paused = False
 
     def get_actions(self) -> list[Action]:
         return [Action.LEFT, Action.RIGHT, Action.UP, Action.DOWN]
+
+    def get_valid_actions(self) -> list[Action]:
+        actions = []
+        x, y = self.state
+
+        if x > 0 and self.grid[y, x - 1] != Cell.WALL.value:
+            actions.append(Action.LEFT)
+        if x < len(self.grid[y]) - 1 and self.grid[y, x + 1] != Cell.WALL.value:
+            actions.append(Action.RIGHT)
+        if y > 0 and self.grid[y - 1, x] != Cell.WALL.value:
+            actions.append(Action.UP)
+        if y < len(self.grid) - 1 and self.grid[y + 1, x] != Cell.WALL.value:
+            actions.append(Action.DOWN)
+
+        return actions
 
     def step(self, action: Action) -> tuple[State, Cell]:
         x, y = self.state
@@ -197,15 +213,15 @@ class GridWorld:
                     action = self.policy[y, x]
                     policy_texture = ""
 
-                    # if cell == Cell.EMPTY.value:
-                    if action == Action.LEFT.value:
-                        policy_texture = "<"
-                    elif action == Action.RIGHT.value:
-                        policy_texture = ">"
-                    elif action == Action.UP.value:
-                        policy_texture = "^"
-                    elif action == Action.DOWN.value:
-                        policy_texture = "v"
+                    if cell == Cell.EMPTY.value:
+                        if action == Action.LEFT.value:
+                            policy_texture = "<"
+                        elif action == Action.RIGHT.value:
+                            policy_texture = ">"
+                        elif action == Action.UP.value:
+                            policy_texture = "^"
+                        elif action == Action.DOWN.value:
+                            policy_texture = "v"
 
                     rl.DrawTextEx(font, policy_texture.encode(), [x * self.font_size, y * self.font_size], self.font_size, 0, colors.ORANGE)
 
