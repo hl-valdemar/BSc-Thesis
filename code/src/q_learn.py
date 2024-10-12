@@ -181,9 +181,8 @@ if __name__ == "__main__":
         render=True,
     )
 
-    # Run Q-learning
-    num_episodes = 20000
-    Q, policy, metrics = world.run_training(lambda w: trainer(w, num_episodes))
+    # Train with Q-learning
+    Q, policy, metrics = world.run_training(lambda w: trainer(w, num_episodes=20000))
     print("Q-learning Policy:")
     for row in policy:
         print(' '.join([Action(action).name[0] for action in row]))

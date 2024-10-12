@@ -1,36 +1,176 @@
-import random
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from lib.gridworld import GridWorld, Cell, Action
 
-class GFlowNet:
-    def __init__(self, env, learning_rate=0.01) -> None:
-        self.env = env
-        self.lr = learning_rate
-        self.flows = {}  # (state, action) -> flow value
+# Constants for state and action sizes
+STATE_SIZE = 2  # x and y coordinates
+ACTION_SIZE = 4  # LEFT, RIGHT, UP, DOWN
 
-    def get_flow(self, state: tuple[int, int], action: str) -> float:
-        return self.flows.get((state, action), 1.0)  # Default to 1.0
+class GFlowNet(nn.Module):
+    def __init__(self):
+        super(GFlowNet, self).__init__()
 
-    def set_flow(self, state: tuple[int, int], action: str, value: float):
-        self.flows[(state, action)] = value
+        # Shared state embedding
+        self.state_embedding = nn.Sequential(
+            nn.Linear(STATE_SIZE, 128),
+            nn.ReLU(),
+        )
 
-    def sample_action(self, state: tuple[int, int]):
-        actions = self.env.get_actions()
-        flows = [self.get_flow(state, a) for a in actions]
-        total_flow = sum(flows)
-        probs = [f / total_flow for f in flows]
-        return random.choices(actions, weights=probs)[0]
+        # Forward policy network P_F(s -> a)
+        self.forward_policy = nn.Sequential(
+            nn.Linear(128, ACTION_SIZE),
+            nn.LogSoftmax(dim=-1)  # Use LogSoftmax for numerical stability
+        )
 
-    def train_step(self, trajectory: list[tuple[tuple[int, int], str]]):
-        for t in range(len(trajectory) - 1):
-            state, action = trajectory[t]
-            next_state = trajectory[t+1][0]
+        # State flow F(s)
+        self.state_flow = nn.Sequential(
+            nn.Linear(128, 1),
+            nn.Softplus()  # Ensure positivity
+        )
 
-            # Calculate incoming and outgoing flows
-            incoming_flow = self.get_flow(state, action)
-            outgoing_flow = sum(self.get_flow(next_state, a) for a in self.env.get_actions())
+    def forward(self, state_tensor):
+        embedding = self.state_embedding(state_tensor)
+        log_forward_policy = self.forward_policy(embedding)
+        flow = self.state_flow(embedding)
+        return log_forward_policy, flow.squeeze()
 
-            if t == len(trajectory) - 2:  # Last transition
-                outgoing_flow = 1.0  # Terminal state has reward/outgoing flow of 1
+def reward(state, env: GridWorld):
+    x, y = state
+    if env.grid[y, x] == Cell.GOAL.value:
+        return 1.0  # Positive reward for reaching the goal
+    else:
+        return 0.0  # Zero reward for non-goal states
 
-            # Update flow to satisfy consistency equation
-            flow_update = self.lr * (outgoing_flow - incoming_flow)
-            self.set_flow(state, action, self.get_flow(state, action) + flow_update)
+
+def trainer(env: GridWorld, num_episodes=10000, max_steps_per_episode=50):
+    flow_network = GFlowNet()
+    optimizer = optim.Adam(flow_network.parameters(), lr=1e-3)
+
+    for episode in range(num_episodes):
+        state = env.reset()
+        trajectory = []
+        done = False
+        steps = 0
+
+        while not done and steps < max_steps_per_episode:
+            state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+
+            # Get log probabilities and flow
+            log_probs, flow = flow_network(state_tensor)
+
+            # Sample an action
+            action_distribution = torch.exp(log_probs).squeeze().detach().numpy()
+            action = np.random.choice(ACTION_SIZE, p=action_distribution)
+            action_enum = Action(action)
+
+            # Take a step in the environment
+            next_state, cell = env.step(action_enum)
+
+            # Store the transition
+            trajectory.append((state, action, next_state))
+
+            # Check if we've reached the goal
+            if cell == Cell.GOAL.value:
+                done = True
+
+            state = next_state
+            steps += 1
+
+            if steps % 10 == 0 or done:  # Update every 10 steps or at the end of an episode
+                current_optimal_policy = optimal_policy(env, flow_network)
+                env.set_policy(current_optimal_policy, render_policy=True)
+
+            state = next_state
+            steps += 1
+
+        # Compute the loss over the trajectory
+        loss = compute_flow_loss(trajectory, flow_network, env)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if episode % 100 == 0:
+            print(f"Episode {episode}, Loss: {loss.item()}")
+            current_optimal_policy = optimal_policy(env, flow_network)
+            env.set_policy(current_optimal_policy, render_policy=True)
+            print("Current optimal policy:")
+            for row in current_optimal_policy:
+                print(' '.join([Action(action).name[0] for action in row]))
+
+    return flow_network
+
+def compute_flow_loss(trajectory, flow_network, env):
+    loss = torch.tensor(0.0, requires_grad=True)
+    trajectory_length = len(trajectory)
+
+    for t in range(trajectory_length):
+        state, action, next_state = trajectory[t]
+
+        # Convert states to tensors
+        state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+        next_state_tensor = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0)
+
+        # Get log probabilities and flows
+        log_probs_s, flow_s = flow_network(state_tensor)
+        log_probs_s_prime, flow_s_prime = flow_network(next_state_tensor)
+
+        # Get the log probability of the taken action
+        log_p_forward = log_probs_s[0, action]
+
+        # Compute F_in(s') = F(s) * P_F(s -> s')
+        F_in_s_prime = flow_s * torch.exp(log_p_forward)
+
+        # Reward at next_state
+        R_s_prime = reward(next_state, env)
+        R_s_prime = torch.tensor(R_s_prime, dtype=torch.float32)
+
+        # Flow consistency at next_state: F_in(s') + R(s') = F(s')
+        flow_consistency = F_in_s_prime + R_s_prime - flow_s_prime
+
+        # Accumulate squared error
+        loss = loss + torch.pow(flow_consistency, 2)
+
+    # Average the loss over the trajectory
+    loss = loss / trajectory_length
+    return loss
+
+def optimal_policy(env: GridWorld, flow_network: GFlowNet):
+    policy_grid = np.full((env.height, env.width), -1, dtype=int)
+
+    for y in range(env.height):
+        for x in range(env.width):
+            cell = env.grid[y, x]
+            if cell == Cell.WALL.value or cell == Cell.OBSTACLE.value:
+                policy_grid[y, x] = -1
+                pass
+            else:
+                state_tensor = torch.tensor([x, y], dtype=torch.float32).unsqueeze(0)
+                log_probs, _ = flow_network(state_tensor)
+                action_probs = torch.exp(log_probs).detach().numpy().squeeze()
+                best_action = np.argmax(action_probs)
+                policy_grid[y, x] = int(best_action)
+
+    return policy_grid
+
+if __name__ == "__main__":
+    description = """
+    ##########
+    #s #     #
+    #  #  #  #
+    #  #  o  #
+    #     # g#
+    ##########
+    """
+    world = GridWorld(
+        description,
+        font_size=40,
+        font_path="/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Regular.ttf",
+        render=True,
+    )
+
+    # Train the GFlowNet
+    world.run_training(lambda w: trainer(w, num_episodes=20000))

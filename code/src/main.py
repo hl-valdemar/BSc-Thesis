@@ -41,12 +41,13 @@ def setup_world(descriptor: str = "small", render: bool = False) -> GridWorld:
 
 def main():
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Run reinforcement learning algorithms on a GridWorld")
+    parser = argparse.ArgumentParser(description="Run reinforcement learning algorithms in a Grid World")
     parser.add_argument("-a", "--algorithm", choices=["qlearn"], help="The algorithm used for training", required=True)
     parser.add_argument("-s", "--world-size", choices=["small", "large"], default="small", help="The size of the world")
     parser.add_argument("-f", "--follow-agent", action="store_true", help="Follow the agent during training")
     parser.add_argument("-r", "--render", action="store_true", help="Render the GridWorld")
     parser.add_argument("-p", "--show-policy", action="store_true", help="Render the policy during training")
+    parser.add_argument("-m", "--plot-metrics", action="store_true", help="Plot the training metrics")
 
     args = parser.parse_args()
 
@@ -63,11 +64,12 @@ def main():
                 show_policy=args.show_policy
             ))
 
-        print("Q-learning Policy:")
+        print("Learned policy: (Q-learning)")
         for row in policy:
             print(' '.join([Action(action).name[0] for action in row]))
 
-        q_learn.plot_metrics(metrics)
+        if args.plot_metrics:
+            q_learn.plot_metrics(metrics)
     else:
         raise ValueError(f"Unsupported algorithm: {args.algorithm}")
 

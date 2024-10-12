@@ -13,6 +13,7 @@ class Cell(Enum):
     OBSTACLE = 4
 
 class Action(Enum):
+    INVALID = -1
     LEFT = 0
     RIGHT = 1
     UP = 2
@@ -145,8 +146,8 @@ class GridWorld:
         rl.CloseWindow()
 
     def _render_loop(self):
-        rl.InitWindow(self.width * self.font_size, self.height * self.font_size, b"BSc :: GridWorld")
         rl.SetTraceLogLevel(rl.RL_LOG_NONE)
+        rl.InitWindow(self.width * self.font_size, self.height * self.font_size, b"BSc :: GridWorld")
         rl.SetTargetFPS(30)
 
         font = rl.LoadFont(self.font_path.encode())
@@ -196,15 +197,15 @@ class GridWorld:
                     action = self.policy[y, x]
                     policy_texture = ""
 
-                    if cell == Cell.EMPTY.value:
-                        if action == Action.LEFT.value:
-                            policy_texture = "<"
-                        elif action == Action.RIGHT.value:
-                            policy_texture = ">"
-                        elif action == Action.UP.value:
-                            policy_texture = "^"
-                        elif action == Action.DOWN.value:
-                            policy_texture = "v"
+                    # if cell == Cell.EMPTY.value:
+                    if action == Action.LEFT.value:
+                        policy_texture = "<"
+                    elif action == Action.RIGHT.value:
+                        policy_texture = ">"
+                    elif action == Action.UP.value:
+                        policy_texture = "^"
+                    elif action == Action.DOWN.value:
+                        policy_texture = "v"
 
                     rl.DrawTextEx(font, policy_texture.encode(), [x * self.font_size, y * self.font_size], self.font_size, 0, colors.ORANGE)
 

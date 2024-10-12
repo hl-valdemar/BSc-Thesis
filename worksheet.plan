@@ -31,7 +31,7 @@
           "uncollapsedSizeY": 32,
           "contents": "Checkbox",
           "properties": {
-            "checked": false,
+            "checked": true,
             "description": "Getting started",
             "filepath": ""
           }
@@ -84,7 +84,7 @@
           "uncollapsedSizeY": 160,
           "contents": "Checkbox",
           "properties": {
-            "checked": false,
+            "checked": true,
             "description": "Implement basic Q-learning to find an optimal policy for navigating the state-space",
             "filepath": ""
           }
