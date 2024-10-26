@@ -4,6 +4,7 @@ import threading
 from raylib import rl, colors
 import time
 from enum import Enum
+import torch
 
 class Cell(Enum):
     EMPTY = 0
@@ -13,7 +14,7 @@ class Cell(Enum):
     OBSTACLE = 4
 
 class Action(Enum):
-    INVALID = -1
+    # INVALID = -1
     LEFT = 0
     RIGHT = 1
     UP = 2
@@ -37,6 +38,15 @@ class GridWorld:
         self.state_count = 0
         self.action_size = 4
         self.grid = np.zeros((self.height, self.width), dtype=int)
+        self.grid_visited = np.zeros((self.height, self.width), dtype=bool)
+        # self.grid_visited = [[False for _ in range(self.width)] for _ in range(self.height)]
+        self.actions = [Action.UP, Action.DOWN, Action.LEFT, Action.RIGHT]
+        self.action_dict = {
+            Action.UP: (0, -1),
+            Action.DOWN: (0, 1),
+            Action.LEFT: (-1, 0),
+            Action.RIGHT: (1, 0),
+        }
 
         state: State | None = None
         for y, row in enumerate(description.split("\n")):
@@ -44,8 +54,9 @@ class GridWorld:
                 if cell == "#":
                     self.grid[y, x] = Cell.WALL.value
                 elif cell == "s":
-                    self.grid[y, x] = Cell.AGENT_SPAWN.value
                     state = (x, y)
+                    self.grid[y, x] = Cell.AGENT_SPAWN.value
+                    self.grid_visited[y, x] = True
                     self.state_count += 1
                 elif cell == "g":
                     self.grid[y, x] = Cell.GOAL.value
@@ -69,23 +80,32 @@ class GridWorld:
         self.lock = threading.Lock()
         self.paused = False
 
-    def get_actions(self) -> list[Action]:
-        return [Action.LEFT, Action.RIGHT, Action.UP, Action.DOWN]
+    def get_valid_actions(self) -> tuple[list[Action], torch.Tensor]:
+        return self.get_valid_actions_for_state(self.state)
 
-    def get_valid_actions(self) -> list[Action]:
-        actions = []
-        x, y = self.state
+    def get_valid_actions_for_state(self, state: State) -> tuple[list[Action], torch.Tensor]:
+        available = []
+        mask = torch.zeros(len(self.actions))
+        for i, action in enumerate(self.actions):
+            delta = self.action_dict[action]
+            new_row = state[0] + delta[0]
+            new_col = state[1] + delta[1]
+            if 0 <= new_row < self.width and 0 <= new_col < self.height:
+                available.append(action)
+                mask[i] = 1.0
+        return available, mask
 
-        if x > 0 and self.grid[y, x - 1] != Cell.WALL.value:
-            actions.append(Action.LEFT)
-        if x < len(self.grid[y]) - 1 and self.grid[y, x + 1] != Cell.WALL.value:
-            actions.append(Action.RIGHT)
-        if y > 0 and self.grid[y - 1, x] != Cell.WALL.value:
-            actions.append(Action.UP)
-        if y < len(self.grid) - 1 and self.grid[y + 1, x] != Cell.WALL.value:
-            actions.append(Action.DOWN)
-
-        return actions
+    def get_parents_for_state(self, state: State) -> tuple[list[State], list[int]]:
+        parents: list[State] = []
+        parent_actions_idx: list[int] = []
+        for i, action in enumerate(self.actions):
+            delta = self.action_dict[action]
+            prev_row = state[0] - delta[0]
+            prev_col = state[1] - delta[1]
+            if 0 <= prev_row < self.width and 0 <= prev_col < self.height:
+                parents.append((prev_row, prev_col))
+                parent_actions_idx.append(i)
+        return parents, parent_actions_idx
 
     def step(self, action: Action) -> tuple[State, Cell]:
         x, y = self.state
@@ -162,8 +182,10 @@ class GridWorld:
         rl.CloseWindow()
 
     def _render_loop(self):
+        font_scale = 0.75
+
         rl.SetTraceLogLevel(rl.RL_LOG_NONE)
-        rl.InitWindow(self.width * self.font_size, self.height * self.font_size, b"BSc :: GridWorld")
+        rl.InitWindow(int(self.width * self.font_size * font_scale), int(self.height * self.font_size * font_scale), b"BSc :: GridWorld")
         rl.SetTargetFPS(30)
 
         font = rl.LoadFont(self.font_path.encode())
@@ -181,13 +203,13 @@ class GridWorld:
                 grid_copy = self.grid.copy()
 
             # Draw grid (doesn't need to be locked since it's read-only)
-            self._draw_grid(grid_copy, font)
+            self._draw_grid(grid_copy, font, font_scale)
 
             rl.EndDrawing()
 
         rl.CloseWindow()
 
-    def _draw_grid(self, grid, font):
+    def _draw_grid(self, grid, font, font_scale_factor: float):
         for y in range(self.height):
             for x in range(self.width):
                 cell = grid[y, x]
@@ -207,7 +229,11 @@ class GridWorld:
                     color = colors.RED
                     texture = b"o"
 
-                rl.DrawTextEx(font, texture, [x * self.font_size, y * self.font_size], self.font_size, 0, color)
+                screen_pos = [
+                    x * self.font_size * font_scale_factor,
+                    y * self.font_size * font_scale_factor
+                ];
+                rl.DrawTextEx(font, texture, screen_pos, self.font_size, 0, color)
 
                 if self.render_policy and self.policy is not None:
                     action = self.policy[y, x]
@@ -222,8 +248,14 @@ class GridWorld:
                             policy_texture = "^"
                         elif action == Action.DOWN.value:
                             policy_texture = "v"
+                        elif action == Action.INVALID.value:
+                            policy_texture = "x"
 
-                    rl.DrawTextEx(font, policy_texture.encode(), [x * self.font_size, y * self.font_size], self.font_size, 0, colors.ORANGE)
+                    rl.DrawTextEx(font, policy_texture.encode(), screen_pos, self.font_size, 0, colors.ORANGE)
 
         agent_x, agent_y = self.state
-        rl.DrawTextEx(font, b"A", [agent_x * self.font_size, agent_y * self.font_size], self.font_size, 0, colors.BLUE)
+        screen_pos = [
+            agent_x * self.font_size * font_scale_factor,
+            agent_y * self.font_size * font_scale_factor
+        ]
+        rl.DrawTextEx(font, b"A", screen_pos, self.font_size, 0, colors.BLUE)

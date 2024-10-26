@@ -22,9 +22,9 @@ def setup_world(descriptor: str = "small", render: bool = False) -> GridWorld:
         #     #  #     #  #
         #oo####  #oo####  #
         #g #     #  #     #
-        #  #  #  #  #  #  #
+        #  #  #     #  #  #
         #  #  o     #  o  #
-        #     #  #     #  #
+        #     #  #     #g #
         ###################
         """
     else:
@@ -59,7 +59,7 @@ def main():
         Q, policy, metrics = world.run_training(
             lambda w: q_learn.trainer(
                 w,
-                num_episodes=20000,
+                num_episodes=50000,
                 follow_agent=args.follow_agent,
                 show_policy=args.show_policy
             ))

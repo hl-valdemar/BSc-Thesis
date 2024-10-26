@@ -1,194 +1,250 @@
-import random
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from lib.gridworld import GridWorld, Cell, Action
+from torch.distributions.categorical import Categorical
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import tqdm
 
-# Constants for state and action sizes
-STATE_SIZE = 2  # x and y coordinates
-ACTION_SIZE = 4  # LEFT, RIGHT, UP, DOWN
+GRID_SIZE: tuple[int, int] = (5, 5)  # Grid dimensions (rows, columns)
+START_POS: tuple[int, int] = (0, 0)  # Starting position (row, column)
+GOAL_POS: tuple[int, int] = (4, 4)   # Goal position
+ACTIONS: list[str] = ['up', 'down', 'left', 'right']  # Possible actions
+ACTION_DICT = {
+    'up': (-1, 0),
+    'down': (1, 0),
+    'left': (0, -1),
+    'right': (0, 1)
+}
 
-class GFlowNet(nn.Module):
-    def __init__(self):
-        super(GFlowNet, self).__init__()
+def state_to_tensor(state):
+    """Converts the grid position to a one-hot tensor."""
+    tensor = torch.zeros(GRID_SIZE[0], GRID_SIZE[1])
+    tensor[state] = 1.0
+    return tensor.flatten()
 
-        # Shared state embedding
-        self.state_embedding = nn.Sequential(
-            nn.Linear(STATE_SIZE, 128),
-            nn.ReLU(),
-        )
-
-        # Forward policy network P_F(s -> a)
-        self.forward_policy = nn.Sequential(
-            nn.Linear(128, ACTION_SIZE),
-            nn.LogSoftmax(dim=-1)  # Use LogSoftmax for numerical stability
-        )
-
-        # State log flow log F(s)
-        self.state_log_flow = nn.Linear(128, 1)
-
-    def forward(self, state_tensor):
-        embedding = self.state_embedding(state_tensor)
-        log_forward_policy = self.forward_policy(embedding)
-        log_flow = self.state_log_flow(embedding)
-        return log_forward_policy, log_flow.squeeze()
-
-def reward(state, env: GridWorld):
-    x, y = state
-    if env.grid[y, x] == Cell.GOAL.value:
+def get_reward(state):
+    if state == GOAL_POS:
         return 1.0  # Positive reward for reaching the goal
     else:
-        return 0.0  # Zero reward for non-goal states
+        return 0.0
 
+class FlowModel(nn.Module):
+    def __init__(self, num_hidden=128):
+        super().__init__()
+        self.mlp = nn.Sequential(
+            nn.Linear(GRID_SIZE[0] * GRID_SIZE[1], num_hidden),
+            nn.ReLU(),
+            nn.Linear(num_hidden, num_hidden),
+            nn.ReLU(),
+            nn.Linear(num_hidden, len(ACTIONS)),
+        )
 
-def trainer(
-    env: GridWorld,
-    num_episodes=10000,
-    max_steps_per_episode=50,
-    show_policy: bool = False,
-):
-    flow_network = GFlowNet()
-    optimizer = optim.Adam(flow_network.parameters(), lr=1e-3)
+    def forward(self, state_tensor, available_actions_mask):
+        logits = self.mlp(state_tensor) # Shape: [batch_size, len(ACTIONS)]
+        # Ensure positive flows and mask unavailable actions
+        flows = (logits.exp() * available_actions_mask)
+        return flows
 
-    for episode in range(num_episodes):
-        state = env.reset()
-        trajectory = []
-        done = False
-        steps = 0
+def get_available_actions(state):
+    if state == GOAL_POS:
+           return [], torch.zeros(len(ACTIONS))
 
-        while not done and steps < max_steps_per_episode:
-            state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+    available = []
+    mask = torch.zeros(len(ACTIONS))
+    for i, action in enumerate(ACTIONS):
+        delta = ACTION_DICT[action]
+        new_row = state[0] + delta[0]
+        new_col = state[1] + delta[1]
+        if 0 <= new_row < GRID_SIZE[0] and 0 <= new_col < GRID_SIZE[1]:
+            available.append(action)
+            mask[i] = 1.0
+    return available, mask
 
-            # Get log probabilities and flow
-            log_probs, flow = flow_network(state_tensor)
+def get_parents(state):
+    parents = []
+    parent_actions = []
+    for i, action in enumerate(ACTIONS):
+        delta = ACTION_DICT[action]
+        prev_row = state[0] - delta[0]
+        prev_col = state[1] - delta[1]
+        if 0 <= prev_row < GRID_SIZE[0] and 0 <= prev_col < GRID_SIZE[1]:
+            parents.append((prev_row, prev_col))
+            parent_actions.append(i)
+    return parents, parent_actions
 
-            # Sample an action
-            action_distribution = torch.exp(log_probs).squeeze().detach().numpy()
-            epsilon = max(0.1, 1 - episode / (num_episodes / 2))  # Decrease epsilon over time
-            # if np.random.rand() < epsilon:
-            #     action = np.random.choice(ACTION_SIZE)
-            # else:
-            action = np.random.choice(ACTION_SIZE, p=action_distribution)
+# Initialize the model and optimizer
+flow_model = FlowModel()
+optimizer = torch.optim.Adam(flow_model.parameters(), lr=1e-3)
 
-            # Take a step in the environment
-            next_state, cell = env.step(Action(action))
+# Training parameters
+num_episodes = 5000
+update_freq = 10  # Update model every 'update_freq' episodes
+losses = []
 
-            # Store the transition
-            trajectory.append((state, action, next_state))
+for episode in tqdm.tqdm(range(num_episodes)):
+    state = START_POS
+    trajectory: list[tuple[int, int]] = [state]
+    state_tensor = state_to_tensor(state)
+    done = False
 
-            # Check if we've reached the goal
-            if cell == Cell.GOAL.value:
-                done = True
+    while not done:
+        minibatch_loss = torch.tensor(0.0, requires_grad=True)
 
-            state = next_state
-            steps += 1
+        # Get available actions and mask
+        available_actions, action_mask = get_available_actions(state)
+        action_mask = action_mask.float()
 
-            if show_policy:
-                current_optimal_policy = optimal_policy(env, flow_network)
-                env.set_policy(current_optimal_policy, render_policy=True)
+        # Predict flows F(s, a)
+        flows = flow_model(state_tensor, action_mask)
+        assert flows.shape == (len(ACTIONS),)
 
-        # Compute the loss over the trajectory
-        loss = compute_flow_loss(trajectory, flow_network, env)
-        if torch.isnan(loss) or torch.isinf(loss):
-            print("Encountered NaN or Inf in loss!")
-            # Take appropriate action (e.g., skip the update, reset the network)
+        # Compute policy (avoid division by zero)
+        epsilon = 1e-8
+        policy = flows / (flows.sum() + epsilon)
 
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        # Sample action
+        action_dist = Categorical(probs=policy)
+        action_idx = action_dist.sample().item()
+        action = ACTIONS[action_idx]
 
-        if episode % 100 == 0:
-            print(f"Episode {episode}/{num_episodes}, Loss: {loss.item()}")
-            current_optimal_policy = optimal_policy(env, flow_network)
-            env.set_policy(current_optimal_policy, render_policy=True)
-            print("Current optimal policy:")
-            for row in current_optimal_policy:
-                print(" ".join([Action(action).name[0] if action != -1 else "#" for action in row]))
+        # Move to next state
+        delta = ACTION_DICT[action]
+        new_state = (state[0] + delta[0], state[1] + delta[1])
+        new_state_tensor = state_to_tensor(new_state)
+        trajectory.append(new_state)
 
-    return flow_network
+        # Get parents of the new state
+        parent_states, parent_actions = get_parents(new_state)
 
-def compute_flow_loss(trajectory, flow_network, env):
-    loss = torch.tensor(0.0)
-    trajectory_length = len(trajectory)
+        # Compute parent flows
+        parent_flows = []
+        for parent_state, parent_action_idx in zip(parent_states, parent_actions):
+            parent_state_tensor = state_to_tensor(parent_state)
+            _, parent_action_mask = get_available_actions(parent_state)
+            parent_action_mask = parent_action_mask.float()
+            parent_flow = flow_model(parent_state_tensor, parent_action_mask)[parent_action_idx]
+            parent_flows.append(parent_flow)
+        parent_flows = torch.stack(parent_flows)
 
-    for t in range(trajectory_length):
-        state, action, next_state = trajectory[t]
-
-        # Convert states to tensors
-        state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
-        next_state_tensor = torch.tensor(next_state, dtype=torch.float32).unsqueeze(0)
-
-        # Get log probabilities and log flows
-        log_probs_s, log_flow_s = flow_network(state_tensor)
-        log_probs_s_prime, log_flow_s_prime = flow_network(next_state_tensor)
-
-        # Get the log probability of the taken action
-        log_p_forward = log_probs_s[0, action]
-
-        # Compute log F_in(s') = log F(s) + log P_F(s -> s')
-        log_F_in_s_prime = log_flow_s + log_p_forward
-
-        # Reward at next_state
-        R_s_prime = reward(next_state, env)
-        if R_s_prime > 0:
-            log_R_s_prime = torch.log(torch.tensor(R_s_prime))
-            # Use log-sum-exp to compute log(F_in(s') + R(s'))
-            log_sum = torch.logsumexp(torch.stack([log_F_in_s_prime, log_R_s_prime]), dim=0)
+        # Compute child flows
+        _, child_action_mask = get_available_actions(new_state)
+        child_action_mask = child_action_mask.float()
+        if new_state == GOAL_POS:
+            child_flows = torch.zeros(len(ACTIONS))
+            reward = get_reward(new_state)
+            done = True
         else:
-            log_sum = log_F_in_s_prime  # No reward to add
+            child_flows = flow_model(new_state_tensor, child_action_mask)
+            reward = 0.0
 
-        # Flow consistency at next_state: log_sum = log F(s')
-        flow_consistency = log_sum - log_flow_s_prime
+        # Flow matching loss
+        total_in_flow = parent_flows.sum()
+        total_out_flow = child_flows.sum() + reward
+        flow_loss = (total_in_flow - total_out_flow).pow(2)
+        minibatch_loss = minibatch_loss + flow_loss
 
-        # Accumulate squared error
-        loss += flow_consistency.pow(2)
+        # Prepare for next iteration
+        state = new_state
+        state_tensor = new_state_tensor
 
-    loss = loss / trajectory_length
-    return loss
+        # Update model
+        minibatch_loss = minibatch_loss / len(trajectory) # Normalize the loss
+        losses.append(minibatch_loss.item())
+        minibatch_loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+        minibatch_loss = 0
 
-def optimal_policy(env: GridWorld, flow_network: GFlowNet):
-    policy_grid = np.full((env.height, env.width), -1, dtype=int)
+plt.plot(losses)
+plt.xlabel('Updates')
+plt.ylabel('Flow Matching Loss')
+plt.title('Training Loss')
+plt.show()
 
-    for y in range(env.height):
-        for x in range(env.width):
-            cell = env.grid[y, x]
-            if cell == Cell.WALL.value or cell == Cell.OBSTACLE.value:
-                policy_grid[y, x] = -1
-                pass
-            else:
-                state_tensor = torch.tensor([x, y], dtype=torch.float32).unsqueeze(0)
-                log_probs, _ = flow_network(state_tensor)
-                action_probs = torch.exp(log_probs).detach().numpy().squeeze()
-                best_action = np.argmax(action_probs)
-                policy_grid[y, x] = int(best_action)
+plt.plot(np.log(losses))
+plt.xlabel('Updates')
+plt.ylabel('Log Flow Matching Loss')
+plt.title('Log Training Loss')
+plt.show()
 
-    return policy_grid
+def generate_trajectory(max_steps: int = 100, temperature: float = 1.0) -> list[tuple[int, int]]:
+    state = START_POS
+    trajectory = [state]
+    state_tensor = state_to_tensor(state)
+    done = False
+    steps = 0
+    visited_states = set()
+    visited_states.add(state)
 
-if __name__ == "__main__":
-    # description = """
-    # ##########
-    # #s #     #
-    # #  #  #  #
-    # #  #  o  #
-    # #     # g#
-    # ##########
-    # """
-    description = """
-    ##########
-    #s       #
-    #        #
-    #        #
-    #       g#
-    ##########
-    """
-    world = GridWorld(
-        description,
-        font_size=40,
-        font_path="/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Regular.ttf",
-        render=True,
-    )
+    while not done and steps < max_steps:
+        available_actions, action_mask = get_available_actions(state)
+        action_mask = action_mask.float()
+        flows = flow_model(state_tensor, action_mask)
+        policy = flows / flows.sum()
 
-    # Train the GFlowNet
-    world.run_training(lambda w: trainer(w, num_episodes=20000, show_policy=True))
+        # # Apply temperature to policy
+        # policy = policy ** (1 / temperature)
+        # policy = policy / policy.sum()
+
+        # Sample action from policy
+        action_dist = Categorical(probs=policy)
+        action_idx = action_dist.sample().item()
+        action = ACTIONS[action_idx]
+
+        # Move to next state
+        delta = ACTION_DICT[action]
+        new_state = (state[0] + delta[0], state[1] + delta[1])
+        trajectory.append(new_state)
+
+        # Check if the new state is the goal
+        if new_state == GOAL_POS:
+            done = True
+        elif new_state in visited_states:
+            print("Detected a loop in the trajectory. Terminating.")
+            break
+        else:
+            visited_states.add(new_state)
+
+        # Prepare for next iteration
+        state = new_state
+        state_tensor = state_to_tensor(state)
+        steps += 1
+
+    if not done:
+        print("Failed to reach the goal within the maximum number of steps.")
+    return trajectory
+
+def plot_trajectory(trajectory):
+    fig, ax = plt.subplots()
+    ax.set_xlim(-0.5, GRID_SIZE[1] - 0.5)
+    ax.set_ylim(-0.5, GRID_SIZE[0] - 0.5)
+    ax.set_xticks(range(GRID_SIZE[1]))
+    ax.set_yticks(range(GRID_SIZE[0]))
+    ax.invert_yaxis()
+    ax.grid(True)
+
+    # Plot start and goal
+    ax.add_patch(patches.Rectangle((START_POS[1] - 0.5, START_POS[0] - 0.5), 1, 1, facecolor='green', alpha=0.5))
+    ax.add_patch(patches.Rectangle((GOAL_POS[1] - 0.5, GOAL_POS[0] - 0.5), 1, 1, facecolor='red', alpha=0.5))
+
+    # Plot trajectory
+    for i in range(len(trajectory) - 1):
+        current = trajectory[i]
+        next_state = trajectory[i + 1]
+        plt.arrow(
+            current[1], current[0],
+            next_state[1] - current[1], next_state[0] - current[0],
+            head_width=0.1, length_includes_head=True, color='blue'
+        )
+
+    plt.show()
+
+# Generate and plot a trajectory
+trajectory = generate_trajectory()
+retries = 0
+while not GOAL_POS in trajectory:
+    retries += 1
+    print(f"Trajectory did not lead to goal: retrying... ({retries})")
+    trajectory = generate_trajectory()
+plot_trajectory(trajectory)
