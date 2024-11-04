@@ -15,6 +15,8 @@
           # select Python packages here
           numpy
           torch
+          matplotlib
+          raylib
         ]))
       ];
 
