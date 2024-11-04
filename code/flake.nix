@@ -18,6 +18,7 @@
           matplotlib
           raylib
         ]))
+        raylib
       ];
 
       shellHook = ''
