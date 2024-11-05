@@ -1,190 +1,275 @@
-import time
-import random
+from typing import Dict, NamedTuple, Optional, Tuple, List
 import numpy as np
-from numpy.typing import NDArray
+import random
+from enum import Enum, global_enum_repr
 import matplotlib.pyplot as plt
-from lib.gridworld import Action, Cell, GridWorld, State
+from collections import deque
 
-def trainer(
-    world: GridWorld,
-    num_episodes: int,
-    learning_rate: float = 0.1,
-    discount_factor: float = 0.9,
-    epsilon: float = 0.1,
-    max_steps: int = 1000,
-    follow_agent: bool = False,
-    show_policy: bool = False,
-) -> tuple[np.ndarray, np.ndarray, dict]:
-    Q = np.zeros((world.height, world.width, world.action_size))
+class Action(Enum):
+    UP = 0
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
 
-    # Performance metrics
-    metrics = {
-        "episode_lengths": [],
-        "cumulative_rewards": [],
-        "success_rate": [],
-        "average_q_values": [],
-        "q_value_variance": [],
-        "q_value_std": [],
-    }
+class EpisodeMetrics(NamedTuple):
+    """Stores metrics for a single episode."""
+    total_reward: float
+    steps: int
+    success: bool
+    final_position: Tuple[int, int]
 
-    # Pre-compute valid actions and rewards for each state
-    valid_actions = np.ones((world.height, world.width, world.action_size), dtype=bool)
-    rewards = np.full((world.height, world.width, world.action_size), -1)
+class TrainingMetrics:
+    """Tracks and computes various training metrics."""
+    def __init__(self, window_size: int = 100) -> None:
+        self.episode_metrics: List[EpisodeMetrics] = []
+        self.window_size = window_size
+        
+    def add_episode(self, metrics: EpisodeMetrics) -> None:
+        """Add metrics for a single episode."""
+        self.episode_metrics.append(metrics)
 
-    for y in range(world.height):
-        for x in range(world.width):
-            cell = world.grid[y, x]
+    def get_success_rate(self, window: Optional[int] = None) -> float:
+        """Calculate success rate over last n episodes."""
+        n = window or len(self.episode_metrics)
+        if not self.episode_metrics:
+            return 0.0
+        recent_episodes = self.episode_metrics[-n:]
+        return sum(1 for m in recent_episodes if m.success) / len(recent_episodes)
 
-            if cell == Cell.WALL.value:
-                valid_actions[y, x, :] = False
-                rewards[y, x, :] = -5
-            elif cell == Cell.EMPTY.value:
-                rewards[y, x, :] = -1
-            elif cell == Cell.GOAL.value:
-                rewards[y, x, :] = 100
-            elif cell == Cell.OBSTACLE.value:
-                rewards[y, x, :] = -100
+    def get_average_reward(self, window: Optional[int] = None) -> float:
+        """Calculate average reward over last n episodes."""
+        n = window or len(self.episode_metrics)
+        if not self.episode_metrics:
+            return 0.0
+        recent_episodes = self.episode_metrics[-n:]
+        return sum(m.total_reward for m in recent_episodes) / len(recent_episodes)
 
-            if x == 0:
-                valid_actions[y, x, Action.LEFT.value] = False
-            if x == world.width - 1:
-                valid_actions[y, x, Action.RIGHT.value] = False
-            if y == 0:
-                valid_actions[y, x, Action.UP.value] = False
-            if y == world.height - 1:
-                valid_actions[y, x, Action.DOWN.value] = False
+    def get_average_steps(self, window: Optional[int] = None) -> float:
+        """Calculate average steps over last n episodes."""
+        n = window or len(self.episode_metrics)
+        if not self.episode_metrics:
+            return 0.0
+        recent_episodes = self.episode_metrics[-n:]
+        return sum(m.steps for m in recent_episodes) / len(recent_episodes)
+        
+    def plot_metrics(self, save_path: Optional[str] = None) -> None:
+        """Plot training metrics."""
+        episodes = list(range(1, len(self.episode_metrics) + 1))
+        rewards = [m.total_reward for m in self.episode_metrics]
+        steps = [m.steps for m in self.episode_metrics]
+        successes = [m.success for m in self.episode_metrics]
 
-    for episode in range(num_episodes):
-        if (episode) % 1000 == 0:
-            print(f"Episode {episode}/{num_episodes}")
+        # Calculate moving averages
+        window = min(self.window_size, len(episodes))
+        reward_ma = np.convolve(rewards, np.ones(window)/window, mode="valid")
+        steps_ma = np.convolve(steps, np.ones(window)/window, mode="valid")
+        successes_ma = np.convolve(successes, np.ones(window)/window, mode="valid")
 
-        state = world.reset()
+        fig, axes = plt.subplots(3, 1, figsize=(10, 12))
+
+        # Plot rewards
+        axes[0].plot(episodes, rewards, alpha=0.3, color="blue")
+        axes[0].plot(range(window, len(episodes) + 1), reward_ma, color="blue", linewidth=2)
+        axes[0].set_title("Episode Rewards")
+        axes[0].set_xlabel("Episode")
+        axes[0].set_ylabel("Total Reward")
+        axes[0].grid(True)
+
+        # Plot steps
+        axes[1].plot(episodes, steps, alpha=0.3, color="green")
+        axes[1].plot(range(window, len(episodes) + 1), reward_ma, color="green", linewidth=2)
+        axes[1].set_title("Steps per Episode")
+        axes[1].set_xlabel("Episode")
+        axes[1].set_ylabel("Steps")
+        axes[1].grid(True)
+
+        # Plot success rate
+        axes[2].plot(episodes, successes, alpha=0.3, color="orange")
+        axes[2].plot(range(window, len(episodes) + 1), reward_ma, color="orange", linewidth=2)
+        axes[2].set_title("Success Rate")
+        axes[2].set_xlabel("Episode")
+        axes[2].set_ylabel("Success Rate")
+        axes[2].grid(True)
+
+        plt.tight_layout()
+        if save_path:
+            plt.savefig(save_path)
+        plt.show()
+
+class GridWorld:
+    def __init__(self, width: int, height: int, start_pos: Tuple[int, int], 
+                 goal_pos: Tuple[int, int], obstacles: List[Tuple[int, int]]) -> None:
+        self.width = width
+        self.height = height
+        self.start_pos = start_pos
+        self.goal_pos = goal_pos
+        self.obstacles = obstacles
+        self.current_pos = start_pos
+        self.max_steps = width * height * 2 # Maximum steps before episode termination
+        
+    def reset(self) -> Tuple[int, int]:
+        """Reset the environment to initial state."""
+        self.current_pos = self.start_pos
+        return self.current_pos
+    
+    def is_valid_position(self, pos: Tuple[int, int]) -> bool:
+        """Check if the position is valid."""
+        x, y = pos
+        return (0 <= x < self.width and 
+                0 <= y < self.height and 
+                pos not in self.obstacles)
+    
+    def get_next_state(self, state: Tuple[int, int], action: Action) -> Tuple[int, int]:
+        """Get next state given current state and action."""
         x, y = state
-        cumulative_reward = 0
-        steps = 0
-        cell: Cell | None = None
+        if action == Action.UP:
+            next_pos = (x, y + 1)
+        elif action == Action.RIGHT:
+            next_pos = (x + 1, y)
+        elif action == Action.DOWN:
+            next_pos = (x, y - 1)
+        else:  # LEFT
+            next_pos = (x - 1, y)
+            
+        return next_pos if self.is_valid_position(next_pos) else state
+    
+    def step(self, action: Action) -> Tuple[Tuple[int, int], float, bool]:
+        """Execute action and return new state, reward and done flag."""
+        next_pos = self.get_next_state(self.current_pos, action)
+        
+        # Update current position
+        self.current_pos = next_pos
+        
+        # Calculate reward
+        if next_pos == self.goal_pos:
+            reward = 100.0
+            done = True
+        elif next_pos in self.obstacles:
+            reward = -100.0
+            done = True
+        else:
+            reward = -1.0  # Small penalty for each move
+            done = False
+            
+        return next_pos, reward, done
 
-        while steps < max_steps:
-            steps += 1
+class QLearningAgent:
+    def __init__(self, 
+                 env: GridWorld, 
+                 learning_rate: float = 0.1, 
+                 discount_factor: float = 0.95, 
+                 epsilon: float = 0.1,
+                 min_epsilon: float = 0.01,
+                 epsilon_decay: float = 0.995) -> None:
+        self.env = env
+        self.lr = learning_rate
+        self.gamma = discount_factor
+        self.epsilon = epsilon
+        self.min_epsilon = min_epsilon
+        self.epsilon_decay = epsilon_decay
+        self.metrics = TrainingMetrics()
+        self.q_table: Dict[Tuple[int, int], Dict[Action, float]] = {}
+        
+        # Initialize Q-table with zeros
+        for x in range(env.width):
+            for y in range(env.height):
+                if (x, y) not in env.obstacles:
+                    self.q_table[(x, y)] = {action: 0.0 for action in Action}
+    
+    def get_action(self, state: Tuple[int, int]) -> Action:
+        """Choose action using epsilon-greedy policy."""
+        if random.random() < self.epsilon:
+            return random.choice(list(Action))
+        else:
+            return max(self.q_table[state].items(), key=lambda x: x[1])[0]
+    
+    def update(self, 
+              state: Tuple[int, int], 
+              action: Action, 
+              reward: float, 
+              next_state: Tuple[int, int]) -> None:
+        """Update Q-value using Q-learning update rule."""
+        best_next_value = max(self.q_table[next_state].values())
+        current_q = self.q_table[state][action]
+        
+        # Q-learning update formula
+        new_q = current_q + self.lr * (reward + self.gamma * best_next_value - current_q)
+        self.q_table[state][action] = new_q
+    
+    def train(self, episodes: int) -> TrainingMetrics:
+        """Train the agent for given number of episodes."""
+        for episode in range(episodes):
+            state = self.env.reset()
+            total_reward = 0.0
+            steps = 0
+            done = False
+            
+            while not done and steps < self.env.max_steps:
+                action = self.get_action(state)
+                next_state, reward, done = self.env.step(action)
+                self.update(state, action, reward, next_state)
+                
+                total_reward += reward
+                steps += 1
+                state = next_state
 
-            if np.random.random() < epsilon:
-                action = np.random.choice(np.where(valid_actions[y, x])[0])
-            else:
-                action = np.argmax(Q[y, x, valid_actions[y, x]])
+            # Record metrics
+            metrics = EpisodeMetrics(
+                total_reward=total_reward,
+                steps=steps,
+                success=(state == self.env.goal_pos),
+                final_position=state
+            )
+            self.metrics.add_episode(metrics)
+            
+            # Decay epsilon
+            self.epsilon = max(self.min_epsilon, self.epsilon * self.epsilon_decay)
 
-            next_state, cell = world.step(Action(action))
-            next_x, next_y = next_state
+            # Print progress
+            if (episode + 1) % 100 == 0:
+                success_rate = self.metrics.get_success_rate(100)
+                avg_reward = self.metrics.get_average_reward(100)
+                avg_steps = self.metrics.get_average_steps(100)
+                print(f"Episode {episode + 1}")
+                print(f"Success Rate: {success_rate:.2%}")
+                print(f"Average Reward: {avg_reward:.2f}")
+                print(f"Average Steps: {avg_steps:.2f}")
+                print(f"Current Epsilon: {self.epsilon:.3f}")
+                print("-" * 40)
+            
+        return self.metrics
 
-            reward = rewards[y, x, action]
+def main() -> None:
+    # Create environment
+    env = GridWorld(
+        width=50,
+        height=40,
+        start_pos=(0, 0),
+        goal_pos=(40, 40),
+        obstacles=[(1, 1), (2, 2), (3, 3), (39, 39)]
+    )
+    
+    # Create and train agent
+    agent = QLearningAgent(env)
+    metrics = agent.train(episodes=1000)
+    
+    # Plot training metrics
+    metrics.plot_metrics()
 
-            best_next_action = np.argmax(Q[next_y, next_x])
-            td_target = reward + discount_factor * Q[next_y, next_x, best_next_action]
-            td_error = td_target - Q[y, x, action]
-            Q[y, x, action] += learning_rate * td_error
+    # Print final statistics
+    print("\nFinal Statistics:")
+    print(f"Final Success Rate: {metrics.get_success_rate(100):.2%}")
+    print(f"Final Average Reward: {metrics.get_average_reward(100):.2f}")
+    print(f"Final Average Steps: {metrics.get_average_steps(100):.2f}")
 
-            cumulative_reward += reward
-
-            if cell == Cell.GOAL.value:  # Goal reached
-                break
-
-            x, y = next_x, next_y
-
-            if show_policy:
-                # Extract current optimal policy from Q-table
-                policy = np.argmax(Q, axis=2)
-                world.set_policy(policy, render_policy=True)
-
-            if follow_agent:
-                # Allow time for the policy updates to be seen one at a time
-                time.sleep(0.1)
-
-        # Update metrics
-        metrics["episode_lengths"].append(steps)
-        metrics["cumulative_rewards"].append(cumulative_reward)
-        metrics["success_rate"].append(1 if cell == Cell.GOAL.value else 0)
-        metrics["average_q_values"].append(np.mean(Q))
-        metrics["q_value_variance"].append(np.var(Q))
-        metrics["q_value_std"].append(np.std(Q))
-
-    # Extract optimal policy from Q-table
-    policy = np.argmax(Q, axis=2)
-
-    return Q, policy, metrics
-
-def plot_metrics(metrics: dict):
-    plt.figure(figsize=(15, 11))
-
-    # Episode Length
-    plt.subplot(3, 2, 1)
-    plt.plot(metrics['episode_lengths'])
-    plt.title('Episode Length')
-    plt.xlabel('Episode')
-    plt.ylabel('Steps')
-
-    # Cumulative Reward
-    plt.subplot(3, 2, 2)
-    plt.plot(metrics['cumulative_rewards'])
-    plt.title('Cumulative Reward')
-    plt.xlabel('Episode')
-    plt.ylabel('Reward')
-
-    # Success Rate
-    plt.subplot(3, 2, 3)
-    plt.plot(metrics['success_rate'])
-    plt.title('Success Rate')
-    plt.xlabel('Episode')
-    plt.ylabel('Rate')
-
-    # Q-value
-    plt.subplot(3, 2, 4)
-    plt.plot(metrics['average_q_values'])
-    plt.title('Q-value')
-    plt.xlabel('Episode')
-    plt.ylabel('Value')
-
-    # Q-value Variance
-    plt.subplot(3, 2, 5)
-    plt.plot(metrics['q_value_variance'])
-    plt.title('Q-value Variance')
-    plt.xlabel('Episode')
-    plt.ylabel('Variance')
-
-    # Average Q-value with Variance
-    plt.subplot(3, 2, 6)
-    episodes = range(len(metrics['average_q_values']))
-    avg_q = np.array(metrics['average_q_values'])
-    std_q = np.array(metrics['q_value_std'])
-
-    plt.plot(episodes, avg_q, label='Average Q-value')
-    plt.fill_between(episodes, avg_q - std_q, avg_q + std_q, alpha=0.3, label='Q-value Std Dev')
-    plt.title('Average Q-value with Variance')
-    plt.xlabel('Episode')
-    plt.ylabel('Q-value')
-    plt.legend()
-
-    plt.tight_layout()
-    plt.show()
+    # Print final Q-table for important states
+    print("\nFinal Q-value for key states:")
+    key_states = [env.start_pos, (0, 1), (1, 0), env.goal_pos]
+    for state in key_states:
+        if state in agent.q_table:
+            print(f"\nState {state}:")
+            for action, value in agent.q_table[state].items():
+                print(f"  {action.name}: {value:.2f}")
 
 if __name__ == "__main__":
-    description = """
-    ##########
-    #s #     #
-    #  #  #  #
-    #  #  o  #
-    #     # g#
-    ##########
-    """
-    world = GridWorld(
-        description,
-        font_size=40,
-        font_path="/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Regular.ttf",
-        render=True,
-    )
-
-    # Train with Q-learning
-    Q, policy, metrics = world.run_training(lambda w: trainer(w, num_episodes=20000))
-    print("Q-learning Policy:")
-    for row in policy:
-        print(' '.join([Action(action).name[0] for action in row]))
-
-    plot_metrics(metrics)
+    main()
