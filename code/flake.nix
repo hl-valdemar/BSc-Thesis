@@ -22,7 +22,7 @@
       ];
 
       shellHook = ''
-        echo "Entered Avalondor shell."
+        echo "Entered BSc thesis shell."
       '';
     };
   };
