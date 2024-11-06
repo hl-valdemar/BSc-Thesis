@@ -11,14 +11,13 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       packages = with pkgs; [
+        python3
         (pkgs.python3.withPackages (python-pkgs: with python-pkgs; [
           # select Python packages here
           numpy
           torch
           matplotlib
-          raylib
         ]))
-        raylib
       ];
 
       shellHook = ''
