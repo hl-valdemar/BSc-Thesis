@@ -11,6 +11,7 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       packages = with pkgs; [
+        typst
         python3
         (pkgs.python3.withPackages (python-pkgs: with python-pkgs; [
           # select Python packages here

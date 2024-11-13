@@ -7,7 +7,6 @@ class Action(Enum):
     DOWN = 2
     LEFT = 3
 
-
 class GridWorld:
     def __init__(self, layout: str | None = None, width: int | None = None, height: int | None = None, 
                  start_pos: Tuple[int, int] | None = None, goal_pos: Tuple[int, int] | None = None, 
