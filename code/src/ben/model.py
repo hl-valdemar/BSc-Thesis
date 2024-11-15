@@ -67,9 +67,7 @@ class BayesianExplorationNetwork(nn.Module):
             hidden=new_hidden
         )
 
-    def update(self, 
-            batch: Dict[str, torch.Tensor],
-        ) -> Dict[str, float]:
+    def update(self, batch: Dict[str, torch.Tensor]) -> Dict[str, float]:
         """
         Update networks using MSBBE and ELBO objectives.
         Returns dict with loss values.

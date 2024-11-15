@@ -2,7 +2,7 @@ def main():
     from gridworld import GridWorld
     from .env import GridWorldEnv
     from .model import BENConfig, BayesianExplorationNetwork
-    from .train import TrainingConfig, train_ben
+    from .train import TrainingConfig, train
 
     # Create a simple grid world
     layout = """
@@ -38,7 +38,7 @@ def main():
         min_experiences=100
     )
 
-    rewards = train_ben(env, ben, training_config)
+    rewards = train(env, ben, training_config)
 
     # Plot learning curve
     import matplotlib.pyplot as plt

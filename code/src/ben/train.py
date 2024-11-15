@@ -18,7 +18,7 @@ class TrainingConfig:
     epsilon_end: float = 0.01
     epsilon_decay: float = 0.995
 
-def train_ben(env: GridWorldEnv, ben: BayesianExplorationNetwork, config: TrainingConfig) -> List[float]:
+def train(env: GridWorldEnv, ben: BayesianExplorationNetwork, config: TrainingConfig) -> List[float]:
     """Train BEN on GridWorld environment"""
     # Initialize replay buffer
     buffer = ReplayBuffer.create(config.replay_capacity)
