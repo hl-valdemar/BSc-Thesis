@@ -1,181 +1,213 @@
-from typing import Dict, List, Tuple, Optional
-import numpy as np
+from typing import Dict
+
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from collections import defaultdict
-from gridworld import Action, GridWorld
 
-class GFlowNetwork:
-    def __init__(
-        self,
-        env: GridWorld,
-        hidden_size: int = 64,
-        learning_rate: float = 1e-4,
-        device: str = "cuda" if torch.cuda.is_available() else "cpu"
-    ) -> None:
-        """Initialize GFlowNet.
-        
-        Args:
-            env: GridWorld environment
-            hidden_size: Number of hidden units in neural network
-            learning_rate: Learning rate for optimizer
-            device: Device to run computations on
-        """
-        self.env = env
-        self.device = device
-        self.hidden_size = hidden_size
-        
-        # Initialize flow predictor network
-        self.flow_predictor = nn.Sequential(
-            nn.Linear(2, hidden_size),  # 2 = x, y coordinates of current position
+from gridworld import Action
+from .config import GFlowNetConfig, GFlowOutput
+
+class FlowNetwork(nn.Module):
+    """Main network that predicts flows F(s,a)"""
+    def __init__(self, config: GFlowNetConfig):
+        super().__init__()
+        self.config = config
+
+        # Neural network to predict flows
+        self.network = nn.Sequential(
+            nn.Linear(config.state_dim, config.hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_size, hidden_size),
+            nn.Linear(config.hidden_dim, config.hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_size, len(Action))  # Predict log flow for each action
-        ).to(device)
-        
-        self.optimizer = torch.optim.Adam(self.flow_predictor.parameters(), lr=learning_rate)
-        
-    def state_to_tensor(self, state: Tuple[int, int]) -> torch.Tensor:
-        """Convert state to tensor representation.
-        
-        Args:
-            state: Current (x, y) position
-            
-        Returns:
-            Tensor representation of state
+            nn.Linear(config.hidden_dim, config.action_dim)
+        )
+
+    def forward(self, state: torch.Tensor) -> torch.Tensor:
         """
-        return torch.tensor([*state], dtype=torch.float32, device=self.device)
-    
-    def predict_flows(self, state: Tuple[int, int]) -> Dict[Action, float]:
-        """Predict flows for all actions from given state.
-        
-        Args:
-            state: Current (x, y) position
-            
+        Predict log flows for all actions from a state
         Returns:
-            Dictionary mapping actions to their predicted flows
+            logits: torch.Tensor of shape [batch_size, action_dim]
         """
-        state_tensor = self.state_to_tensor(state)
-        log_flows = self.flow_predictor(state_tensor)
-        flows = torch.exp(log_flows)  # Convert from log space
-        
-        # Create dictionary of valid actions and their flows
-        action_flows: Dict[Action, float] = {}
-        for action in Action:
-            next_state = self.env.get_next_state(state, action)
-            if self.env.is_valid_position(next_state):
-                action_flows[action] = flows[action.value].item()
-                
-        return action_flows
-    
-    def sample_action(self, state: Tuple[int, int], epsilon: float = 0.1) -> Action:
-        """Sample action according to flow probabilities with epsilon exploration.
-        
+        return self.network(state)
+
+class GFlowNet(nn.Module):
+    def __init__(self, config: GFlowNetConfig):
+        super().__init__()
+        self.config = config
+        self.flow_network = FlowNetwork(config)
+        self.optimizer = torch.optim.Adam(
+            self.flow_network.parameters(),
+            lr=config.learning_rate,
+            weight_decay=1e-5   # L2 regularization
+        )
+
+    def forward(self, state: torch.Tensor) -> GFlowOutput:
+        """
+        Forward pass to get flows and policy
         Args:
-            state: Current (x, y) position
-            epsilon: Probability of random action
-            
-        Returns:
-            Sampled action
+            state: torch.Tensor of shape [batch_size, state_dim]
         """
-        if np.random.random() < epsilon:
-            # Random valid action for exploration
-            valid_actions = [a for a in Action 
-                            if self.env.is_valid_position(self.env.get_next_state(state, a))]
-            return valid_actions[np.random.randint(len(valid_actions))]
+        # Get log flows (logits)
+        logits = self.flow_network(state)
         
-        action_flows = self.predict_flows(state)
-        total_flow = sum(action_flows.values())
+        # Convert to actual flows (always positive)
+        flows = torch.exp(logits)
         
-        if total_flow == 0:
-            # If all flows are 0, use random valid action
-            valid_actions = [a for a in Action 
-                            if self.env.is_valid_position(self.env.get_next_state(state, a))]
-            return valid_actions[np.random.randint(len(valid_actions))]
-            
-        # Sample according to flow probabilities
-        action_probs = {a: f/total_flow for a, f in action_flows.items()}
-        actions = list(action_probs.keys())
-        probs = list(action_probs.values())
-        # Convert to numpy arrays for proper sampling
-        probs = np.array(probs)
-        # Handle numerical instability
-        probs = probs / probs.sum()  
-        return actions[np.random.choice(len(actions), p=probs)]
-    
-    def compute_loss(self, trajectory: List[Tuple[Tuple[int, int], Action]], 
-                    final_reward: float) -> torch.Tensor:
-        """Compute flow matching loss for a trajectory.
-        
+        # Calculate total flow through state
+        state_flow = flows.sum(dim=-1, keepdim=True)
+
+        return GFlowOutput(
+            flows=flows,
+            state_flow=state_flow,
+            logits=logits
+        )
+
+    def compute_flow_matching_loss(self, 
+                             states: torch.Tensor,
+                             next_states: torch.Tensor,
+                             actions: torch.Tensor,
+                             rewards: torch.Tensor,
+                             dones: torch.Tensor,
+                             epsilon: float = 1e-6) -> torch.Tensor:
+        """
+        Compute flow matching loss with proper terminal state handling
         Args:
-            trajectory: List of (state, action) pairs
-            final_reward: Reward received at terminal state
-            
-        Returns:
-            Loss value
+            states: [batch_size, state_dim]
+            next_states: [batch_size, state_dim]
+            actions: [batch_size]
+            rewards: [batch_size]
+            dones: [batch_size] boolean tensor indicating terminal states
+            epsilon: small constant for numerical stability
         """
-        loss = 0.0
-        
-        # For each state in trajectory
-        for i, (state, _) in enumerate(trajectory):
-            # Get predicted flows for all actions
-            state_tensor = self.state_to_tensor(state, self.env.goal_pos)
-            log_flows = self.flow_predictor(state_tensor)
-            flows = torch.exp(log_flows)
-            
-            # Calculate outgoing flow
-            valid_flows = torch.zeros_like(flows)
-            for action in Action:
-                next_state = self.env.get_next_state(state, action)
-                if self.env.is_valid_position(next_state):
-                    valid_flows[action.value] = flows[action.value]
-            outgoing_flow = valid_flows.sum()
-            
-            # Target flow is final reward for last state, outgoing flow for others
-            target_flow = final_reward if i == len(trajectory)-1 else outgoing_flow.detach()
-            
-            # Flow matching loss (in log space)
-            loss += (torch.log(outgoing_flow + 1e-8) - torch.log(target_flow + 1e-8))**2
-            
+        # Get flows
+        output_current = self.forward(states)
+        output_next = self.forward(next_states)
+
+        # Get current action flows
+        action_indices = actions.unsqueeze(-1)
+        current_flows = torch.gather(output_current.flows, 1, action_indices)
+
+        # Compute log flows
+        log_current_flows = torch.log(current_flows + epsilon)
+
+        # For non-terminal states: match incoming flow with outgoing flow
+        # For terminal states: match incoming flow with reward
+        non_terminal_mask = -dones
+
+        # Initialize loss tensors
+        terminal_loss = torch.zeros_like(rewards)
+        non_terminal_loss = torch.zeros_like(rewards)
+
+        # Terminal states: flow should match reward
+        if dones.any():
+            terminal_states_flows = log_current_flows[dones]
+            terminal_rewards = torch.log(rewards[dones].unsqueeze(-1) + epsilon)
+            terminal_loss[dones] = (terminal_states_flows - terminal_rewards) ** 2
+
+        # Non-terminal states: flow should match sum of outgoing flows
+        if non_terminal_mask.any():
+            non_terminal_flows = log_current_flows[non_terminal_mask]
+            next_state_outflow = torch.log(output_next.state_flow[non_terminal_mask] + epsilon)
+            non_terminal_loss[non_terminal_mask] = (non_terminal_flows - next_state_outflow) ** 2
+
+        # Combine losses
+        loss = terminal_loss.mean() + non_terminal_loss.mean()
+
         return loss
-    
-    def train_step(self, trajectory: List[Tuple[Tuple[int, int], Action]], 
-                  final_reward: float) -> float:
-        """Perform a single training step.
-        
-        Args:
-            trajectory: List of (state, action) pairs
-            final_reward: Reward received at terminal state
-            
-        Returns:
-            Loss value
-        """
+
+    def update(self, batch: Dict[str, torch.Tensor]) -> Dict[str, float]:
+        """Update network using flow matching loss"""
+        # Compute loss with terminal state handling
+        loss = self.compute_flow_matching_loss(
+            states=batch["states"],
+            next_states=batch["next_states"],
+            actions=batch["actions"],
+            rewards=batch["rewards"],
+            dones=batch["dones"],
+        )
+
+        # Optimize
         self.optimizer.zero_grad()
-        loss = self.compute_loss(trajectory, final_reward)
         loss.backward()
         self.optimizer.step()
-        return loss.item()
-    
-    def generate_episode(self, epsilon: float = 0.1) -> Tuple[List[Tuple[Tuple[int, int], Action]], float]:
-        """Generate a complete episode using current policy.
-        
-        Args:
-            epsilon: Exploration probability
-            
-        Returns:
-            Trajectory and final reward
+
+        return {
+            "flow_matching_loss": loss.item(),
+            "terminal_ratio": batch["dones"].float().mean().item() # Log terminal state ratio
+        }
+
+
+    # def compute_flow_matching_loss(self, states, next_states, actions, rewards, epsilon=1e-6):
+    #     """Compute flow matching loss from equation 12 in the paper"""
+    #     # Get flows
+    #     output_current = self.forward(states)
+    #     output_next = self.forward(next_states)
+    #
+    #     # For each state s', sum all incoming flows F(s,a) where T(s,a)=s'
+    #     incoming_flows = output_current.flows.gather(1, actions.unsqueeze(-1))
+    #
+    #     # Total outgoing flow is sum of F(s',a') plus reward R(s') if terminal
+    #     outgoing_flows = output_next.state_flow + rewards.unsqueeze(-1)
+    #
+    #     # Compute loss in log space for numerical stability
+    #     log_incoming = torch.log(epsilon + incoming_flows)
+    #     log_outgoing = torch.log(epsilon + outgoing_flows)
+    #
+    #     # Flow matching objective from equation 12 in paper
+    #     loss = torch.mean((log_incoming - log_outgoing)**2)
+    #
+    #     return loss
+
+    # def update(self, batch: Dict[str, torch.Tensor]) -> Dict[str, float]:
+    #     """Update network using flow matching loss"""
+    #     # Compute loss
+    #     loss = self.compute_flow_matching_loss(
+    #         states=batch['states'],
+    #         next_states=batch['next_states'],
+    #         actions=batch['actions'],
+    #         rewards=batch['rewards']
+    #     )
+    #
+    #     # Optimize
+    #     self.optimizer.zero_grad()
+    #     loss.backward()
+    #     self.optimizer.step()
+    #
+    #     return {'flow_matching_loss': loss.item()}
+
+    # def get_action(self, state: torch.Tensor, epsilon: float = 0.0) -> Action:
+    #     """
+    #     Get action using the flow-based policy
+    #     Args:
+    #         state: torch.Tensor of shape [state_dim]
+    #         epsilon: probability of random action
+    #     """
+    #     if torch.rand(1) < epsilon:
+    #         return Action(torch.randint(self.config.action_dim, (1,)).item())
+    #
+    #     with torch.no_grad():
+    #         output = self.forward(state.unsqueeze(0))
+    #         # Policy π(a|s) = F(s,a)/F(s)
+    #         probs = output.flows / output.state_flow
+    #         action_idx = torch.multinomial(probs[0], 1).item()
+    #         return Action(action_idx)
+
+    def get_action(self, state: torch.Tensor, epsilon: float = 0.0, temperature: float = 1.0) -> Action:
         """
-        state = self.env.reset()
-        trajectory: List[Tuple[Tuple[int, int], Action]] = []
+        Get action using the flow-based policy
+        Args:
+            state: torch.Tensor of shape [state_dim]
+            epsilon: probability of random action
+            temperature: value by which to scale the flows
+
+        Returns: an Action
+        """
+        if torch.rand(1) < epsilon:
+            return Action(torch.randint(self.config.action_dim, (1,)).item())
         
-        while True:
-            action = self.sample_action(state, epsilon)
-            trajectory.append((state, action))
-            
-            next_state, reward, done = self.env.step(action)
-            state = next_state
-            
-            if done:
-                return trajectory, reward
+        with torch.no_grad():
+            output = self.forward(state.unsqueeze(0))
+            # Add temperature scaling
+            flows = output.flows / temperature
+            probs = flows / flows.sum(dim=-1, keepdim=True)
+            action_idx = torch.multinomial(probs[0], 1).item()
+            return Action(action_idx)
