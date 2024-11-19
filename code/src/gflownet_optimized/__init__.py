@@ -8,7 +8,7 @@ from gridworld import GridWorld
 from .env import GridWorldEnv
 from .config import GFlowNetConfig
 from .model import GFlowNet
-from .train import GFlowNetTrainingConfig, train, visualize_flows
+from .train import GFlowNetTrainingConfig, train, visualize_flows, visualize_training_metrics
 
 def create_random_env_factory(
     width: int = 8,
@@ -172,16 +172,17 @@ def main():
         obstacle_density=0.10,  # 15% obstacles
         min_path_length=2
     )
-    rewards = train(env_factory, gflownet, training_config)
+    training_metrics = train(env_factory, gflownet, training_config)
 
-    # Plot learning curve
-    plt.figure(figsize=(10, 5))
-    plt.plot(rewards)
-    plt.title('GFlowNet Training Progress')
-    plt.xlabel('Episode')
-    plt.ylabel('Total Reward')
-    plt.grid(True)
-    plt.show()
+    visualize_training_metrics(
+        rewards_history=training_metrics["rewards"],
+        metrics_history=training_metrics["metrics"],
+        epsilon_history=training_metrics["epsilons"],
+        temperature_history=training_metrics["temperatures"],
+        success_history=training_metrics["successes"],
+        gflownet=gflownet,
+        env_factory=env_factory,
+    )
 
     # Visualize flows for a few states
     print("\nFinal Flow Values:")
