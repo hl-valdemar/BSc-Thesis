@@ -7,9 +7,12 @@ class GFlowNetConfig:
     state_dim: int
     action_dim: int
     hidden_dim: int = 64
+    batch_size: int = 16
+    min_batch_size: int = 4
     learning_rate: float = 1e-4
     weight_decay: float = 1e-5
     flow_entropy_coef: float = 0.01  # For flow regularization
+    grad_clip: float = 1.0
     
 @dataclass 
 class GFlowOutput:
@@ -21,7 +24,8 @@ class GFlowOutput:
 @dataclass
 class GFlowNetTrainingConfig:
     num_episodes: int = 1000
-    batch_size: int = 32
+    batch_size: int = 16
+    min_batch_size: int = 4
     replay_capacity: int = 10000
     min_experiences: int = 100
     epsilon_start: float = 1.0

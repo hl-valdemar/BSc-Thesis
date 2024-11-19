@@ -25,9 +25,6 @@ class FlowNetwork(nn.Module):
         # Initialize with small positive values
         self.log_Z = nn.Parameter(torch.tensor(0.0)) # Log partition function
 
-        # Layer normalization for better gradient flow
-        self.layer_norm = nn.LayerNorm(config.action_dim)
-
     def forward(self, state: torch.Tensor) -> torch.Tensor:
         """
         Predict log flows for all actions from a state
@@ -36,13 +33,7 @@ class FlowNetwork(nn.Module):
         Returns:
             logits: torch.Tensor of shape [batch_size, action_dim]
         """
-        # Ensure proper batching
-        if state.dim() == 1:
-            state = state.unsqueeze(0)
-
-        # Forward pass with improved numerical stability
         logits = self.network(state)
-        logits = self.layer_norm(logits)
         return logits + self.log_Z # Add in log space
 
 class GFlowNet(nn.Module):
@@ -103,10 +94,6 @@ class GFlowNet(nn.Module):
         Args:
             state: torch.Tensor of shape [batch_size, state_dim]
         """
-        # Ensure proper batching
-        if state.dim() == 1:
-            state = state.unsqueeze(0)
-
         # Get log flows (logits)
         logits = self.flow_network(state)
         
@@ -125,78 +112,135 @@ class GFlowNet(nn.Module):
 
     def compute_trajectory_balance_loss(
         self, 
-        trajectory: Trajectory, 
+        trajectories: List[Trajectory],
         epsilon: float = 1e-6
     ) -> torch.Tensor:
-        total_loss = torch.tensor(0.0, device=trajectory.states[0].device)
-        cumulative_logprob = torch.tensor(0.0, device=trajectory.states[0].device)
+        """Compute trajectory balance loss for a batch of trajectories"""
+        losses = []
+        max_length = max(len(traj.states) - 1 for traj in trajectories)
         
-        # Note: we have len(states) = len(action_indices) + 1 because the final state has no action
-        for t in range(len(trajectory.states) - 1):  # Only iterate up to the second-to-last state
-            # Get current state and properly shape action index
-            state = trajectory.states[t]
-            action_idx = trajectory.action_indices[t].view(1, 1)  # Shape: [1, 1]
+        # Process trajectories in batches at each timestep
+        for t in range(max_length):
+            # Collect states and actions for this timestep from all trajectories
+            batch_states = []
+            batch_actions = []
+            batch_is_valid = []  # Track which trajectories are still active
             
-            # Forward pass with batch dimension
-            output = self.forward(state.unsqueeze(0))  # Add batch dimension
-            logits = output.logits  # Shape: [1, action_dim]
+            for traj in trajectories:
+                if t < len(traj.states) - 1:
+                    batch_states.append(traj.states[t])
+                    batch_actions.append(traj.action_indices[t])
+                    batch_is_valid.append(True)
+                else:
+                    # Pad with zeros for shorter trajectories
+                    batch_states.append(torch.zeros_like(trajectories[0].states[0]))
+                    batch_actions.append(torch.zeros_like(trajectories[0].action_indices[0]))
+                    batch_is_valid.append(False)
             
-            # Get action log probability
-            action_logprob = logits.gather(1, action_idx)  # Shape: [1, 1]
-            log_Z = torch.logsumexp(logits, dim=-1, keepdim=True)  # Shape: [1, 1]
-            step_logprob = action_logprob - log_Z  # Shape: [1, 1]
+            # Convert to tensors
+            states_tensor = torch.stack(batch_states)
+            actions_tensor = torch.stack(batch_actions).view(-1, 1)
+            valid_mask = torch.tensor(batch_is_valid, device=states_tensor.device)
             
-            cumulative_logprob = cumulative_logprob + step_logprob.squeeze()
-        
-        # After accumulating all probabilities, compute loss if this was a complete trajectory
-        if trajectory.done:
-            target_logprob = torch.log(trajectory.rewards[-1] + epsilon)
-            loss = (cumulative_logprob - target_logprob) ** 2
-            total_loss = total_loss + loss
+            if valid_mask.sum() == 0:
+                continue
                 
-        return total_loss.mean()
+            # Forward pass with batch
+            output = self.forward(states_tensor)
+            logits = output.logits
+            
+            # Compute probabilities
+            action_logprob = logits.gather(1, actions_tensor)
+            log_Z = torch.logsumexp(logits, dim=-1, keepdim=True)
+            step_logprob = action_logprob - log_Z
+            
+            # Mask out padded trajectories
+            step_logprob = step_logprob.squeeze() * valid_mask
+            
+            # Add to loss for valid trajectories
+            for i, traj in enumerate(trajectories):
+                if batch_is_valid[i] and traj.done:
+                    target_logprob = torch.log(traj.rewards[-1] + epsilon)
+                    loss = (step_logprob[i] - target_logprob) ** 2
+                    losses.append(loss)
+        
+        return torch.stack(losses).mean() if losses else torch.tensor(0.0)
 
+    
     def compute_flow_matching_loss(
         self, 
-        trajectory: Trajectory, 
+        trajectories: List[Trajectory],
         epsilon: float = 1e-6
     ) -> torch.Tensor:
+        """Compute flow matching loss for a batch of trajectories"""
         losses = []
-
-        # Process trajectory in chunks for better memory efficiency
-        chunk_size = 32
-        for t in range(0, len(trajectory.states) - 1, chunk_size):
-            chunk_end = min(t + chunk_size, len(trajectory.states) - 1)
-
-            # Get current and next states for chunk
-            curr_states = trajectory.states[t:chunk_end]
-            next_states = trajectory.states[t + 1:chunk_end + 1]
-            curr_actions = trajectory.action_indices[t:chunk_end]
-
-            # Batch process states
-            curr_output = self.forward(torch.stack(curr_states))
-            next_output = self.forward(torch.stack(next_states))
-
-            # Compute loss for chunk
-            curr_flow = curr_output.flows.gather(1, torch.stack(curr_actions).unsqueeze(1))
-
-            # Handle terminal states in chunk
-            is_terminal = torch.tensor([
-                t == len(trajectory.states) - 2 and trajectory.done
-                for t in range(chunk_end - t)
-            ], device=curr_flow.device)
-
-            target_flow = torch.where(
-                is_terminal.unsqueeze(1),
-                torch.stack(trajectory.rewards[t:chunk_end]).unsqueeze(1),
-                next_output.state_flow,
-            )
-
-            # Compute loss using log space for numerical stability
-            loss = (torch.log(curr_flow + epsilon) - torch.log(target_flow + epsilon)) ** 2
-            losses.append(loss)
-
-        return torch.cat(losses).mean()
+        
+        # Process trajectories in chunks
+        chunk_size = self.config.min_batch_size
+        
+        for start_idx in range(0, len(trajectories), chunk_size):
+            chunk = trajectories[start_idx:start_idx + chunk_size]
+            max_length = max(len(traj.states) - 1 for traj in chunk)
+            
+            # Process each timestep for this chunk
+            for t in range(max_length):
+                # Collect states for this timestep
+                curr_states = []
+                next_states = []
+                curr_actions = []
+                is_terminal = []
+                rewards = []
+                is_valid = []
+                
+                for traj in chunk:
+                    if t < len(traj.states) - 1:
+                        curr_states.append(traj.states[t])
+                        next_states.append(traj.states[t + 1])
+                        curr_actions.append(traj.action_indices[t])
+                        is_terminal.append(t == len(traj.states) - 2 and traj.done)
+                        rewards.append(traj.rewards[t])
+                        is_valid.append(True)
+                    else:
+                        # Padding
+                        curr_states.append(torch.zeros_like(chunk[0].states[0]))
+                        next_states.append(torch.zeros_like(chunk[0].states[0]))
+                        curr_actions.append(torch.zeros_like(chunk[0].action_indices[0]))
+                        is_terminal.append(False)
+                        rewards.append(torch.zeros_like(chunk[0].rewards[0]))
+                        is_valid.append(False)
+                
+                # Convert to tensors
+                curr_states = torch.stack(curr_states)
+                next_states = torch.stack(next_states)
+                curr_actions = torch.stack(curr_actions).view(-1, 1)
+                is_terminal = torch.tensor(is_terminal, device=curr_states.device)
+                rewards = torch.stack(rewards)
+                valid_mask = torch.tensor(is_valid, device=curr_states.device)
+                
+                if valid_mask.sum() == 0:
+                    continue
+                    
+                # Get flows
+                curr_output = self.forward(curr_states)
+                next_output = self.forward(next_states)
+                
+                # Get current flow
+                curr_flow = curr_output.flows.gather(1, curr_actions)
+                
+                # Get target flow
+                target_flow = torch.where(
+                    is_terminal.unsqueeze(1),
+                    rewards.unsqueeze(1),
+                    next_output.state_flow
+                )
+                
+                # Compute loss
+                loss = (torch.log(curr_flow + epsilon) - torch.log(target_flow + epsilon)) ** 2
+                loss = loss * valid_mask.unsqueeze(1)
+                
+                losses.append(loss.mean())
+        
+        return torch.stack(losses).mean() if losses else torch.tensor(0.0)
 
 
     def compute_regularization_loss(
@@ -211,50 +255,37 @@ class GFlowNet(nn.Module):
         return -self.config.flow_entropy_coef * flow_entropy
 
     def update(self, trajectories: List[Trajectory]) -> Dict[str, float]:
-        flow_losses = []
-        balance_losses = []
-        reg_losses = []
-
+        """Update the model using a batch of trajectories"""
         self.optimizer.zero_grad()
         
-        for trajectory in trajectories:
-            # Compute the individual losses
-            flow_loss = self.compute_flow_matching_loss(trajectory)
-            balance_loss = self.compute_trajectory_balance_loss(trajectory)
-            reg_loss = self.compute_regularization_loss(
-                self.forward(trajectory.states[0].unsqueeze(0))
-            )
-
-            # Store the losses
-            flow_losses.append(flow_loss)
-            balance_losses.append(balance_loss)
-            reg_losses.append(reg_loss)
+        # Compute losses using batched computations
+        flow_loss = self.compute_flow_matching_loss(trajectories)
+        balance_loss = self.compute_trajectory_balance_loss(trajectories)
         
-        # Combine all losses with their respective weights
-        total_flow_loss = torch.stack(flow_losses).mean()
-        total_balance_loss = torch.stack(balance_losses).mean()
-        total_reg_loss = torch.stack(reg_losses).mean()
+        # Compute regularization loss on a sample batch
+        sample_states = torch.stack([traj.states[0] for traj in trajectories])
+        reg_loss = self.compute_regularization_loss(self.forward(sample_states))
         
-        # Weighted sum of losses
+        # Combine losses
         total_loss = (
-            1.0 * total_flow_loss +
-            0.1 * total_balance_loss + # Lower weight since this is supplementary
-            0.01 * total_reg_loss     # Very small weight for regularization
+            1.0 * flow_loss +
+            0.1 * balance_loss +
+            0.01 * reg_loss
         )
         
         # Backward pass with gradient clipping
         total_loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.parameters(), 1.0)
+        torch.nn.utils.clip_grad_norm_(self.parameters(), self.config.grad_clip)
         self.optimizer.step()
-
+        
         # Update learning rate
         self.scheduler.step(total_loss)
         
         return {
             'total_loss': total_loss.item(),
-            'flow_loss': total_flow_loss.item(),
-            'balance_loss': total_balance_loss.item(),
-            'reg_loss': total_reg_loss.item(),
+            'flow_loss': flow_loss.item(),
+            'balance_loss': balance_loss.item(),
+            'reg_loss': reg_loss.item(),
             'learning_rate': self.optimizer.param_groups[0]['lr'],
         }
 

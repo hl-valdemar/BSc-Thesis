@@ -9,7 +9,6 @@ from .env import GridWorldEnv, ReplayBuffer, Trajectory
 from .config import GFlowNetTrainingConfig
 
 def train(
-    # env: GridWorldEnv, 
     env_factory: Callable[[], GridWorldEnv],
     gflownet: GFlowNet, 
     config: GFlowNetTrainingConfig,
@@ -23,23 +22,19 @@ def train(
     for episode in range(config.num_episodes):
         # Collect multiple trajectories
         print("Collecting trajectories...")
-        trajectories = collect_trajectories_parallel(
+        trajectories = collect_trajectories_batch(
             env_factory,
             gflownet,
             epsilon,
             temperature,
             num_trajectories=config.batch_size,
+            min_batch_size=config.min_batch_size
         )
 
         # Add trajectories to buffer
         for trajectory in trajectories:
             buffer.add_trajectory(trajectory)
             rewards_history.append(trajectory.total_reward)
-
-        # current_trajectory = collect_trajectory(
-        #     env, gflownet, epsilon, temperature
-        # )
-        # buffer.add_trajectory(current_trajectory)
         
         # Train on batch
         if len(buffer) >= config.min_experiences:
@@ -65,94 +60,91 @@ def train(
         
     return rewards_history
 
-def collect_trajectory(
-    env: GridWorldEnv,
-    gflownet: GFlowNet,
-    epsilon: float,
-    temperature: float,
-) -> Trajectory:
-    """Collect a single trajectory by running the agent in the environment.
-    
-    Args:
-        env: The environment to interact with
-        gflownet: The GFlowNet model
-        epsilon: Probability of random action
-        temperature: Temperature for action sampling
-        
-    Returns:
-        Trajectory: Collected trajectory with states, actions, and rewards
-    """
-    current_trajectory = Trajectory([], [], [], [], False, 0.0, 0)
-    step_data = env.reset()
-    
-    while not step_data.done:
-        state = step_data.state
-        
-        # Get action using epsilon-greedy with temperature
-        if torch.rand(1) < epsilon:
-            action = Action(torch.randint(gflownet.config.action_dim, (1,)).item())
-        else:
-            with torch.no_grad():
-                output = gflownet.forward(state.unsqueeze(0))
-                # Temperature scaled probabilities with numerical stability
-                logits = output.logits / temperature
-                probs = F.softmax(logits, dim=-1)
-                action_idx = torch.multinomial(probs[0], 1).item()
-                action = Action(action_idx)
-        
-        # Take step in environment
-        next_step_data = env.step(action)
-        
-        # Add to current trajectory
-        current_trajectory.states.append(state)
-        current_trajectory.action_indices.append(
-            torch.tensor(action.value, dtype=torch.long, device=state.device)
-        )
-        current_trajectory.actions.append(action)
-        current_trajectory.rewards.append(next_step_data.reward)
-        current_trajectory.total_reward += next_step_data.reward.item()
-        current_trajectory.length += 1
-        
-        step_data = next_step_data
-    
-    # Add final state without action
-    current_trajectory.states.append(step_data.state)
-    current_trajectory.done = True
-    
-    return current_trajectory
-
-def collect_trajectories_parallel(
+def collect_trajectories_batch(
     env_factory: Callable[[], GridWorldEnv],
     gflownet: GFlowNet,
     epsilon: float,
     temperature: float,
     num_trajectories: int,
-    num_workers: int = 4
+    min_batch_size: int = 4,
 ) -> List[Trajectory]:
-    """Collect multiple trajectories in parallel using multiple workers.
+    """Collect multiple trajectories with batched processing."""
+    # Initialize environments and trajectories
+    envs = [env_factory() for _ in range(num_trajectories)]
+    trajectories = [Trajectory([], [], [], [], False, 0.0, 0) for _ in range(num_trajectories)]
     
-    Args:
-        env_factory: Function that creates new environment instances
-        gflownet: The GFlowNet model
-        epsilon: Probability of random action
-        temperature: Temperature for action sampling
-        num_trajectories: Number of trajectories to collect
-        num_workers: Number of parallel workers
+    # Track which environments are still active
+    active_envs = list(range(num_trajectories))
+    
+    # Get initial states
+    current_steps = [env.reset() for env in envs]
+    
+    while active_envs:
+        # Collect states from active environments
+        states = []
+        active_indices = []  # Keep track of which trajectories these states belong to
         
-    Returns:
-        List[Trajectory]: List of collected trajectories
-    """
-    from concurrent.futures import ThreadPoolExecutor
-    
-    def collect_single():
-        env = env_factory()
-        return collect_trajectory(env, gflownet, epsilon, temperature)
-    
-    with ThreadPoolExecutor(max_workers=num_workers) as executor:
-        trajectories = list(executor.map(
-            lambda _: collect_single(),
-            range(num_trajectories)
-        ))
+        for idx in active_envs:
+            states.append(current_steps[idx].state)
+            active_indices.append(idx)
+            
+            # Add state to trajectory
+            if len(trajectories[idx].states) == 0:
+                trajectories[idx].states.append(current_steps[idx].state)
+        
+        if not states:  # All environments are done
+            break
+            
+        # Process batch of states
+        state_batch = torch.stack(states)
+        
+        # Get actions for entire batch
+        with torch.no_grad():
+            output = gflownet.forward(state_batch)
+            
+            # Handle epsilon-greedy exploration
+            random_mask = torch.rand(len(states)) < epsilon
+            
+            # Get actions from policy
+            logits = output.logits / temperature
+            probs = F.softmax(logits, dim=-1)
+            policy_actions = torch.multinomial(probs, 1).squeeze(-1)
+            
+            # Random actions for exploration
+            random_action_indices = torch.randint(
+                gflownet.config.action_dim, 
+                (len(states),)
+            )
+            
+            # Combine random and policy actions
+            action_indices = torch.where(
+                random_mask,
+                random_action_indices,
+                policy_actions
+            )
+        
+        # Take steps in environments
+        for batch_idx, env_idx in enumerate(active_indices):
+            action = Action(action_indices[batch_idx].item())
+            
+            # Take step in environment
+            step_data = envs[env_idx].step(action)
+            current_steps[env_idx] = step_data
+            
+            # Update trajectory
+            trajectories[env_idx].action_indices.append(
+                torch.tensor(action.value, dtype=torch.long)
+            )
+            trajectories[env_idx].actions.append(action)
+            trajectories[env_idx].rewards.append(step_data.reward)
+            trajectories[env_idx].total_reward += step_data.reward.item()
+            trajectories[env_idx].length += 1
+            trajectories[env_idx].states.append(step_data.state)
+            
+            # Check if environment is done
+            if step_data.done:
+                trajectories[env_idx].done = True
+                active_envs.remove(env_idx)
     
     return trajectories
 
@@ -165,7 +157,7 @@ def visualize_flows(
     Visualize the flows and policy for a given state
     """
     with torch.no_grad():
-        output = gflownet.forward(state.unsqueeze(0))
+        output = gflownet.forward(state)
         flows = output.flows[0]
         policy = flows / output.state_flow[0]
         
