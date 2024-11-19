@@ -18,6 +18,7 @@
           numpy
           torch
           matplotlib
+          seaborn
         ]))
       ];
 
