@@ -1,6 +1,6 @@
 import gflownet
+import gflownet_optimized
 import ben
 
 if __name__ == "__main__":
-    gflownet.main()
-    # ben.main()
+    gflownet_optimized.main()

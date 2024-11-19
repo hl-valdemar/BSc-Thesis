@@ -14,25 +14,35 @@ class FlowNetwork(nn.Module):
     def __init__(self, config: GFlowNetConfig):
         super().__init__()
 
+        # Wider but shallower network with batch optimization (compared to the unoptimized implementation)
+        self.network = nn.Sequential(
+            nn.Linear(config.state_dim, config.hidden_dim * 2),
+            nn.BatchNorm1d(config.hidden_dim * 2),
+            nn.ReLU(),
+            nn.Linear(config.hidden_dim * 2, config.action_dim),
+        )
+
         # Initialize with small positive values
         self.log_Z = nn.Parameter(torch.tensor(0.0)) # Log partition function
 
-        # Neural network to predict flows
-        self.network = nn.Sequential(
-            nn.Linear(config.state_dim, config.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(config.hidden_dim, config.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(config.hidden_dim, config.action_dim),
-        )
+        # Layer normalization for better gradient flow
+        self.layer_norm = nn.LayerNorm(config.action_dim)
 
     def forward(self, state: torch.Tensor) -> torch.Tensor:
         """
         Predict log flows for all actions from a state
+        Args:
+            state: torch.Tensor of shape [batch_size, state_dim]
         Returns:
             logits: torch.Tensor of shape [batch_size, action_dim]
         """
+        # Ensure proper batching
+        if state.dim() == 1:
+            state = state.unsqueeze(0)
+
+        # Forward pass with improved numerical stability
         logits = self.network(state)
+        logits = self.layer_norm(logits)
         return logits + self.log_Z # Add in log space
 
 class GFlowNet(nn.Module):
@@ -41,18 +51,17 @@ class GFlowNet(nn.Module):
         self.config = config
         self.flow_network = FlowNetwork(config)
 
+        # Add gradient clipping threshold
+        self.grad_clip_val = 1.0
+
         # Create optimizer but allow configuration
         self.setup_optimizer(
             optimizer_type='adam',
             lr=config.learning_rate,
-            weight_decay=config.weight_decay
+            weight_decay=config.weight_decay,
+            betas=(0.9, 0.999),
+            eps=1e-8,
         )
-
-        # self.optimizer = torch.optim.Adam(
-        #     self.flow_network.parameters(),
-        #     lr=config.learning_rate,
-        #     weight_decay=config.weight_decay,   # L2 regularization
-        # )
 
     def setup_optimizer(
         self, 
@@ -85,8 +94,8 @@ class GFlowNet(nn.Module):
             mode='min',
             factor=0.5,
             patience=5,
+            min_lr=1e-6,
         )
-
 
     def forward(self, state: torch.Tensor) -> GFlowOutput:
         """
@@ -94,11 +103,15 @@ class GFlowNet(nn.Module):
         Args:
             state: torch.Tensor of shape [batch_size, state_dim]
         """
+        # Ensure proper batching
+        if state.dim() == 1:
+            state = state.unsqueeze(0)
+
         # Get log flows (logits)
         logits = self.flow_network(state)
         
-        # Convert to actual flows (always positive)
-        flows = torch.exp(logits)
+        # More numerically stable flow computation (compared to unoptimized version)
+        flows = torch.exp(logits - logits.max(dim=-1, keepdim=True)[0])
         
         # Calculate total flow through state
         state_flow = flows.sum(dim=-1, keepdim=True)
@@ -150,33 +163,41 @@ class GFlowNet(nn.Module):
     ) -> torch.Tensor:
         losses = []
 
-        for t in range(len(trajectory.states) - 1):
-            # Add batch dimension and get flows
-            curr_state = trajectory.states[t].unsqueeze(0)  # Shape: [1, state_dim]
-            next_state = trajectory.states[t + 1].unsqueeze(0)  # Shape: [1, state_dim]
+        # Process trajectory in chunks for better memory efficiency
+        chunk_size = 32
+        for t in range(0, len(trajectory.states) - 1, chunk_size):
+            chunk_end = min(t + chunk_size, len(trajectory.states) - 1)
 
-            curr_output = self.forward(curr_state)  # Get flows for current state
-            next_output = self.forward(next_state)  # Get flows for next state
+            # Get current and next states for chunk
+            curr_states = trajectory.states[t:chunk_end]
+            next_states = trajectory.states[t + 1:chunk_end + 1]
+            curr_actions = trajectory.action_indices[t:chunk_end]
 
-            # Properly shape action index for gathering
-            # Shape: [1, 1] to match [batch_size, 1] for gathering from [batch_size, action_dim]
-            action_idx = trajectory.action_indices[t].view(1, 1)
+            # Batch process states
+            curr_output = self.forward(torch.stack(curr_states))
+            next_output = self.forward(torch.stack(next_states))
 
-            # Gather current flow
-            curr_flow = curr_output.flows.gather(1, action_idx)  # Shape: [1, 1]
+            # Compute loss for chunk
+            curr_flow = curr_output.flows.gather(1, torch.stack(curr_actions).unsqueeze(1))
 
-            if t == len(trajectory.states) - 2 and trajectory.done:
-                # For terminal states, match against reward
-                target_flow = trajectory.rewards[-1].view_as(curr_flow)
-            else:
-                # For non-terminal states, match against next state flow
-                target_flow = next_output.state_flow  # Already has shape [1, 1]
+            # Handle terminal states in chunk
+            is_terminal = torch.tensor([
+                t == len(trajectory.states) - 2 and trajectory.done
+                for t in range(chunk_end - t)
+            ], device=curr_flow.device)
+
+            target_flow = torch.where(
+                is_terminal.unsqueeze(1),
+                torch.stack(trajectory.rewards[t:chunk_end]).unsqueeze(1),
+                next_output.state_flow,
+            )
 
             # Compute loss using log space for numerical stability
             loss = (torch.log(curr_flow + epsilon) - torch.log(target_flow + epsilon)) ** 2
             losses.append(loss)
 
-        return torch.mean(torch.stack(losses))
+        return torch.cat(losses).mean()
+
 
     def compute_regularization_loss(
         self, 

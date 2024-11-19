@@ -31,3 +31,8 @@ class GFlowNetTrainingConfig:
     temperature_end: float = 0.1
     temperature_decay: float = 0.995
     trajectory_length: int = 50  # Max length of trajectories to store
+    grad_clip: float = 1.0
+    # learning_rate: float = 1e-4
+    # weight_decay: float = 1e-5
+    chunk_size: int = 32
+    num_workers: int = 4
