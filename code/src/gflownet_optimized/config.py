@@ -2,17 +2,22 @@ from dataclasses import dataclass
 
 import torch
 
+
 @dataclass
 class GFlowNetConfig:
     state_dim: int
     action_dim: int
     hidden_dim: int = 64
+    num_episodes: int = 1000
     batch_size: int = 16
     min_batch_size: int = 4
-    learning_rate: float = 1e-4
+    learning_rate: float = 5e-5
+    lr_warmup_steps: int = 1000
+    min_lr: float = 1e-6
     weight_decay: float = 1e-5
     flow_entropy_coef: float = 0.01  # For flow regularization
     grad_clip: float = 1.0
+    action_entropy_coef: float = 0.01
     
 @dataclass 
 class GFlowOutput:

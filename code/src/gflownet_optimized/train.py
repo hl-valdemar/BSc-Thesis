@@ -9,34 +9,56 @@ import torch.nn.functional as F
 from gridworld import Action
 
 from .config import GFlowNetConfig, GFlowNetTrainingConfig
-from .env import GridWorldEnv, ReplayBuffer, Trajectory
+from .env import (Curriculum, GridWorldEnv, PrioritizedReplayBuffer,
+                  Trajectory, create_curriculum_env_factory)
 from .model import GFlowNet
 
 
 def train_gflownet(
-    env_factory: Callable[[], GridWorldEnv],
+    curriculum: Curriculum,
     config: GFlowNetTrainingConfig,
 ) -> Tuple[Dict[str, Any], GFlowNet]:
-    buffer = ReplayBuffer(config.replay_capacity, config.trajectory_length)
+    # Initialize buffer and other components
+    buffer = PrioritizedReplayBuffer(
+        capacity=config.replay_capacity,
+        max_trajectory_length=config.trajectory_length,
+        alpha=0.6,
+        beta=0.4
+    )
+    
     rewards_history = []
     metrics_history = []
     epsilon_history = []
     temperature_history = []
     success_history = []
+    success_rate_history = []
+    curriculum_history = []  # Track curriculum changes
 
     epsilon = config.epsilon_start
     temperature = config.temperature_start
 
-    # Initialize environments and trajectories
-    envs = [env_factory() for _ in range(config.batch_size)]
+    # Create initial environment factory
+    env_factory = create_curriculum_env_factory(curriculum)
+    envs: List[GridWorldEnv] = []
+    for _ in range(config.batch_size):
+        env = env_factory()
+        while env is None:
+            print("Failed to generate necessary environment, retrying...")
+            env = env_factory()
 
-    gflownet_config = GFlowNetConfig(state_dim=envs[0].state_dim, action_dim=envs[0].action_dim)
+        envs.append(env)
+
+
+    gflownet_config = GFlowNetConfig(
+        state_dim=envs[0].state_dim,
+        action_dim=envs[0].action_dim,
+        num_episodes=config.num_episodes,
+    )
     gflownet = GFlowNet(gflownet_config)
     
     # Training loop
     for episode in range(config.num_episodes):
-        # Collect multiple trajectories
-        print("Collecting trajectories...")
+        # Collect trajectories
         trajectories = collect_trajectories_batch(
             envs,
             gflownet,
@@ -44,50 +66,175 @@ def train_gflownet(
             temperature,
         )
 
+        # Calculate success metrics
+        successes = sum(1 for t in trajectories if t.done and t.total_reward > 0)
+        success_rate = successes / len(trajectories)
+        success_history.append(successes)  # Raw successes
+        success_rate_history.append(success_rate)  # Rates
+        
+        # Update curriculum
+        curriculum.record_success(success_rate)
+        if curriculum.should_increase_difficulty():
+            curriculum.increase_difficulty()
+            # REPLACE environments with new ones
+            envs = []  # Clear existing envs
+            env_factory = create_curriculum_env_factory(curriculum)
+            
+            for _ in range(config.batch_size):
+                env = env_factory()
+                while env is None:
+                    print("Failed to generate necessary environment, retrying...")
+                    env = env_factory()
+                envs.append(env)
+
+            curriculum_history.append(curriculum.get_current_params())
+            print(f"Episode {episode}: Increasing difficulty to {curriculum.get_current_params()}")
+
         # Add trajectories to buffer
         for trajectory in trajectories:
             buffer.add_trajectory(trajectory)
             rewards_history.append(trajectory.total_reward)
-        
-        successes = sum(1 for t in trajectories if t.done and t.total_reward > 0)
-        success_rate = successes / len(trajectories)
-        success_history.append(success_rate)
 
-        # Train on batch
+        # Training with gradient accumulation and prioritized replay
         if len(buffer) >= config.min_experiences:
-            train_trajectories = buffer.sample(config.batch_size)
-            if train_trajectories is not None:
-                print("Updating gflownet...")
-                metrics = gflownet.update(train_trajectories)
+            larger_batch_size = config.batch_size * gflownet.accumulation_steps
+            result = buffer.sample(larger_batch_size)
+            
+            if result is not None:
+                train_trajectories, indices, weights = result
+                metrics = gflownet.update(
+                    train_trajectories,
+                    indices=indices,
+                    weights=weights
+                )
+                buffer.update_priorities(indices, np.array([metrics['td_errors']]))
                 metrics_history.append(metrics)
                 
+                # Logging
                 if (episode + 1) % 10 == 0:
                     print(f"Episode {episode + 1}:")
+                    print(f"  Grid size: {curriculum.current_grid_size}")
                     print(f"  Success rate: {success_rate:.3f}")
                     for k, v in metrics.items():
-                        print(f"  {k}: {v:.4f}")
+                        print(f"  {k}: {v:.8f}")
         
         # Update exploration parameters
-        epsilon = max(
-            config.epsilon_end,
-            epsilon * config.epsilon_decay
-        )
-        temperature = max(
-            config.temperature_end,
-            temperature * config.temperature_decay
-        )
-
+        epsilon = max(config.epsilon_end, epsilon * config.epsilon_decay)
+        temperature = max(config.temperature_end, temperature * config.temperature_decay)
+        
         epsilon_history.append(epsilon)
         temperature_history.append(temperature)
-        
+    
     return {
         "rewards": rewards_history, 
         "metrics": metrics_history,
         "epsilons": epsilon_history,
         "temperatures": temperature_history,
         "successes": success_history,
+        "success_rates": success_rate_history,
+        "curriculum": curriculum_history,
     }, gflownet
 
+# def train_gflownet(
+#     env_factory: Callable[[], GridWorldEnv],
+#     config: GFlowNetTrainingConfig,
+# ) -> Tuple[Dict[str, Any], GFlowNet]:
+#     # Initialize buffer and metrics tracking
+#     # buffer = ReplayBuffer(config.replay_capacity, config.trajectory_length)
+#     buffer = PrioritizedReplayBuffer(
+#         capacity=config.replay_capacity,
+#         max_trajectory_length=config.trajectory_length,
+#         alpha=0.6, # Priority exponent
+#         beta=0.4, # Initial importance sampling weight
+#     )
+#
+#     rewards_history = []
+#     metrics_history = []
+#     epsilon_history = []
+#     temperature_history = []
+#     success_history = []
+#
+#     epsilon = config.epsilon_start
+#     temperature = config.temperature_start
+#
+#     # Initialize environments and trajectories
+#     envs = [env_factory() for _ in range(config.batch_size)]
+#
+#     gflownet_config = GFlowNetConfig(state_dim=envs[0].state_dim, action_dim=envs[0].action_dim)
+#     gflownet = GFlowNet(gflownet_config)
+#
+#     # Training loop
+#     for episode in range(config.num_episodes):
+#         # Collect multiple trajectories
+#         print("Collecting trajectories...")
+#         trajectories = collect_trajectories_batch(
+#             envs,
+#             gflownet,
+#             epsilon,
+#             temperature,
+#         )
+#
+#         # Add trajectories to buffer
+#         for trajectory in trajectories:
+#             buffer.add_trajectory(trajectory)
+#             rewards_history.append(trajectory.total_reward)
+#
+#         # Compute success rate
+#         successes = sum(1 for t in trajectories if t.done and t.total_reward > 0)
+#         success_rate = successes / len(trajectories)
+#         success_history.append(success_rate)
+#
+#         # Train on batch with prioritized replay
+#         if len(buffer) >= config.min_experiences:
+#             # Need larger batch for gradient accumulation
+#             larger_batch_size = config.batch_size * gflownet.accumulation_steps
+#
+#             # Sample batch with importance sampling weights
+#             result = buffer.sample(larger_batch_size)
+#
+#             if result is not None:
+#                 train_trajectories, indices, weights = result
+#
+#                 # Update model
+#                 print("Updating gflownet...")
+#                 metrics = gflownet.update(
+#                     train_trajectories,
+#                     indices=indices,
+#                     weights=weights,
+#                 )
+#
+#                 # Update priorities based on new TD errors
+#                 buffer.update_priorities(indices, np.array([metrics['td_errors']]))
+#                 metrics_history.append(metrics)
+#
+#                 # Logging
+#                 if (episode + 1) % 10 == 0:
+#                     print(f"Episode {episode + 1}:")
+#                     print(f"  Success rate: {success_rate:.3f}")
+#                     for k, v in metrics.items():
+#                         print(f"  {k}: {v:.4f}")
+#
+#         # Update exploration parameters
+#         epsilon = max(
+#             config.epsilon_end,
+#             epsilon * config.epsilon_decay
+#         )
+#         temperature = max(
+#             config.temperature_end,
+#             temperature * config.temperature_decay
+#         )
+#
+#         epsilon_history.append(epsilon)
+#         temperature_history.append(temperature)
+#
+#     return {
+#         "rewards": rewards_history, 
+#         "metrics": metrics_history,
+#         "epsilons": epsilon_history,
+#         "temperatures": temperature_history,
+#         "successes": success_history,
+#     }, gflownet
+#
 def collect_trajectories_batch(
     envs: List[GridWorldEnv],
     gflownet: GFlowNet,
@@ -177,7 +324,8 @@ def visualize_training_metrics(
     metrics_history: List[Dict[str, float]],
     epsilon_history: List[float],
     temperature_history: List[float],
-    success_history: List[float],
+    success_history: List[int],  # Raw successes
+    success_rate_history: List[float],  # Success rates
     gflownet: GFlowNet,
     env_factory: Callable[[], GridWorldEnv],
 ):
@@ -185,10 +333,10 @@ def visualize_training_metrics(
     # Set the seaborn style
     sns.set_theme(style="whitegrid")
 
-    fig = plt.figure(figsize=(20, 12))
+    fig = plt.figure(figsize=(20, 15))
     
     # 1. Rewards subplot
-    ax1 = plt.subplot(231)
+    ax1 = plt.subplot(331)
     ax1.plot(rewards_history, alpha=0.3, color='blue', label='Raw rewards')
     # Add moving average
     window_size = 50
@@ -204,42 +352,66 @@ def visualize_training_metrics(
     ax1.set_ylabel('Total Reward')
     ax1.legend()
     
-    # 2. Loss components
-    ax2 = plt.subplot(232)
+    # 2. Success Metrics
+    ax2 = plt.subplot(332)
+    # Plot raw successes
+    ax2.plot(success_history, alpha=0.3, color='green', label='Raw successes')
+    # Plot success rate
+    ax2.plot(success_rate_history, color='blue', label='Success rate')
+    # Add moving averages
+    success_avg = np.convolve(success_history, 
+                             np.ones(window_size)/window_size, 
+                             mode='valid')
+    rate_avg = np.convolve(success_rate_history, 
+                          np.ones(window_size)/window_size, 
+                          mode='valid')
+    ax2.plot(range(window_size-1, len(success_history)), 
+             success_avg, 
+             color='darkgreen', 
+             label='Success MA')
+    ax2.plot(range(window_size-1, len(success_rate_history)), 
+             rate_avg, 
+             color='darkblue', 
+             label='Rate MA')
+    ax2.set_title('Success Metrics')
+    ax2.set_xlabel('Episode')
+    ax2.set_ylabel('Count / Rate')
+    ax2.legend()
+    
+    # 3. Loss components
+    ax3 = plt.subplot(333)
     episodes = range(len(metrics_history))
     flow_losses = [m['flow_loss'] for m in metrics_history]
     balance_losses = [m['balance_loss'] for m in metrics_history]
     reg_losses = [m['reg_loss'] for m in metrics_history]
+    entropy_losses = [m['entropy_loss'] for m in metrics_history]
     
-    ax2.plot(episodes, flow_losses, label='Flow Loss')
-    ax2.plot(episodes, balance_losses, label='Balance Loss')
-    ax2.plot(episodes, reg_losses, label='Reg Loss')
-    ax2.set_yscale('log')
-    ax2.set_title('Training Losses')
-    ax2.set_xlabel('Episode')
-    ax2.set_ylabel('Loss (log scale)')
-    ax2.legend()
-    
-    # 3. Exploration parameters
-    ax3 = plt.subplot(233)
-    ax3.plot(epsilon_history, label='Epsilon')
-    ax3.plot(temperature_history, label='Temperature')
-    ax3.set_title('Exploration Parameters')
+    ax3.plot(episodes, flow_losses, label='Flow Loss')
+    ax3.plot(episodes, balance_losses, label='Balance Loss')
+    ax3.plot(episodes, reg_losses, label='Reg Loss')
+    ax3.plot(episodes, entropy_losses, label='Entropy Loss')
+    ax3.set_yscale('log')
+    ax3.set_title('Training Losses')
     ax3.set_xlabel('Episode')
-    ax3.set_ylabel('Value')
+    ax3.set_ylabel('Loss (log scale)')
     ax3.legend()
     
-    # 4. Success rate
-    ax4 = plt.subplot(234)
-    ax4.plot(success_history, color='green')
-    ax4.set_title('Success Rate')
+    # 4. Exploration parameters
+    ax4 = plt.subplot(334)
+    ax4.plot(epsilon_history, label='Epsilon')
+    ax4.plot(temperature_history, label='Temperature')
+    ax4.set_title('Exploration Parameters')
     ax4.set_xlabel('Episode')
-    ax4.set_ylabel('Success Rate')
-    ax4.set_ylim((0, 1))
+    ax4.set_ylabel('Value')
+    ax4.legend()
     
     # 5. Flow network visualization for a sample environment
-    ax5 = plt.subplot(235)
+    ax5 = plt.subplot(335)
     env = env_factory()
+    while env is None:
+        print("Failed to generate valid environment, retrying...")
+        env = env_factory()
+
     state = env.reset().state
     
     # Create grid for flow visualization
@@ -262,7 +434,7 @@ def visualize_training_metrics(
     ax5.set_title('Flow Network Values')
     
     # 6. Policy distribution
-    ax6 = plt.subplot(236)
+    ax6 = plt.subplot(336)
     # Sample a state and show action probabilities
     with torch.no_grad():
         output = gflownet.forward(state.unsqueeze(0))
@@ -273,6 +445,26 @@ def visualize_training_metrics(
     ax6.set_title('Action Distribution (Sample State)')
     ax6.set_ylabel('Probability')
     plt.xticks(rotation=45)
-    
+
+    # 7. Learning rate if available
+    if metrics_history and 'learning_rate' in metrics_history[0]:
+        ax7 = plt.subplot(337)
+        learning_rates = [m['learning_rate'] for m in metrics_history]
+        ax7.plot(episodes, learning_rates)
+        ax7.set_title('Learning Rate')
+        ax7.set_xlabel('Episode')
+        ax7.set_ylabel('Learning Rate')
+        ax7.set_yscale('log')
+
+    # 8. TD Errors if available
+    if metrics_history and 'td_errors' in metrics_history[0]:
+        ax8 = plt.subplot(338)
+        td_errors = [m['td_errors'] for m in metrics_history]
+        ax8.plot(episodes, td_errors)
+        ax8.set_title('TD Errors')
+        ax8.set_xlabel('Episode')
+        ax8.set_ylabel('Error')
+        ax8.set_yscale('log')
+
     plt.tight_layout()
     plt.show()

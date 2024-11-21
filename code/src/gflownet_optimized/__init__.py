@@ -3,9 +3,8 @@ from typing import Callable, List, Tuple
 
 from gridworld import GridWorld
 
-from .config import GFlowNetConfig
-from .env import GridWorldEnv
-from .model import GFlowNet
+from .env import (Curriculum, CurriculumConfig, GridWorldEnv,
+                  create_curriculum_env_factory)
 from .train import (GFlowNetTrainingConfig, train_gflownet,
                     visualize_training_metrics)
 
@@ -141,14 +140,15 @@ def main():
         min_experiences=100
     )
 
+    # Initialize curriculum
+    curriculum_config = CurriculumConfig()
+    curriculum = Curriculum(curriculum_config)
+
+    # Create curriculum-based factory
+    env_factory = create_curriculum_env_factory(curriculum)
+
     # Train
-    env_factory = create_random_env_factory(
-        width=5,
-        height=5,
-        obstacle_density=0.15,
-        min_path_length=2
-    )
-    training_metrics, gflownet = train_gflownet(env_factory, training_config)
+    training_metrics, gflownet = train_gflownet(curriculum, training_config)
 
     visualize_training_metrics(
         rewards_history=training_metrics["rewards"],
@@ -156,6 +156,7 @@ def main():
         epsilon_history=training_metrics["epsilons"],
         temperature_history=training_metrics["temperatures"],
         success_history=training_metrics["successes"],
+        success_rate_history=training_metrics["success_rates"],
         gflownet=gflownet,
         env_factory=env_factory,
     )
