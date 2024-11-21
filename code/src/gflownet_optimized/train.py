@@ -1,22 +1,22 @@
-from typing import Callable, List, Dict, Any
+from typing import Any, Callable, Dict, List, Tuple
 
+import matplotlib.pyplot as plt
 import numpy as np
-
+import seaborn as sns
 import torch
 import torch.nn.functional as F
 
-import matplotlib.pyplot as plt
-
 from gridworld import Action
-from .model import GFlowNet
-from .env import GridWorldEnv, ReplayBuffer, Trajectory
-from .config import GFlowNetTrainingConfig
 
-def train(
+from .config import GFlowNetConfig, GFlowNetTrainingConfig
+from .env import GridWorldEnv, ReplayBuffer, Trajectory
+from .model import GFlowNet
+
+
+def train_gflownet(
     env_factory: Callable[[], GridWorldEnv],
-    gflownet: GFlowNet, 
     config: GFlowNetTrainingConfig,
-) -> Dict[str, Any]:
+) -> Tuple[Dict[str, Any], GFlowNet]:
     buffer = ReplayBuffer(config.replay_capacity, config.trajectory_length)
     rewards_history = []
     metrics_history = []
@@ -26,18 +26,22 @@ def train(
 
     epsilon = config.epsilon_start
     temperature = config.temperature_start
+
+    # Initialize environments and trajectories
+    envs = [env_factory() for _ in range(config.batch_size)]
+
+    gflownet_config = GFlowNetConfig(state_dim=envs[0].state_dim, action_dim=envs[0].action_dim)
+    gflownet = GFlowNet(gflownet_config)
     
     # Training loop
     for episode in range(config.num_episodes):
         # Collect multiple trajectories
         print("Collecting trajectories...")
         trajectories = collect_trajectories_batch(
-            env_factory,
+            envs,
             gflownet,
             epsilon,
             temperature,
-            num_trajectories=config.batch_size,
-            min_batch_size=config.min_batch_size
         )
 
         # Add trajectories to buffer
@@ -82,23 +86,19 @@ def train(
         "epsilons": epsilon_history,
         "temperatures": temperature_history,
         "successes": success_history,
-    }
+    }, gflownet
 
 def collect_trajectories_batch(
-    env_factory: Callable[[], GridWorldEnv],
+    envs: List[GridWorldEnv],
     gflownet: GFlowNet,
     epsilon: float,
     temperature: float,
-    num_trajectories: int,
-    min_batch_size: int = 4,
 ) -> List[Trajectory]:
     """Collect multiple trajectories with batched processing."""
-    # Initialize environments and trajectories
-    envs = [env_factory() for _ in range(num_trajectories)]
-    trajectories = [Trajectory([], [], [], [], False, 0.0, 0) for _ in range(num_trajectories)]
+    trajectories = [Trajectory([], [], [], [], False, 0.0, 0) for _ in range(gflownet.config.batch_size)]
     
     # Track which environments are still active
-    active_envs = list(range(num_trajectories))
+    active_envs = list(range(gflownet.config.batch_size))
     
     # Get initial states
     current_steps = [env.reset() for env in envs]
@@ -172,27 +172,6 @@ def collect_trajectories_batch(
     
     return trajectories
 
-def visualize_flows(
-        # env: GridWorldEnv, 
-        gflownet: GFlowNet, 
-        state: torch.Tensor,
-    ) -> None:
-    """
-    Visualize the flows and policy for a given state
-    """
-    with torch.no_grad():
-        output = gflownet.forward(state)
-        flows = output.flows[0]
-        policy = flows / output.state_flow[0]
-        
-        print("\nFlows F(s,a):")
-        for action in Action:
-            print(f"{action.name}: {flows[action.value]:.3f}")
-            
-        print("\nPolicy π(a|s):")
-        for action in Action:
-            print(f"{action.name}: {policy[action.value]:.3f}")
-
 def visualize_training_metrics(
     rewards_history: List[float],
     metrics_history: List[Dict[str, float]],
@@ -203,7 +182,9 @@ def visualize_training_metrics(
     env_factory: Callable[[], GridWorldEnv],
 ):
     """Create comprehensive visualization of training metrics"""
-    plt.style.use('seaborn')
+    # Set the seaborn style
+    sns.set_theme(style="whitegrid")
+
     fig = plt.figure(figsize=(20, 12))
     
     # 1. Rewards subplot

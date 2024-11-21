@@ -1,14 +1,14 @@
+import random
 from typing import Callable, List, Tuple
 
-import random
-
-import matplotlib.pyplot as plt
-
 from gridworld import GridWorld
-from .env import GridWorldEnv
+
 from .config import GFlowNetConfig
+from .env import GridWorldEnv
 from .model import GFlowNet
-from .train import GFlowNetTrainingConfig, train, visualize_flows, visualize_training_metrics
+from .train import (GFlowNetTrainingConfig, train_gflownet,
+                    visualize_training_metrics)
+
 
 def create_random_env_factory(
     width: int = 8,
@@ -134,45 +134,21 @@ def test_random_env_factory():
         print()
 
 def main():
-    # Create a simple grid world
-    layout = """
-    #######
-    #s   g#
-    # o o #
-    #     #
-    #######
-    """
-
-    # Initialize environment
-    grid_world = GridWorld(layout=layout)
-    env = GridWorldEnv(grid_world)
-
-    # Initialize GFlowNet
-    config = GFlowNetConfig(
-        state_dim=env.state_dim,
-        action_dim=env.action_dim,
-        hidden_dim=64,
-        learning_rate=1e-4
-    )
-
-    gflownet = GFlowNet(config)
-
     # Training configuration
     training_config = GFlowNetTrainingConfig(
         num_episodes=1000,
-        batch_size=32,
         replay_capacity=10000,
         min_experiences=100
     )
 
     # Train
     env_factory = create_random_env_factory(
-        width=4,
-        height=4,
-        obstacle_density=0.10,  # 15% obstacles
+        width=5,
+        height=5,
+        obstacle_density=0.15,
         min_path_length=2
     )
-    training_metrics = train(env_factory, gflownet, training_config)
+    training_metrics, gflownet = train_gflownet(env_factory, training_config)
 
     visualize_training_metrics(
         rewards_history=training_metrics["rewards"],
@@ -184,7 +160,3 @@ def main():
         env_factory=env_factory,
     )
 
-    # Visualize flows for a few states
-    print("\nFinal Flow Values:")
-    test_state = env.reset().state
-    visualize_flows(gflownet, test_state)

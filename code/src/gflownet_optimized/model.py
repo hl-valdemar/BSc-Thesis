@@ -1,13 +1,14 @@
 from typing import Dict, List
 
 import numpy as np
-
 import torch
 import torch.nn as nn
 
 from gridworld import Action
+
 from .config import GFlowNetConfig, GFlowOutput
 from .env import Trajectory
+
 
 class FlowNetwork(nn.Module):
     """Main network that predicts flows F(s,a)"""
@@ -17,7 +18,7 @@ class FlowNetwork(nn.Module):
         # Wider but shallower network with batch optimization (compared to the unoptimized implementation)
         self.network = nn.Sequential(
             nn.Linear(config.state_dim, config.hidden_dim * 2),
-            nn.BatchNorm1d(config.hidden_dim * 2),
+            nn.LayerNorm(config.hidden_dim * 2),
             nn.ReLU(),
             nn.Linear(config.hidden_dim * 2, config.action_dim),
         )
@@ -239,8 +240,11 @@ class GFlowNet(nn.Module):
                 loss = loss * valid_mask.unsqueeze(1)
                 
                 losses.append(loss.mean())
+
+        loss = torch.stack(losses).mean() if losses else torch.tensor(0.0)
+        torch.nn.utils.clip_grad_norm_(self.parameters(), self.config.grad_clip)
         
-        return torch.stack(losses).mean() if losses else torch.tensor(0.0)
+        return loss
 
 
     def compute_regularization_loss(
@@ -273,9 +277,8 @@ class GFlowNet(nn.Module):
             0.01 * reg_loss
         )
         
-        # Backward pass with gradient clipping
+        # Backward pass
         total_loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.parameters(), self.config.grad_clip)
         self.optimizer.step()
         
         # Update learning rate
