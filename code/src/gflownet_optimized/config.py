@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-
 import torch
 
 
@@ -18,13 +17,17 @@ class GFlowNetConfig:
     flow_entropy_coef: float = 0.01  # For flow regularization
     grad_clip: float = 1.0
     action_entropy_coef: float = 0.01
-    
-@dataclass 
+    device: str = "cuda" if torch.cuda.is_available() else "cpu"  # Add device config
+    use_amp: bool = True  # Enable automatic mixed precision for better GPU performance
+
+
+@dataclass
 class GFlowOutput:
     flows: torch.Tensor  # F(s,a) for each action
     state_flow: torch.Tensor  # F(s) total flow through state
     logits: torch.Tensor  # log F(s,a) for numerical stability
     log_Z: torch.Tensor  # log partition function
+
 
 @dataclass
 class GFlowNetTrainingConfig:
