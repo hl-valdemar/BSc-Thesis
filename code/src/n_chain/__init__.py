@@ -1,1 +1,1 @@
-from .n_chain import NChain
+from n_chain.n_chain import NChainEnv, NChainState

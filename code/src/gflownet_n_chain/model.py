@@ -1,156 +1,164 @@
-from typing import List, Tuple
+from dataclasses import dataclass
+from typing import List, Optional
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch import Tensor
 
-from n_chain import NChain
 
-
-class GFlowNet(nn.Module):
+@dataclass
+class GFlowNetOutput:
     """
-    Basic GFlowNet implementation for N-Chain environment.
+    Container for GFlowNet forward pass outputs.
+
+    Attributes:
+        logits_pf: Forward policy logits, shape [batch_size, num_actions]
+        logits_pb: Backward policy logits, shape [batch_size, num_actions]
+        log_state_flow: Log flow through state, shape [batch_size]
     """
 
-    def __init__(self, n_states: int, n_actions: int, hidden_dim: int = 64):
+    logits_pf: Tensor
+    logits_pb: Tensor
+    log_state_flow: Tensor
+
+
+class GFlowNetModel(nn.Module):
+    """
+    GFlowNet implementation for N-Chain problem.
+
+    The model takes a state and outputs:
+    1. Forward policy probabilities (PF)
+    2. Backward policy probabilities (PB)
+    3. State flow values
+
+    Architecture:
+    - Shared MLP backbone
+    - Separate heads for PF, PB, and flow
+    """
+
+    def __init__(self, state_dim: int, num_actions: int, hidden_dim: int = 64):
+        """
+        Args:
+            state_dim: Dimension of state space (n for n-chain)
+            num_actions: Number of possible actions (2 for n-chain)
+            hidden_dim: Hidden layer dimension
+        """
         super().__init__()
-        self.n_states = n_states
-        self.n_actions = n_actions
 
-        # State embedding
-        self.state_embedding = nn.Embedding(n_states, hidden_dim)
-
-        # Forward policy network (PF)
-        self.policy_net = nn.Sequential(
+        # Shared backbone
+        self.backbone = nn.Sequential(
+            nn.Linear(state_dim, hidden_dim),
+            nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, n_actions),
         )
 
-        # Flow network for F(s)
-        self.flow_net = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim), nn.ReLU(), nn.Linear(hidden_dim, 1)
+        # Policy heads
+        self.pf_head = nn.Linear(hidden_dim, num_actions)  # Forward policy
+        self.pb_head = nn.Linear(hidden_dim, num_actions)  # Backward policy
+
+        # State flow head (scalar)
+        self.flow_head = nn.Linear(hidden_dim, 1)
+
+        # Save dims for shape checking
+        self.state_dim = state_dim
+        self.num_actions = num_actions
+
+    def _check_input_shapes(self, states: Tensor):
+        """Validate input tensor shapes.
+
+        Args:
+            states: Shape [batch_size, state_dim]
+        """
+        assert (
+            states.ndim == 2
+        ), f"Expected states to have 2 dims, got shape {states.shape}"
+        assert (
+            states.shape[1] == self.state_dim
+        ), f"Expected states to have shape [batch_size, {self.state_dim}], got {states.shape}"
+
+    def forward(self, states: Tensor) -> GFlowNetOutput:
+        """
+        Forward pass computing policy and flow outputs.
+
+        Args:
+            states: Tensor of shape [batch_size, state_dim]
+
+        Returns:
+            GFlowNetOutput containing:
+                - logits_pf: Forward policy logits [batch_size, num_actions]
+                - logits_pb: Backward policy logits [batch_size, num_actions]
+                - log_state_flow: Log flow values [batch_size]
+        """
+        self._check_input_shapes(states)
+
+        # Get shared features
+        features = self.backbone(states)  # Shape: [batch_size, hidden_dim]
+
+        # Compute outputs
+        logits_pf = self.pf_head(features)  # Shape: [batch_size, num_actions]
+        logits_pb = self.pb_head(features)  # Shape: [batch_size, num_actions]
+        log_state_flow = self.flow_head(features).squeeze(-1)  # Shape: [batch_size]
+
+        return GFlowNetOutput(
+            logits_pf=logits_pf,
+            logits_pb=logits_pb,
+            log_state_flow=log_state_flow,
         )
 
-    def forward(self, states: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def get_forward_policy(
+        self,
+        states: Tensor,
+        valid_actions: Optional[List[List[int]]] = None,
+        temperature: float = 1.0,
+    ) -> Tensor:
         """
-        Forward pass to compute policy and flows.
+        Get forward policy probabilities PF(a|s).
 
         Args:
-            states: Tensor of state indices [batch_size]
+            states: States to get policy for, shape [batch_size, state_dim]
+            valid_actions: List of lists containing valid actions for each state
+            temperature: Softmax temperature (higher = more uniform)
 
         Returns:
-            policy_logits: Unnormalized log probabilities of actions [batch_size, n_actions]
-            log_flows: Log of state flows [batch_size, 1]
+            Tensor: Forward policy probs, shape [batch_size, num_actions]
         """
-        x: torch.Tensor = self.state_embedding(states)  # [batch_size, hidden_dim]
+        outputs = self.forward(states)
+        logits = outputs.logits_pf / temperature
 
-        # Compute policy logits
-        policy_logits: torch.Tensor = self.policy_net(x)  # [batch_size, n_actions]
+        # Mask invalid actions if provided
+        if valid_actions is not None:
+            mask = torch.zeros_like(logits, dtype=torch.bool)
+            for i, actions in enumerate(valid_actions):
+                mask[i, actions] = True
+            logits = logits.masked_fill(~mask, float("-inf"))
 
-        # Compute log flows (ensure positivity through exponential)
-        log_flows: torch.Tensor = self.flow_net(x)  # [batch_size, 1]
+        return F.softmax(logits, dim=-1)
 
-        return policy_logits, log_flows
-
-    def compute_trajectory_balance_loss(
-        self, trajectories: List[List[Tuple[int, int]]]
-    ) -> torch.Tensor:
+    def get_backward_policy(self, states: Tensor, temperature: float = 1.0) -> Tensor:
         """
-        Compute trajectory balance loss for a batch of trajectories.
-
-        Loss = (log F(s₀) + Σ log PF(aₜ|sₜ) - log R(x))²
+        Get backward policy probabilities PB(s|s').
 
         Args:
-            trajectories: List of trajectories, each containing (state, action) pairs
-            rewards: Terminal rewards for each trajectory [batch_size]
+            states: States to get policy for, shape [batch_size, state_dim]
+            temperature: Softmax temperature
 
         Returns:
-            loss: Trajectory balance loss
+            Tensor: Backward policy probs, shape [batch_size, num_actions]
         """
-        batch_size = len(trajectories)
-        device = next(self.parameters()).device
+        outputs = self.forward(states)
+        return F.softmax(outputs.logits_pb / temperature, dim=-1)
 
-        # Convert trajectories to tensors
-        max_len = max(len(traj) for traj in trajectories)
-        state_tensor = torch.full((batch_size, max_len), -1, device=device)
-        action_tensor = torch.full((batch_size, max_len), -1, device=device)
-        mask = torch.zeros((batch_size, max_len), device=device)
-
-        for i, traj in enumerate(trajectories):
-            states, actions = zip(*traj)
-            traj_len = len(traj)
-            state_tensor[i, :traj_len] = torch.tensor(states, device=device)
-            action_tensor[i, :traj_len] = torch.tensor(actions, device=device)
-            mask[i, :traj_len] = 1
-
-        # Compute initial state flows
-        _, initial_log_flows = self.forward(state_tensor[:, 0])
-
-        # Compute action probabilities for each step
-        total_log_probs = torch.zeros(batch_size, device=device)
-
-        for t in range(max_len):
-            # Skip if all trajectories are done
-            if not mask[:, t].any():
-                break
-
-            # Get policy logits for current states
-            policy_logits, _ = self.forward(state_tensor[:, t])
-
-            # Compute log probabilities of chosen actions
-            log_probs = F.log_softmax(policy_logits, dim=-1)
-            step_log_probs = torch.gather(
-                log_probs, 1, action_tensor[:, t].unsqueeze(-1)
-            ).unsqueeze(-1)
-
-            # Add to total, considering mask
-            total_log_probs += step_log_probs * mask[:, t]
-
-        # Compute loss: (log F(s₀) + Σ log PF(aₜ|sₜ) - log R(x))²
-        log_rewards = torch.log(
-            rewards + 1e-8
-        )  # Add small epsilon for numerical stability
-        loss = (
-            (initial_log_flows.squeeze(-1) + total_log_probs - log_rewards)
-            .pow(2)
-            .mean()
-        )
-
-        return loss
-
-    def sample_trajectory(self, env: NChain) -> Tuple[List[Tuple[int, int]], float]:
+    def get_state_flow(self, states: Tensor) -> Tensor:
         """
-        Sample a trajectory using the current policy.
+        Get flow values F(s) for states.
 
         Args:
-            env: N-Chain environment instance
+            states: States to get flow for, shape [batch_size, state_dim]
 
         Returns:
-            trajectory: List of (state, action) pairs
-            reward: Final reward received
+            Tensor: Flow values, shape [batch_size]
         """
-        device = next(self.parameters()).device
-        state = env.reset()
-        trajectory = []
-        done = False
-        total_reward = 0
-
-        while not done:
-            # Get action probabilities
-            state_tensor = torch.tensor([state], device=device)
-            policy_logits, _ = self.forward(state_tensor)
-            action_probs = F.softmax(policy_logits, dim=-1)
-
-            # Sample action
-            action = torch.multinomial(action_probs[0], 1).item()
-
-            # Take step in environment
-            next_state, reward, done = env.step(Action(action))
-
-            # Store transition
-            trajectory.append((state, action))
-            total_reward += reward
-            state = next_state
-
-        return trajectory, total_reward
+        outputs = self.forward(states)
+        return torch.exp(outputs.log_state_flow)  # Convert from log space

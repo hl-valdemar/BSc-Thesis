@@ -1,70 +1,136 @@
-from enum import Enum
-from typing import Tuple
+from dataclasses import dataclass
+from typing import List, Optional, Tuple
+
+import torch
+from torch import Tensor
 
 
-class Action(Enum):
-    FORWARD = 0
-    STAY = 1
-
-
-class NChain:
+@dataclass
+class NChainState:
     """
-    N-Chain environment:
-    - Linear chain of n states
-    - Two actions: move forward or stay
-    - Reward only at the end of chain
-    - Episode terminates when reaching end or max steps
+    Represents a state in the N-Chain environment.
+
+    Attributes:
+        position: Integer position in the chain [0, n-1]
+        n: Length of the chain
     """
 
-    def __init__(self, n: int = 5, reward: float = 1.0):
+    position: int
+    n: int
+
+    def __post_init__(self):
+        assert (
+            0 <= self.position < self.n
+        ), f"Position {self.position} must be in [0, {self.n-1}]"
+
+    def to_tensor(self) -> Tensor:
+        """Convert state to one-hot tensor representation.
+
+        Returns:
+            Tensor: Shape [n], one-hot encoding of position
+        """
+        state_tensor = torch.zeros(self.n)
+        state_tensor[self.position] = 1.0
+        return state_tensor
+
+    @classmethod
+    def from_tensor(cls, tensor: Tensor) -> "NChainState":
+        """Convert one-hot tensor back to NChainState.
+
+        Args:
+            tensor: Shape [n], one-hot encoding of position
+
+        Returns:
+            NChainState: Corresponding state object
+        """
+        position = torch.argmax(tensor).item()
+        return cls(position=position, n=len(tensor))
+
+
+class NChainEnv:
+    """
+    N-Chain environment with sparse rewards.
+
+    The agent starts at position 0 and can move right or stay.
+    The only reward is at the rightmost state (n-1).
+
+    Attributes:
+        n: Length of the chain
+        sparse_reward: Reward given at the final state
+    """
+
+    def __init__(self, n: int = 5, sparse_reward: float = 10.0):
         """
         Args:
             n: Length of the chain
-            reward: Reward at the end of chain
+            sparse_reward: Reward given at the final state
         """
         self.n = n
-        self.reward = reward
-        self.max_steps = n * 2  # Allow some redundancy
-        self.reset()
+        self.sparse_reward = sparse_reward
+        self.current_state: Optional[NChainState] = None
 
-    def reset(self) -> int:
-        """Reset environment to initial state."""
-        self.current_state = 0
-        self.steps = 0
-        return self.current_state
+        # Define action space: 0 = stay, 1 = right
+        self.num_actions = 2
 
-    def step(self, action: Action) -> Tuple[int, float, bool]:
-        """
-        Take action in environment.
-
-        Args:
-            action: FORWARD or STAY
+    def reset(self) -> NChainState:
+        """Reset environment to initial state (position 0).
 
         Returns:
-            (next_state, reward, done)
+            NChainState: Initial state
         """
-        self.steps += 1
+        self.current_state = NChainState(position=0, n=self.n)
+        return self.current_state
 
-        # Move according to action
-        if action == Action.FORWARD:
-            self.current_state = min(self.current_state + 1, self.n - 1)
+    def step(self, action: int) -> Tuple[NChainState, float, bool]:
+        """Take a step in the environment.
 
-        # Check if done
-        done = self.current_state == self.n - 1 or self.steps >= self.max_steps
+        Args:
+            action: Integer in {0, 1} representing stay/right
 
-        # Get reward
-        reward = self.reward if self.current_state == self.n - 1 else 0.0
+        Returns:
+            Tuple containing:
+                - NChainState: New state
+                - float: Reward (0 except at final state)
+                - bool: Whether episode is done
+        """
+        assert self.current_state is not None, "Must call reset() before step()"
+        assert action in {0, 1}, f"Action must be 0 or 1, got {action}"
+
+        # Update position based on action
+        new_position = min(self.current_state.position + action, self.n - 1)
+
+        self.current_state = NChainState(position=new_position, n=self.n)
+
+        # Check if we reached the end
+        done = new_position == self.n - 1
+        reward = self.sparse_reward if done else 0.0
 
         return self.current_state, reward, done
 
-    def get_state_space_size(self) -> int:
-        """Return number of possible states."""
-        return self.n
+    def get_valid_actions(self, state: Optional[NChainState] = None) -> List[int]:
+        """Get list of valid actions for given state.
 
-    def get_action_space_size(self) -> int:
-        """Return number of possible actions."""
-        return len(Action)
+        Args:
+            state: State to get actions for, uses current state if None
 
-    def is_terminal(self, state: int) -> bool:
-        """Check if state is terminal."""
-        return state == self.n - 1
+        Returns:
+            List[int]: Valid actions (0=stay always valid, 1=right if not at end)
+        """
+        if state is None:
+            assert self.current_state is not None
+            state = self.current_state
+
+        if state.position == self.n - 1:
+            return [0]  # Can only stay at the end
+        return [0, 1]  # Can stay or move right
+
+    def is_terminal(self, state: NChainState) -> bool:
+        """Check if state is terminal (rightmost position).
+
+        Args:
+            state: State to check
+
+        Returns:
+            bool: Whether state is terminal
+        """
+        return state.position == self.n - 1
