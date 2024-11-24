@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Dict, Any
 from enum import Enum
 
 class Action(Enum):
@@ -21,24 +21,29 @@ class GridWorld:
                    '#' for walls/bounds
                    ' ' for empty spaces
             width: Explicit width of the grid
-            height: Explicit height of the grid
+            height: Explicit height of the grid 
             start_pos: Explicit start position
             goal_pos: Explicit goal position
             obstacles: Explicit list of obstacle positions
         """
         if layout is not None:
             self._init_from_layout(layout.strip())
-        elif width is not None and height is not None and start_pos is not None and goal_pos is not None and obstacles is not None:
+        elif all(x is not None for x in [width, height, start_pos, goal_pos, obstacles]):
             self._init_from_parameters(width, height, start_pos, goal_pos, obstacles)
         else:
             raise ValueError("Must provide either a layout string or all explicit parameters")
             
-        # Set maximum steps as twice the grid area
-        self.max_steps = self.width * self.height * 2
-        if self.start_pos is not None:
-            self.current_pos = self.start_pos
-        else:
-            raise ValueError("Start position is None")
+        # Initialize state
+        self.current_pos = self.start_pos
+        self.steps_taken = 0
+        self.max_steps = self.width * self.height * 2  # Set maximum steps as twice the grid area
+        
+        # Define rewards
+        self.rewards = {
+            'goal': 100.0,
+            'obstacle': -100.0,
+            'step': -1.0
+        }
     
     def _init_from_layout(self, layout: str) -> None:
         """Initialize the grid from a text layout."""
@@ -117,23 +122,17 @@ class GridWorld:
                     
         return '\n'.join(''.join(row) for row in grid)
         
-    def reset(self) -> Tuple[int, int]:
-        """Reset the environment to initial state."""
-        if self.start_pos is not None:
-            self.current_pos = self.start_pos
-            return self.current_pos
-        else:
-            raise ValueError("Start position is None")
-    
-    def is_valid_position(self, pos: Tuple[int, int]) -> bool:
-        """Check if the position is valid."""
+    def is_within_bounds(self, pos: Tuple[int, int]) -> bool:
+        """Check if the position is within grid boundaries."""
         x, y = pos
-        return (0 <= x < self.width and 
-                0 <= y < self.height and 
-                pos not in self.obstacles)
+        return 0 <= x < self.width and 0 <= y < self.height
     
     def get_next_state(self, state: Tuple[int, int], action: Action) -> Tuple[int, int]:
-        """Get next state given current state and action."""
+        """Get next state given current state and action.
+        
+        Only prevents moving outside boundaries. Allows moving into obstacles
+        but those moves will be penalized in the step function.
+        """
         x, y = state
         if action == Action.UP:
             next_pos = (x, y + 1)
@@ -144,24 +143,55 @@ class GridWorld:
         else:  # LEFT
             next_pos = (x - 1, y)
             
-        return next_pos if self.is_valid_position(next_pos) else state
+        # Only prevent out-of-bounds moves
+        return next_pos if self.is_within_bounds(next_pos) else state
     
-    def step(self, action: Action) -> Tuple[Tuple[int, int], float, bool]:
-        """Execute action and return new state, reward and done flag."""
-        next_pos = self.get_next_state(self.current_pos, action)
+    def step(self, action: Action) -> Tuple[Tuple[int, int], float, bool, Dict[str, Any]]:
+        """Execute action and return (next_state, reward, done, info).
         
-        # Update current position
+        Returns:
+            next_state: The new position after taking the action
+            reward: The reward received for this step
+            done: Whether the episode has ended
+            info: Additional information about the step
+        """
+        self.steps_taken += 1
+        next_pos = self.get_next_state(self.current_pos, action)
         self.current_pos = next_pos
         
-        # Calculate reward
+        # Initialize info dict
+        info = {
+            'hit_obstacle': False,
+            'reached_goal': False,
+            'timeout': False
+        }
+        
+        # Check termination conditions and calculate reward
         if next_pos == self.goal_pos:
-            reward = 100.0
+            reward = self.rewards['goal']
             done = True
+            info['reached_goal'] = True
         elif next_pos in self.obstacles:
-            reward = -100.0
+            reward = self.rewards['obstacle']
             done = True
+            info['hit_obstacle'] = True
         else:
-            reward = -1.0  # Small penalty for each move
+            reward = self.rewards['step']
             done = False
             
-        return next_pos, reward, done
+        # Check for timeout
+        if self.steps_taken >= self.max_steps:
+            done = True
+            info['timeout'] = True
+            
+        return next_pos, reward, done, info
+    
+    def reset(self) -> Tuple[int, int]:
+        """Reset the environment to initial state.
+        
+        Returns:
+            The initial state (start position)
+        """
+        self.current_pos = self.start_pos
+        self.steps_taken = 0
+        return self.start_pos
