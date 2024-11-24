@@ -1,21 +1,22 @@
 from typing import Dict, List
 
-import numpy as np
-
 import torch
 import torch.nn as nn
 
 from gridworld import Action
+
 from .config import GFlowNetConfig, GFlowOutput
 from .env import Trajectory
 
+
 class FlowNetwork(nn.Module):
     """Main network that predicts flows F(s,a)"""
+
     def __init__(self, config: GFlowNetConfig):
         super().__init__()
 
         # Initialize with small positive values
-        self.log_Z = nn.Parameter(torch.tensor(0.0)) # Log partition function
+        self.log_Z = nn.Parameter(torch.tensor(0.0))  # Log partition function
 
         # Neural network to predict flows
         self.network = nn.Sequential(
@@ -33,7 +34,8 @@ class FlowNetwork(nn.Module):
             logits: torch.Tensor of shape [batch_size, action_dim]
         """
         logits = self.network(state)
-        return logits + self.log_Z # Add in log space
+        return logits + self.log_Z  # Add in log space
+
 
 class GFlowNet(nn.Module):
     def __init__(self, config: GFlowNetConfig):
@@ -43,9 +45,9 @@ class GFlowNet(nn.Module):
 
         # Create optimizer but allow configuration
         self.setup_optimizer(
-            optimizer_type='adam',
+            optimizer_type="adam",
             lr=config.learning_rate,
-            weight_decay=config.weight_decay
+            weight_decay=config.weight_decay,
         )
 
         # self.optimizer = torch.optim.Adam(
@@ -55,38 +57,31 @@ class GFlowNet(nn.Module):
         # )
 
     def setup_optimizer(
-        self, 
-        optimizer_type: str = 'adam',
+        self,
+        optimizer_type: str = "adam",
         lr: float = 1e-4,
         weight_decay: float = 1e-5,
-        **kwargs
+        **kwargs,
     ):
         """Configure the optimizer with flexibility"""
-        if optimizer_type.lower() == 'adam':
+        if optimizer_type.lower() == "adam":
             self.optimizer = torch.optim.Adam(
-                self.parameters(),
-                lr=lr,
-                weight_decay=weight_decay,
-                **kwargs
+                self.parameters(), lr=lr, weight_decay=weight_decay, **kwargs
             )
-        elif optimizer_type.lower() == 'sgd':
+        elif optimizer_type.lower() == "sgd":
             self.optimizer = torch.optim.SGD(
-                self.parameters(),
-                lr=lr,
-                weight_decay=weight_decay,
-                **kwargs
+                self.parameters(), lr=lr, weight_decay=weight_decay, **kwargs
             )
         else:
             raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
-        
+
         # Create a learning rate scheduler
         self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             self.optimizer,
-            mode='min',
+            mode="min",
             factor=0.5,
             patience=5,
         )
-
 
     def forward(self, state: torch.Tensor) -> GFlowOutput:
         """
@@ -96,10 +91,10 @@ class GFlowNet(nn.Module):
         """
         # Get log flows (logits)
         logits = self.flow_network(state)
-        
+
         # Convert to actual flows (always positive)
         flows = torch.exp(logits)
-        
+
         # Calculate total flow through state
         state_flow = flows.sum(dim=-1, keepdim=True)
 
@@ -111,42 +106,40 @@ class GFlowNet(nn.Module):
         )
 
     def compute_trajectory_balance_loss(
-        self, 
-        trajectory: Trajectory, 
-        epsilon: float = 1e-6
+        self, trajectory: Trajectory, epsilon: float = 1e-6
     ) -> torch.Tensor:
         total_loss = torch.tensor(0.0, device=trajectory.states[0].device)
         cumulative_logprob = torch.tensor(0.0, device=trajectory.states[0].device)
-        
+
         # Note: we have len(states) = len(action_indices) + 1 because the final state has no action
-        for t in range(len(trajectory.states) - 1):  # Only iterate up to the second-to-last state
+        for t in range(
+            len(trajectory.states) - 1
+        ):  # Only iterate up to the second-to-last state
             # Get current state and properly shape action index
             state = trajectory.states[t]
             action_idx = trajectory.action_indices[t].view(1, 1)  # Shape: [1, 1]
-            
+
             # Forward pass with batch dimension
             output = self.forward(state.unsqueeze(0))  # Add batch dimension
             logits = output.logits  # Shape: [1, action_dim]
-            
+
             # Get action log probability
             action_logprob = logits.gather(1, action_idx)  # Shape: [1, 1]
             log_Z = torch.logsumexp(logits, dim=-1, keepdim=True)  # Shape: [1, 1]
             step_logprob = action_logprob - log_Z  # Shape: [1, 1]
-            
+
             cumulative_logprob = cumulative_logprob + step_logprob.squeeze()
-        
+
         # After accumulating all probabilities, compute loss if this was a complete trajectory
         if trajectory.done:
             target_logprob = torch.log(trajectory.rewards[-1] + epsilon)
             loss = (cumulative_logprob - target_logprob) ** 2
             total_loss = total_loss + loss
-                
+
         return total_loss.mean()
 
     def compute_flow_matching_loss(
-        self, 
-        trajectory: Trajectory, 
-        epsilon: float = 1e-6
+        self, trajectory: Trajectory, epsilon: float = 1e-6
     ) -> torch.Tensor:
         losses = []
 
@@ -173,20 +166,16 @@ class GFlowNet(nn.Module):
                 target_flow = next_output.state_flow  # Already has shape [1, 1]
 
             # Compute loss using log space for numerical stability
-            loss = (torch.log(curr_flow + epsilon) - torch.log(target_flow + epsilon)) ** 2
+            loss = (
+                torch.log(curr_flow + epsilon) - torch.log(target_flow + epsilon)
+            ) ** 2
             losses.append(loss)
 
         return torch.mean(torch.stack(losses))
 
-    def compute_regularization_loss(
-        self, 
-        output: GFlowOutput
-    ) -> torch.Tensor:
+    def compute_regularization_loss(self, output: GFlowOutput) -> torch.Tensor:
         # Encourage smooth flow distributions
-        flow_entropy = -(
-            output.flows * 
-            torch.log(output.flows + 1e-6)
-        ).sum(-1).mean()
+        flow_entropy = -(output.flows * torch.log(output.flows + 1e-6)).sum(-1).mean()
         return -self.config.flow_entropy_coef * flow_entropy
 
     def update(self, trajectories: List[Trajectory]) -> Dict[str, float]:
@@ -195,7 +184,7 @@ class GFlowNet(nn.Module):
         reg_losses = []
 
         self.optimizer.zero_grad()
-        
+
         for trajectory in trajectories:
             # Compute the individual losses
             flow_loss = self.compute_flow_matching_loss(trajectory)
@@ -208,19 +197,19 @@ class GFlowNet(nn.Module):
             flow_losses.append(flow_loss)
             balance_losses.append(balance_loss)
             reg_losses.append(reg_loss)
-        
+
         # Combine all losses with their respective weights
         total_flow_loss = torch.stack(flow_losses).mean()
         total_balance_loss = torch.stack(balance_losses).mean()
         total_reg_loss = torch.stack(reg_losses).mean()
-        
+
         # Weighted sum of losses
         total_loss = (
-            1.0 * total_flow_loss +
-            0.1 * total_balance_loss + # Lower weight since this is supplementary
-            0.01 * total_reg_loss     # Very small weight for regularization
+            1.0 * total_flow_loss
+            + 0.1 * total_balance_loss  # Lower weight since this is supplementary
+            + 0.01 * total_reg_loss  # Very small weight for regularization
         )
-        
+
         # Backward pass with gradient clipping
         total_loss.backward()
         torch.nn.utils.clip_grad_norm_(self.parameters(), 1.0)
@@ -228,13 +217,13 @@ class GFlowNet(nn.Module):
 
         # Update learning rate
         self.scheduler.step(total_loss)
-        
+
         return {
-            'total_loss': total_loss.item(),
-            'flow_loss': total_flow_loss.item(),
-            'balance_loss': total_balance_loss.item(),
-            'reg_loss': total_reg_loss.item(),
-            'learning_rate': self.optimizer.param_groups[0]['lr'],
+            "total_loss": total_loss.item(),
+            "flow_loss": total_flow_loss.item(),
+            "balance_loss": total_balance_loss.item(),
+            "reg_loss": total_reg_loss.item(),
+            "learning_rate": self.optimizer.param_groups[0]["lr"],
         }
 
     def get_action(
@@ -245,7 +234,7 @@ class GFlowNet(nn.Module):
     ) -> Action:
         if torch.rand(1) < epsilon:
             return Action(torch.randint(self.config.action_dim, (1,)).item())
-        
+
         with torch.no_grad():
             output = self.forward(state.unsqueeze(0))
             # Temperature scaled probabilities
