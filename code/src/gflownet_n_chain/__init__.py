@@ -1,13 +1,13 @@
 from n_chain import NChainEnv
 
-from .model import GFlowNetModel
+from .model import GFlowNet
 from .train import GFlowNetTrainer
 
 
 def main():
     # Create environment and model
     env = NChainEnv(n=20, reward=10.0)
-    model = GFlowNetModel(state_dim=env.n, num_actions=env.num_actions, hidden_dim=64)
+    model = GFlowNet(state_dim=env.n, num_actions=env.num_actions, hidden_dim=64)
 
     # Create trainer
     trainer = GFlowNetTrainer(

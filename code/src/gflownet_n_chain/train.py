@@ -11,7 +11,7 @@ from torch.optim import Adam
 from n_chain import NChainEnv, NChainState
 
 from .metrics import MetricsTracker, TrainingMetrics
-from .model import GFlowNetModel
+from .model import GFlowNet
 
 
 @dataclass
@@ -50,7 +50,7 @@ class GFlowNetTrainer:
     def __init__(
         self,
         env: NChainEnv,
-        model: GFlowNetModel,
+        model: GFlowNet,
         learning_rate: float = 1e-4,
         gamma: float = 0.99,
         buffer_size: int = 10000,

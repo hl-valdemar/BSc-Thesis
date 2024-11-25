@@ -23,7 +23,7 @@ class GFlowNetOutput:
     log_state_flow: Tensor
 
 
-class GFlowNetModel(nn.Module):
+class GFlowNet(nn.Module):
     """
     GFlowNet implementation for N-Chain problem.
 
