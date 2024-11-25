@@ -100,13 +100,21 @@ class MetricsTracker:
         # State visitation statistics
         all_visits = defaultdict(list)
         for m in recent:
+            # Calculate total visits for this trajectory
+            total_visits = sum(m.state_visits.values())
+            # Store normalized visit counts (as percentages)
             for state, count in m.state_visits.items():
-                all_visits[state].append(count)
+                visit_rate = (count / total_visits) if total_visits > 0 else 0
+                all_visits[state].append(visit_rate)
 
-        summary["state_coverage"] = len(all_visits) / max(all_visits.keys())
+        max_state = max(all_visits.keys())
+        summary["state_coverage"] = len(all_visits) / (
+            max_state + 1
+        )  # +1 because states are 0-based
 
-        for state, visits in all_visits.items():
-            summary[f"state_{state}_visit_rate"] = np.mean(visits)
+        # Compute average visit rates across trajectories
+        for state, rates in all_visits.items():
+            summary[f"state_{state}_visit_rate"] = np.mean(rates)
 
         return summary
 
@@ -245,4 +253,123 @@ class MetricsTracker:
         plt.title("State Visitation Distribution")
         plt.xlabel("State")
         plt.ylabel("Visitation Frequency")
+        plt.show()
+
+    def plot_policy_distribution(self):
+        """Plot heatmap of forward and backward policy distributions over time."""
+        if not self.metrics_history:
+            print("No metrics to plot")
+            return
+
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import seaborn as sns
+
+        # Get recent metrics
+        recent = self.metrics_history[-self.window_size :]
+
+        # Extract final forward and backward policies
+        final_metrics = recent[-1]
+
+        # Determine actual number of states from the policy probabilities
+        num_states = (
+            max(final_metrics.pf_probs.keys()) + 1
+        )  # Since states are 0-indexed
+        num_actions = len(
+            next(iter(final_metrics.pf_probs.values()))
+        )  # Get length of first prob array
+
+        # Create matrices for forward and backward policies
+        pf_matrix = np.zeros((num_states, num_actions))
+        pb_matrix = np.zeros((num_states, num_actions))
+
+        # Fill matrices only for states that exist in the policies
+        for state in final_metrics.pf_probs.keys():
+            pf_matrix[state] = final_metrics.pf_probs[state]
+            pb_matrix[state] = final_metrics.pb_probs[state]
+
+        # Create subplots
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+
+        # Plot forward policy
+        sns.heatmap(
+            pf_matrix,
+            ax=ax1,
+            cmap="viridis",
+            annot=True,
+            fmt=".2f",
+            xticklabels=["Stay", "Right"],
+            yticklabels=[f"State {i}" for i in range(num_states)],
+        )
+        ax1.set_title("Forward Policy Distribution (PF)")
+        ax1.set_xlabel("Actions")
+        ax1.set_ylabel("States")
+
+        # Plot backward policy
+        sns.heatmap(
+            pb_matrix,
+            ax=ax2,
+            cmap="viridis",
+            annot=True,
+            fmt=".2f",
+            xticklabels=["Stay", "Right"],
+            yticklabels=[f"State {i}" for i in range(num_states)],
+        )
+        ax2.set_title("Backward Policy Distribution (PB)")
+        ax2.set_xlabel("Actions")
+        ax2.set_ylabel("States")
+
+        plt.tight_layout()
+        plt.show()
+
+        # Plot policy changes over time
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 10))
+
+        # Get policies over time for a few key states
+        timestamps = np.linspace(
+            0,
+            len(self.metrics_history) - 1,
+            min(10, len(self.metrics_history)),
+            dtype=int,
+        )
+
+        # Only plot states that consistently appear in the data
+        states_to_plot = []
+        for state in range(num_states):
+            if all(state in self.metrics_history[t].pf_probs for t in timestamps):
+                states_to_plot.append(state)
+
+        # If no consistent states found, use states from the last timestep
+        if not states_to_plot:
+            states_to_plot = sorted(list(self.metrics_history[-1].pf_probs.keys()))[:3]
+
+        for state in states_to_plot:
+            # Forward policy - probability of moving right
+            # Only plot if state exists in policies
+            if all(state in self.metrics_history[t].pf_probs for t in timestamps):
+                right_probs = [
+                    self.metrics_history[t].pf_probs[state][1] for t in timestamps
+                ]
+                ax1.plot(timestamps, right_probs, marker="o", label=f"State {state}")
+
+            # Backward policy
+            if all(state in self.metrics_history[t].pb_probs for t in timestamps):
+                right_probs = [
+                    self.metrics_history[t].pb_probs[state][1] for t in timestamps
+                ]
+                ax2.plot(timestamps, right_probs, marker="o", label=f"State {state}")
+
+        ax1.set_title("Forward Policy Evolution (Probability of Moving Right)")
+        ax1.set_xlabel("Training Step")
+        ax1.set_ylabel("Probability")
+        ax1.grid(True)
+        # ax1.legend()
+
+        ax2.set_title("Backward Policy Evolution (Probability of Moving Right)")
+        ax2.set_xlabel("Training Step")
+        ax2.set_ylabel("Probability")
+        ax2.grid(True)
+        # ax2.legend()
+
+        plt.tight_layout()
         plt.show()

@@ -110,6 +110,10 @@ class GFlowNetTrainer:
 
             states.append(next_state)
             actions.append(action)
+
+            # Scale the reward according the number of actions taken
+            # This should lead to policies that sample shorter paths with higher frequencies
+            reward = reward / len(actions)
             rewards.append(reward)
 
             state = next_state
@@ -354,87 +358,3 @@ class GFlowNetTrainer:
                 self.metrics.print_summary()
 
         return losses
-
-
-# #######################
-#
-# from typing import List
-#
-# import matplotlib.pyplot as plt
-#
-#
-# def plot_training_progress(
-#     losses: List[float], window_size: int = 100, title: Optional[str] = None
-# ):
-#     """Plot training losses with moving average.
-#
-#     Args:
-#         losses: List of training losses
-#         window_size: Size of moving average window
-#         title: Optional plot title
-#     """
-#     plt.figure(figsize=(10, 5))
-#
-#     # Plot raw losses
-#     plt.plot(losses, alpha=0.3, label="Raw Loss")
-#
-#     # Plot moving average
-#     if len(losses) >= window_size:
-#         moving_avg = np.convolve(
-#             losses, np.ones(window_size) / window_size, mode="valid"
-#         )
-#         plt.plot(
-#             range(window_size - 1, len(losses)),
-#             moving_avg,
-#             label=f"Moving Average (window={window_size})",
-#         )
-#
-#     plt.xlabel("Training Step")
-#     plt.ylabel("Loss")
-#     if title:
-#         plt.title(title)
-#     plt.legend()
-#     plt.grid(True)
-#     plt.yscale("log")
-#     plt.show()
-#
-#
-# def visualize_policy(env: NChainEnv, model: GFlowNetModel, temperature: float = 1.0):
-#     """Visualize forward policy probabilities for all states.
-#
-#     Args:
-#         env: N-Chain environment
-#         model: Trained GFlowNet model
-#         temperature: Policy temperature
-#     """
-#     plt.figure(figsize=(12, 4))
-#
-#     # Get policy for all states
-#     states = []
-#     for pos in range(env.n):
-#         state = NChainState(position=pos, n=env.n)
-#         states.append(state.to_tensor())
-#
-#     states_tensor = torch.stack(states)
-#     valid_actions = [
-#         env.get_valid_actions(NChainState(pos, env.n)) for pos in range(env.n)
-#     ]
-#
-#     probs = (
-#         model.get_forward_policy(states_tensor, valid_actions, temperature)
-#         .detach()
-#         .numpy()
-#     )
-#
-#     # Plot probabilities for each action
-#     positions = np.arange(env.n)
-#     plt.bar(positions - 0.2, probs[:, 0], 0.4, label="Stay", color="blue", alpha=0.6)
-#     plt.bar(positions + 0.2, probs[:, 1], 0.4, label="Right", color="red", alpha=0.6)
-#
-#     plt.xlabel("Position")
-#     plt.ylabel("Action Probability")
-#     plt.title("GFlowNet Forward Policy")
-#     plt.xticks(positions)
-#     plt.legend()
-#     plt.grid(True)
-#     plt.show()

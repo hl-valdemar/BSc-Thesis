@@ -6,7 +6,7 @@ from .train import GFlowNetTrainer
 
 def main():
     # Create environment and model
-    env = NChainEnv(n=20, sparse_reward=10.0)
+    env = NChainEnv(n=20, reward=10.0)
     model = GFlowNetModel(state_dim=env.n, num_actions=env.num_actions, hidden_dim=64)
 
     # Create trainer
@@ -22,7 +22,7 @@ def main():
     )
 
     # Train the model
-    losses = trainer.train(num_steps=1000)
+    losses = trainer.train(num_steps=500)
 
     # Plot comprehensive metrics
     print("\nPlotting training metrics...")
@@ -32,6 +32,10 @@ def main():
     print("\nPlotting state visitation distribution...")
     trainer.metrics.plot_state_visits()
 
+    # Plot policy distribution
+    print("\nPlotting policy distribution...")
+    trainer.metrics.plot_policy_distribution()
+
     # Print final summary
     print("\nFinal training summary:")
     trainer.metrics.print_summary()
@@ -40,7 +44,3 @@ def main():
     # if save_model_path:
     #     print(f"\nSaving model to {save_model_path}")
     #     torch.save(model.state_dict(), save_model_path)
-
-    # # Visualize results
-    # plot_training_progress(losses, window_size=100)
-    # visualize_policy(env, model)

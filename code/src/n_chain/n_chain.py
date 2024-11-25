@@ -59,14 +59,14 @@ class NChainEnv:
         sparse_reward: Reward given at the final state
     """
 
-    def __init__(self, n: int = 5, sparse_reward: float = 10.0):
+    def __init__(self, n: int = 5, reward: float = 10.0):
         """
         Args:
             n: Length of the chain
             sparse_reward: Reward given at the final state
         """
         self.n = n
-        self.sparse_reward = sparse_reward
+        self.reward = reward
         self.current_state: Optional[NChainState] = None
 
         # Define action space: 0 = stay, 1 = right
@@ -103,7 +103,7 @@ class NChainEnv:
 
         # Check if we reached the end
         done = new_position == self.n - 1
-        reward = self.sparse_reward if done else 0.0
+        reward = self.reward if done else 0.0
 
         return self.current_state, reward, done
 
