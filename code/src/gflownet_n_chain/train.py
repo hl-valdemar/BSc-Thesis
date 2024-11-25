@@ -121,7 +121,15 @@ class GFlowNetTrainer:
         return Trajectory(states, actions, rewards, done)
 
     def compute_returns(self, rewards: Tensor) -> Tensor:
-        """Compute discounted returns."""
+        """
+        Compute discounted returns.
+
+        Args:
+            rewards: Rewards collected for a single trajectory
+
+        Returns:
+            Tensor: The discounted returns
+        """
         returns = torch.zeros_like(rewards)
         running_sum = 0
         for t in reversed(range(len(rewards))):
