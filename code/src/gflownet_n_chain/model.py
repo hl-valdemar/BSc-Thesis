@@ -111,7 +111,6 @@ class GFlowNet(nn.Module):
         self,
         states: Tensor,
         valid_actions: Optional[List[List[int]]] = None,
-        temperature: float = 1.0,
     ) -> Tensor:
         """
         Get forward policy probabilities PF(a|s).
@@ -119,13 +118,12 @@ class GFlowNet(nn.Module):
         Args:
             states: States to get policy for, shape [batch_size, state_dim]
             valid_actions: List of lists containing valid actions for each state
-            temperature: Softmax temperature (higher = more uniform)
 
         Returns:
             Tensor: Forward policy probs, shape [batch_size, num_actions]
         """
         outputs = self.forward(states)
-        logits = outputs.logits_pf / temperature
+        logits = outputs.logits_pf
 
         # Mask invalid actions if provided
         if valid_actions is not None:
@@ -136,19 +134,18 @@ class GFlowNet(nn.Module):
 
         return F.softmax(logits, dim=-1)
 
-    def get_backward_policy(self, states: Tensor, temperature: float = 1.0) -> Tensor:
+    def get_backward_policy(self, states: Tensor) -> Tensor:
         """
         Get backward policy probabilities PB(s|s').
 
         Args:
             states: States to get policy for, shape [batch_size, state_dim]
-            temperature: Softmax temperature
 
         Returns:
             Tensor: Backward policy probs, shape [batch_size, num_actions]
         """
         outputs = self.forward(states)
-        return F.softmax(outputs.logits_pb / temperature, dim=-1)
+        return F.softmax(outputs.logits_pb, dim=-1)
 
     def get_state_flow(self, states: Tensor) -> Tensor:
         """

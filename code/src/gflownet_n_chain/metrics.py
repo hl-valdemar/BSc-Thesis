@@ -22,6 +22,7 @@ class TrainingMetrics:
         pf_probs: Forward policy probabilities
         pb_probs: Backward policy probabilities
         value_estimation_error: Error in flow value estimation
+        flow_normalization_error: Deviation from unit sum constraint
     """
 
     loss: float
@@ -33,7 +34,8 @@ class TrainingMetrics:
     flow_values: Dict[int, float]
     pf_probs: Dict[int, np.ndarray]
     pb_probs: Dict[int, np.ndarray]
-    value_estimation_error: float
+    flow_value_estimation_error: float
+    flow_normalization_error: float
 
 
 class MetricsTracker:
@@ -52,21 +54,21 @@ class MetricsTracker:
         self.metrics_history.append(metrics)
 
     def compute_policy_entropy(
-        self, logits: torch.Tensor, action_masks: torch.Tensor, temperature: float
+        self,
+        logits: torch.Tensor,
+        action_masks: torch.Tensor,
     ) -> float:
         """Compute entropy of policy distribution.
 
         Args:
             logits: Raw logits from model [batch_size, num_actions]
             action_masks: Binary masks for valid actions [batch_size, num_actions]
-            temperature: Softmax temperature
 
         Returns:
             float: Average entropy across batch
         """
-        # Apply temperature and masking
-        scaled_logits = logits / temperature
-        masked_logits = scaled_logits + (action_masks + 1e-8).log()
+        # Apply masking
+        masked_logits = logits + (action_masks + 1e-8).log()
 
         # Get probabilities
         probs = F.softmax(masked_logits, dim=-1)
@@ -94,7 +96,7 @@ class MetricsTracker:
             "avg_episode_return": np.mean([m.episode_return for m in recent]),
             "avg_policy_entropy": np.mean([m.policy_entropy for m in recent]),
             "success_rate": np.mean([m.successful_episodes for m in recent]),
-            "avg_value_error": np.mean([m.value_estimation_error for m in recent]),
+            "avg_value_error": np.mean([m.flow_value_estimation_error for m in recent]),
         }
 
         # State visitation statistics
@@ -153,7 +155,7 @@ class MetricsTracker:
 
         # Create subplots for different metrics
         fig, axes = plt.subplots(4, 2, figsize=(15, 16))
-        fig.suptitle("Training Metrics")
+        fig.suptitle("GFlowNet Training Metrics")
 
         # Helper function for plotting with moving average
         def plot_metric(ax, values, title, ylabel):
@@ -184,7 +186,9 @@ class MetricsTracker:
         returns = [m.episode_return for m in self.metrics_history]
         entropies = [m.policy_entropy for m in self.metrics_history]
         successes = [m.successful_episodes for m in self.metrics_history]
-        value_errors = [m.value_estimation_error for m in self.metrics_history]
+        flow_value_errors = [
+            m.flow_value_estimation_error for m in self.metrics_history
+        ]
 
         # Get flow values per state
         all_states = sorted(self.metrics_history[-1].flow_values.keys())
@@ -198,8 +202,13 @@ class MetricsTracker:
         plot_metric(axes[0, 1], lengths, "Episode Length", "Steps")
         plot_metric(axes[1, 0], returns, "Episode Return", "Return")
         plot_metric(axes[1, 1], entropies, "Policy Entropy", "Entropy")
-        plot_metric(axes[2, 0], successes, "Success Rate", "Rate")
-        plot_metric(axes[2, 1], value_errors, "Value Error", "Error")
+        plot_metric(
+            axes[2, 0],
+            [m.flow_normalization_error for m in self.metrics_history],
+            "Flow Normalization Error",
+            "Error",
+        )
+        plot_metric(axes[2, 1], flow_value_errors, "Flow Value Error", "Error")
 
         # Plot flow values
         ax_flow = axes[3, 0]

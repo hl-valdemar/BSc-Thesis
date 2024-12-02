@@ -55,8 +55,6 @@ class GFlowNetTrainer:
         gamma: float = 0.99,
         buffer_size: int = 10000,
         batch_size: int = 32,
-        pf_temperature: float = 1.0,
-        pb_temperature: float = 1.0,
         metrics_window: int = 100,
     ):
         self.env = env
@@ -65,8 +63,6 @@ class GFlowNetTrainer:
         self.gamma = gamma
         self.buffer_size = buffer_size
         self.batch_size = batch_size
-        self.pf_temperature = pf_temperature
-        self.pb_temperature = pb_temperature
 
         # Initialize replay buffer
         self.replay_buffer = deque(maxlen=buffer_size)
@@ -94,9 +90,7 @@ class GFlowNetTrainer:
             action_mask[0, valid_actions] = 1.0
 
             # Get masked action probabilities
-            action_probs = self.model.get_forward_policy(
-                state_tensor, temperature=self.pf_temperature
-            )
+            action_probs = self.model.get_forward_policy(state_tensor)
             action_probs = action_probs * action_mask
             action_probs = action_probs / action_probs.sum()  # Renormalize
 
@@ -113,29 +107,36 @@ class GFlowNetTrainer:
 
             # Scale the reward according the number of actions taken
             # This should lead to policies that sample shorter paths with higher frequencies
-            reward = reward / len(actions)
+            reward = self.env.n * reward / (2 * len(actions))
+            # alpha = 3
+            # beta = 1.1
+            # reward = (
+            #     (self.env.n / alpha)
+            #     * reward
+            #     * np.exp(len(actions)) ** (-beta / self.env.n)
+            # )
             rewards.append(reward)
 
             state = next_state
 
         return Trajectory(states, actions, rewards, done)
 
-    def compute_returns(self, rewards: Tensor) -> Tensor:
-        """
-        Compute discounted returns.
-
-        Args:
-            rewards: Rewards collected for a single trajectory
-
-        Returns:
-            Tensor: The discounted returns
-        """
-        returns = torch.zeros_like(rewards)
-        running_sum = 0
-        for t in reversed(range(len(rewards))):
-            running_sum = rewards[t] + self.gamma * running_sum
-            returns[t] = running_sum
-        return returns
+    # def compute_returns(self, rewards: Tensor) -> Tensor:
+    #     """
+    #     Compute discounted returns.
+    #
+    #     Args:
+    #         rewards: Rewards collected for a single trajectory
+    #
+    #     Returns:
+    #         Tensor: The discounted returns
+    #     """
+    #     returns = torch.zeros_like(rewards)
+    #     running_sum = 0
+    #     for t in reversed(range(len(rewards))):
+    #         running_sum = rewards[t] + self.gamma * running_sum
+    #         returns[t] = running_sum
+    #     return returns
 
     def create_action_masks(
         self, valid_actions_list: List[List[int]], num_actions: int
@@ -159,14 +160,12 @@ class GFlowNetTrainer:
         self,
         logits: Tensor,  # Shape [batch_size, num_actions]
         valid_actions: List[List[int]],
-        temperature: float,
     ) -> Tensor:
         """Compute log probabilities with valid action masking.
 
         Args:
             logits: Raw logits from model
             valid_actions: List of valid actions for each state
-            temperature: Softmax temperature
 
         Returns:
             Tensor: Masked log probabilities
@@ -174,11 +173,8 @@ class GFlowNetTrainer:
         # Create action masks
         action_masks = self.create_action_masks(valid_actions, logits.shape[1])
 
-        # Apply temperature scaling
-        scaled_logits = logits / temperature
-
         # Apply mask in log space
-        masked_logits = scaled_logits + (action_masks + 1e-8).log()
+        masked_logits = logits + (action_masks + 1e-8).log()
 
         # Compute log_softmax
         log_probs = F.log_softmax(masked_logits, dim=-1)
@@ -199,34 +195,42 @@ class GFlowNetTrainer:
         outputs = self.model.forward(states)
 
         # Compute masked log probabilities
-        pf_logprobs = self.compute_masked_log_probs(
-            outputs.logits_pf, valid_actions, self.pf_temperature
-        )
-        pb_logprobs = self.compute_masked_log_probs(
-            outputs.logits_pb, valid_actions, self.pb_temperature
-        )
+        pf_logprobs = self.compute_masked_log_probs(outputs.logits_pf, valid_actions)
+        pb_logprobs = self.compute_masked_log_probs(outputs.logits_pb, valid_actions)
 
         # Gather chosen action probabilities
         pf_logprobs = torch.gather(pf_logprobs, 1, actions.unsqueeze(1)).squeeze(1)
         pb_logprobs = torch.gather(pb_logprobs, 1, actions.unsqueeze(1)).squeeze(1)
 
-        # Compute returns for weighting
-        returns = self.compute_returns(rewards)
-
         # SubTrajectory Balance loss
-        loss = 0
+        flow_matching_loss = 0
         for t in range(T - 1):
             left_term = outputs.log_state_flow[t] + pf_logprobs[t]
             right_term = outputs.log_state_flow[t + 1] + pb_logprobs[t]
 
-            # Add return-based weighting
-            weight = returns[t].detach()
-
             # Squared error in log space
             step_loss = (left_term - right_term) ** 2
-            loss = loss + weight * step_loss
+            flow_matching_loss = flow_matching_loss + step_loss
 
-        return loss.mean()
+        # Normalization loss for terminal states
+        # terminal_flows = torch.exp(outputs.log_state_flow[-1])  # Flow at terminal state
+        # normalization_loss = (terminal_flows - rewards[-1]) ** 2
+
+        terminal_flows = torch.exp(outputs.log_state_flow)
+        Z = terminal_flows.sum()
+        normalized_flows = terminal_flows / Z
+
+        # Compare normalized flows to normalized rewards
+        terminal_rewards = rewards[-1]
+        normalization_loss = (Z - 1.0) ** 2 + (
+            normalized_flows[-1] - terminal_rewards
+        ) ** 2
+
+        # Combine losses with appropirate weighting
+        lambda_norm = 0.9  # Hyperparameter to control normalization strength
+        total_loss = flow_matching_loss + lambda_norm * normalization_loss
+
+        return total_loss.mean()
 
     def compute_trajectory_metrics(self, trajectory: Trajectory) -> TrainingMetrics:
         """
@@ -266,16 +270,31 @@ class GFlowNetTrainer:
 
         # Get model outputs
         with torch.no_grad():
-            outputs = self.model(states)
+            outputs = self.model.forward(states)
+
+            # Get terminal flow and reward
+            terminal_flow = outputs.log_state_flow[-1].exp()
+            terminal_reward = rewards[-1]
+
+            # Compute value error as deviation from desired normalized flow
+            flow_value_error = (terminal_flow - terminal_reward) ** 2
+
+            # Flow normalization error
+            terminal_states_mask = torch.tensor(
+                [self.env.is_terminal(s) for s in trajectory.states]
+            )
+            terminal_flows = outputs.log_state_flow[terminal_states_mask].exp()
+            Z = terminal_flows.sum()
+            flow_normalization_error = (Z - 1.0) ** 2
 
             # Compute policy entropy
             entropy = self.metrics.compute_policy_entropy(
-                outputs.logits_pf, action_masks, self.pf_temperature
+                outputs.logits_pf, action_masks
             )
 
             # Get probabilities
-            pf_probs = F.softmax(outputs.logits_pf / self.pf_temperature, dim=-1)
-            pb_probs = F.softmax(outputs.logits_pb / self.pb_temperature, dim=-1)
+            pf_probs = F.softmax(outputs.logits_pf, dim=-1)
+            pb_probs = F.softmax(outputs.logits_pb, dim=-1)
 
             # Convert to numpy for storage
             pf_probs = {i: probs.numpy() for i, probs in enumerate(pf_probs)}
@@ -292,17 +311,6 @@ class GFlowNetTrainer:
         for state in trajectory.states:
             state_visits[state.position] += 1
 
-        # Compute value estimation error
-        # Note: returns tensor has one less element than states tensor
-        # because returns are computed for transitions
-        true_returns = self.compute_returns(rewards)
-        predicted_values = outputs.log_state_flow.exp()
-
-        # Use only the first len(true_returns) elements for comparison
-        value_error = (
-            ((true_returns - predicted_values[: len(true_returns)]) ** 2).mean().item()
-        )
-
         return TrainingMetrics(
             loss=0.0,  # Will be updated during training step
             episode_length=len(trajectory.states) - 1,
@@ -313,7 +321,8 @@ class GFlowNetTrainer:
             flow_values=flow_values,
             pf_probs=pf_probs,
             pb_probs=pb_probs,
-            value_estimation_error=value_error,
+            flow_value_estimation_error=flow_value_error.item(),
+            flow_normalization_error=flow_normalization_error.item(),
         )
 
     def train_step(self) -> float:

@@ -101,7 +101,7 @@ class BENTrainer:
         state = self.env.reset()
         hidden = None
         done = False
-        trajectory: List[Tuple] = []
+        trajectory = []
 
         while not done:
             # Get action using ε-greedy with uncertainty bonus
@@ -112,7 +112,7 @@ class BENTrainer:
             _, _, bonus = self.get_uncertainties(outputs)
             q_values = outputs.q_value + bonus.unsqueeze(-1)
 
-            # epsilon-greedy action selection
+            # ε-greedy action selection
             if torch.rand(1).item() < self.eps_threshold:
                 action = torch.randint(2, (1,)).item()
             else:
@@ -120,15 +120,6 @@ class BENTrainer:
 
             # Take step in environment
             next_state, reward, done = self.env.step(action)
-
-            reward = self.env.n * reward / (2 * len(trajectory) + 1)
-
-            # beta = 1.1
-            # reward = (
-            #     (self.env.n / alpha)
-            #     * reward
-            #     * np.exp(len(trajectory)) ** (-beta / self.env.n)
-            # )
 
             # Store transition
             trajectory.append((state, action, reward, next_state, done))

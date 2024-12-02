@@ -6,7 +6,7 @@ from .train import GFlowNetTrainer
 
 def main():
     # Create environment and model
-    env = NChainEnv(n=20, reward=10.0)
+    env = NChainEnv(n=50, reward=10.0)
     model = GFlowNet(state_dim=env.n, num_actions=env.num_actions, hidden_dim=64)
 
     # Create trainer
@@ -17,12 +17,10 @@ def main():
         gamma=0.99,
         buffer_size=10000,
         batch_size=32,
-        pf_temperature=1.0,
-        pb_temperature=1.0,
     )
 
     # Train the model
-    losses = trainer.train(num_steps=500)
+    losses = trainer.train(num_steps=1000)
 
     # Plot comprehensive metrics
     print("\nPlotting training metrics...")
