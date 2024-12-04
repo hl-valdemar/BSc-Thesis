@@ -1,4 +1,6 @@
-from n_chain import NChainEnv
+import matplotlib.pyplot as plt
+
+from nchain_v2 import NChainEnv, NChainState
 
 from .model import GFlowNet
 from .train import GFlowNetTrainer
@@ -6,7 +8,8 @@ from .train import GFlowNetTrainer
 
 def main():
     # Create environment and model
-    env = NChainEnv(n=50, reward=10.0)
+    chain_length = 30
+    env = NChainEnv(n=chain_length, base_reward=2 * chain_length, path_penalty=0.95)
     model = GFlowNet(state_dim=env.n, num_actions=env.num_actions, hidden_dim=64)
 
     # Create trainer
@@ -20,20 +23,20 @@ def main():
     )
 
     # Train the model
-    losses = trainer.train(num_steps=1000)
+    losses = trainer.train(num_steps=10000)
 
     # Plot comprehensive metrics
     print("\nPlotting training metrics...")
     trainer.metrics.plot_metrics(include_raw=True)
 
-    # Plot state visitation distribution
-    print("\nPlotting state visitation distribution...")
-    trainer.metrics.plot_state_visits()
-
-    # Plot policy distribution
-    print("\nPlotting policy distribution...")
-    trainer.metrics.plot_policy_distribution()
-
+    # # Plot state visitation distribution
+    # print("\nPlotting state visitation distribution...")
+    # trainer.metrics.plot_state_visits()
+    #
+    # # Plot policy distribution
+    # print("\nPlotting policy distribution...")
+    # trainer.metrics.plot_policy_distribution()
+    #
     # Print final summary
     print("\nFinal training summary:")
     trainer.metrics.print_summary()

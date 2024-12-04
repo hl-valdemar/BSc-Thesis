@@ -1,49 +1,16 @@
 import random
 from collections import defaultdict, deque
-from dataclasses import dataclass
-from typing import List, Tuple
+from typing import Deque, List
 
 import torch
 import torch.nn.functional as F
 from torch import Tensor
 from torch.optim import Adam
 
-from n_chain import NChainEnv, NChainState
+from nchain_v2 import NChainEnv, Trajectory
 
 from .metrics import MetricsTracker, TrainingMetrics
 from .model import GFlowNet
-
-
-@dataclass
-class Trajectory:
-    """
-    Container for a single trajectory through the environment.
-
-    Attributes:
-        states: List of states visited
-        actions: List of actions taken
-        rewards: List of rewards received
-        done: Whether trajectory ended at terminal state
-    """
-
-    states: List[NChainState]
-    actions: List[int]
-    rewards: List[float]
-    done: bool
-
-    def to_tensors(self) -> Tuple[Tensor, Tensor, Tensor]:
-        """Convert trajectory to tensor format.
-
-        Returns:
-            Tuple containing:
-                - states_tensor: Shape [T, state_dim]
-                - actions_tensor: Shape [T]
-                - rewards_tensor: Shape [T]
-        """
-        states_tensor = torch.stack([s.to_tensor() for s in self.states])
-        actions_tensor = torch.tensor(self.actions)
-        rewards_tensor = torch.tensor(self.rewards)
-        return states_tensor, actions_tensor, rewards_tensor
 
 
 class GFlowNetTrainer:
@@ -65,7 +32,10 @@ class GFlowNetTrainer:
         self.batch_size = batch_size
 
         # Initialize replay buffer
-        self.replay_buffer = deque(maxlen=buffer_size)
+        self.replay_buffer: Deque[Trajectory] = deque(maxlen=buffer_size)
+
+        self.Z_estimate = env.base_reward
+        self.Z_momentum = 0.99
 
         # Training tracking
         self.steps_done = 0
@@ -86,57 +56,26 @@ class GFlowNetTrainer:
             state_tensor = state.to_tensor().unsqueeze(0)
 
             # Create action mask for valid actions
-            action_mask = torch.zeros(1, self.model.num_actions)
+            action_mask = torch.zeros(
+                1, self.model.num_actions
+            )  # Shape: [1, self.model.num_actions]
             action_mask[0, valid_actions] = 1.0
 
             # Get masked action probabilities
             action_probs = self.model.get_forward_policy(state_tensor)
             action_probs = action_probs * action_mask
             action_probs = action_probs / action_probs.sum()  # Renormalize
-
-            # ε-greedy exploration
-            if random.random() < self.eps_threshold:
-                action = random.choice(valid_actions)
-            else:
-                action = action_probs.argmax().item()
+            action = torch.multinomial(action_probs, 1).item()
 
             next_state, reward, done = self.env.step(action)
 
             states.append(next_state)
             actions.append(action)
-
-            # Scale the reward according the number of actions taken
-            # This should lead to policies that sample shorter paths with higher frequencies
-            reward = self.env.n * reward / (2 * len(actions))
-            # alpha = 3
-            # beta = 1.1
-            # reward = (
-            #     (self.env.n / alpha)
-            #     * reward
-            #     * np.exp(len(actions)) ** (-beta / self.env.n)
-            # )
             rewards.append(reward)
 
             state = next_state
 
         return Trajectory(states, actions, rewards, done)
-
-    # def compute_returns(self, rewards: Tensor) -> Tensor:
-    #     """
-    #     Compute discounted returns.
-    #
-    #     Args:
-    #         rewards: Rewards collected for a single trajectory
-    #
-    #     Returns:
-    #         Tensor: The discounted returns
-    #     """
-    #     returns = torch.zeros_like(rewards)
-    #     running_sum = 0
-    #     for t in reversed(range(len(rewards))):
-    #         running_sum = rewards[t] + self.gamma * running_sum
-    #         returns[t] = running_sum
-    #     return returns
 
     def create_action_masks(
         self, valid_actions_list: List[List[int]], num_actions: int
@@ -181,154 +120,198 @@ class GFlowNetTrainer:
 
         return log_probs
 
-    def compute_subtraj_balance_loss(
-        self,
-        states: Tensor,  # Shape [T, state_dim]
-        actions: Tensor,  # Shape [T]
-        rewards: Tensor,  # Shape [T]
-        valid_actions: List[List[int]],
-    ) -> Tensor:
-        """Compute SubTrajectory Balance loss for a single trajectory."""
-        T = states.shape[0]
+    # def compute_subtraj_balance_loss(self, trajectory: Trajectory) -> Tensor:
+    #     """Compute SubTrajectory Balance loss following GFlowNet principles.
+    #
+    #     GFlowNet requires:
+    #     1. Flow consistency: F(s)PF(a|s) = F(s')PB(a|s') for all transitions
+    #     2. Terminal matching: F(x) = R(x) for terminal states x
+    #     3. Partition function: Z = sum(R(x)) over all terminal states x
+    #     """
+    #     states, actions, rewards = trajectory.to_tensors()
+    #     valid_actions = [self.env.get_valid_actions(s) for s in trajectory.states]
+    #     T = states.shape[0]
+    #
+    #     # Get model outputs (log space)
+    #     outputs = self.model.forward(states)
+    #
+    #     # Get masked log probabilities for chosen actions
+    #     pf_logprobs = self.compute_masked_log_probs(outputs.logits_pf, valid_actions)
+    #     pb_logprobs = self.compute_masked_log_probs(outputs.logits_pb, valid_actions)
+    #     pf_logprobs = torch.gather(pf_logprobs, 1, actions.unsqueeze(1)).squeeze(1)
+    #     pb_logprobs = torch.gather(pb_logprobs, 1, actions.unsqueeze(1)).squeeze(1)
+    #
+    #     # 1. Flow consistency loss (computed in log space)
+    #     flow_matching_loss = torch.tensor(0.0, device=states.device)
+    #     for t in range(T - 1):
+    #         # For each transition s->s', require:
+    #         # log(F(s)) + log(PF(a|s)) = log(F(s')) + log(PB(a|s'))
+    #         left_flow = outputs.log_state_flow[t] + pf_logprobs[t]
+    #         right_flow = outputs.log_state_flow[t + 1] + pb_logprobs[t]
+    #         flow_matching_loss = flow_matching_loss + (left_flow - right_flow) ** 2
+    #
+    #     # 2. Terminal flow matching
+    #     # For terminal states x, require F(x) = R(x)
+    #     terminal_mask = torch.tensor(
+    #         [self.env.is_terminal(s) for s in trajectory.states]
+    #     )
+    #     terminal_flows = outputs.log_state_flow[terminal_mask]
+    #     terminal_rewards = torch.tensor(
+    #         [r for r, is_term in zip(rewards, terminal_mask) if is_term]
+    #     )
+    #     terminal_loss = (
+    #         (terminal_flows - torch.log(terminal_rewards + 1e-8)) ** 2
+    #     ).mean()
+    #
+    #     # 3. Partition function regulation
+    #     # The sum of flows at all terminal states should equal sum of rewards
+    #     terminal_flows = outputs.log_state_flow[terminal_mask].exp()
+    #     current_Z = terminal_flows.sum()
+    #     self.Z_estimate = (
+    #         self.Z_momentum * self.Z_estimate + (1 - self.Z_momentum) * current_Z.item()
+    #     )
+    #     partition_loss = (
+    #         torch.log(current_Z) - torch.log(torch.tensor(self.Z_estimate))
+    #     ) ** 2
+    #
+    #     # Combine losses
+    #     # Note: No need for manual importance weighting as it emerges from flow consistency
+    #     total_loss = (
+    #         flow_matching_loss / (T - 1)  # Normalize by trajectory length
+    #         + terminal_loss
+    #         + partition_loss
+    #     )
+    #
+    #     return total_loss
 
-        # Get model outputs
-        outputs = self.model.forward(states)
-
-        # Compute masked log probabilities
-        pf_logprobs = self.compute_masked_log_probs(outputs.logits_pf, valid_actions)
-        pb_logprobs = self.compute_masked_log_probs(outputs.logits_pb, valid_actions)
-
-        # Gather chosen action probabilities
-        pf_logprobs = torch.gather(pf_logprobs, 1, actions.unsqueeze(1)).squeeze(1)
-        pb_logprobs = torch.gather(pb_logprobs, 1, actions.unsqueeze(1)).squeeze(1)
-
-        # SubTrajectory Balance loss
-        flow_matching_loss = 0
-        for t in range(T - 1):
-            left_term = outputs.log_state_flow[t] + pf_logprobs[t]
-            right_term = outputs.log_state_flow[t + 1] + pb_logprobs[t]
-
-            # Squared error in log space
-            step_loss = (left_term - right_term) ** 2
-            flow_matching_loss = flow_matching_loss + step_loss
-
-        # Normalization loss for terminal states
-        # terminal_flows = torch.exp(outputs.log_state_flow[-1])  # Flow at terminal state
-        # normalization_loss = (terminal_flows - rewards[-1]) ** 2
-
-        terminal_flows = torch.exp(outputs.log_state_flow)
-        Z = terminal_flows.sum()
-        normalized_flows = terminal_flows / Z
-
-        # Compare normalized flows to normalized rewards
-        terminal_rewards = rewards[-1]
-        normalization_loss = (Z - 1.0) ** 2 + (
-            normalized_flows[-1] - terminal_rewards
-        ) ** 2
-
-        # Combine losses with appropirate weighting
-        lambda_norm = 0.9  # Hyperparameter to control normalization strength
-        total_loss = flow_matching_loss + lambda_norm * normalization_loss
-
-        return total_loss.mean()
-
-    def compute_trajectory_metrics(self, trajectory: Trajectory) -> TrainingMetrics:
-        """
-        Shape information:
-        - trajectory.states: [T+1] states (including initial and final)
-        - trajectory.actions: [T] actions
-        - trajectory.rewards: [T] rewards
-        where T is the number of steps taken
-        """
-        """Compute metrics for a single trajectory.
-        
-        Args:
-            trajectory: Completed trajectory
-            
-        Returns:
-            TrainingMetrics: Computed metrics
-        """
-        # Convert trajectory to tensors
+    def compute_trajectory_balance_loss(self, trajectory: Trajectory) -> Tensor:
+        """Compute trajectory balance loss following GFlowNet principles."""
         states, actions, rewards = trajectory.to_tensors()
         valid_actions = [self.env.get_valid_actions(s) for s in trajectory.states]
-        action_masks = self.create_action_masks(valid_actions, self.model.num_actions)
 
-        # Verify tensor shapes
-        T = len(trajectory.actions)  # Number of steps
-        assert (
-            len(trajectory.states) == T + 1
-        ), f"Expected {T+1} states, got {len(trajectory.states)}"
-        assert (
-            len(trajectory.actions) == T
-        ), f"Expected {T} actions, got {len(trajectory.actions)}"
-        assert (
-            len(trajectory.rewards) == T
-        ), f"Expected {T} rewards, got {len(trajectory.rewards)}"
-        assert (
-            states.shape[0] == T + 1
-        ), f"Expected states tensor of shape [{T+1}, state_dim], got {states.shape}"
+        outputs = self.model.forward(states)
 
-        # Get model outputs
+        # Get forward probabilities for taken actions
+        pf_logprobs = self.compute_masked_log_probs(outputs.logits_pf, valid_actions)
+        pf_logprobs = torch.gather(pf_logprobs, 1, actions.unsqueeze(1)).squeeze(1)
+
+        # Get backward probabilities for taken actions
+        pb_logprobs = self.compute_masked_log_probs(outputs.logits_pb, valid_actions)
+        pb_logprobs = torch.gather(pb_logprobs, 1, actions.unsqueeze(1)).squeeze(1)
+
+        # Forward term (in log space):
+        # log(Z) + sum(log(PF(s_t+1|s_t)))
+        log_forward = (
+            torch.log(torch.tensor(self.Z_estimate) + 1e-8) + pf_logprobs.sum()
+        )
+
+        # Backward term (in log space):
+        # log(R(x)) + sum(log(PB(s_t|s_t+1)))
+        terminal_reward = rewards[-1]
+        log_backward = torch.log(terminal_reward + 1e-8) + pb_logprobs.sum()
+
+        # Trajectory balance loss
+        balance_loss = (log_forward - log_backward).pow(2)
+
+        return balance_loss
+
+    def compute_trajectory_metrics(self, trajectory: Trajectory) -> TrainingMetrics:
+        """Compute metrics including path length analysis."""
+        states, actions, rewards = trajectory.to_tensors()
+        valid_actions = [self.env.get_valid_actions(s) for s in trajectory.states]
+        T = len(trajectory.actions)
+
         with torch.no_grad():
             outputs = self.model.forward(states)
 
-            # Get terminal flow and reward
+            # Existing flow consistency metrics
             terminal_flow = outputs.log_state_flow[-1].exp()
             terminal_reward = rewards[-1]
-
-            # Compute value error as deviation from desired normalized flow
             flow_value_error = (terminal_flow - terminal_reward) ** 2
 
-            # Flow normalization error
-            terminal_states_mask = torch.tensor(
-                [self.env.is_terminal(s) for s in trajectory.states]
-            )
-            terminal_flows = outputs.log_state_flow[terminal_states_mask].exp()
-            Z = terminal_flows.sum()
-            flow_normalization_error = (Z - 1.0) ** 2
+            # Path length analysis
+            path_length = T
+            position = trajectory.states[-1].position
+            optimal_length = position  # Minimum path length to reach position
+            path_efficiency = optimal_length / path_length if path_length > 0 else 0.0
 
-            # Compute policy entropy
-            entropy = self.metrics.compute_policy_entropy(
-                outputs.logits_pf, action_masks
-            )
+            # Flow distribution analysis by path length
+            terminal_flows = []
+            terminal_rewards = []
 
-            # Get probabilities
-            pf_probs = F.softmax(outputs.logits_pf, dim=-1)
-            pb_probs = F.softmax(outputs.logits_pb, dim=-1)
+            # Analyze last N trajectories to get path length distribution
+            recent_trajectories = list(self.replay_buffer)[-self.metrics.window_size :]
+            for traj in recent_trajectories:
+                if traj.done:  # Only consider completed trajectories
+                    length = len(traj.actions)
+                    pos = traj.states[-1].position
+                    with torch.no_grad():
+                        final_flow = self.model.forward(
+                            traj.states[-1].to_tensor().unsqueeze(0)
+                        )
+                        terminal_flows.append(
+                            (length, final_flow.log_state_flow[0].exp().item())
+                        )
+                        terminal_rewards.append((length, traj.rewards[-1]))
 
-            # Convert to numpy for storage
-            pf_probs = {i: probs.numpy() for i, probs in enumerate(pf_probs)}
-            pb_probs = {i: probs.numpy() for i, probs in enumerate(pb_probs)}
+            # Group flows and rewards by path length
+            length_flows = defaultdict(list)
+            length_rewards = defaultdict(list)
+            for length, flow in terminal_flows:
+                length_flows[length].append(flow)
+            for length, reward in terminal_rewards:
+                length_rewards[length].append(reward)
 
-            # Get flow values
-            flow_values = {
-                i: flow.item()
-                for i, flow in enumerate(torch.exp(outputs.log_state_flow))
+            # Compute average flows and rewards per path length
+            avg_flows_by_length = {
+                length: sum(flows) / len(flows)
+                for length, flows in length_flows.items()
+            }
+            avg_rewards_by_length = {
+                length: sum(rewards) / len(rewards)
+                for length, rewards in length_rewards.items()
             }
 
-        # Count state visits
-        state_visits = defaultdict(int)
-        for state in trajectory.states:
-            state_visits[state.position] += 1
+            return TrainingMetrics(
+                partition_estimate=self.Z_estimate,
+                loss=0.0,  # Updated during training step
+                episode_length=path_length,
+                episode_return=sum(trajectory.rewards),
+                # state_visits=self.get_state_visits(trajectory),
+                successful_episodes=trajectory.done,
+                flow_values=dict(enumerate(outputs.log_state_flow.exp().tolist())),
+                flow_value_estimation_error=flow_value_error.item(),
+                # New path-specific metrics
+                path_length=path_length,
+                optimal_length=optimal_length,
+                path_efficiency=path_efficiency,
+                flows_by_path_length=avg_flows_by_length,
+                rewards_by_path_length=avg_rewards_by_length,
+                # Distribution metrics
+                path_length_distribution={
+                    length: len(flows) / len(terminal_flows)
+                    for length, flows in length_flows.items()
+                },
+            )
 
-        return TrainingMetrics(
-            loss=0.0,  # Will be updated during training step
-            episode_length=len(trajectory.states) - 1,
-            episode_return=sum(trajectory.rewards),
-            policy_entropy=entropy,
-            state_visits=dict(state_visits),
-            successful_episodes=trajectory.done,
-            flow_values=flow_values,
-            pf_probs=pf_probs,
-            pb_probs=pb_probs,
-            flow_value_estimation_error=flow_value_error.item(),
-            flow_normalization_error=flow_normalization_error.item(),
+    def update_Z_estimate(self, trajectory: Trajectory):
+        """Update partition function estimate using terminal rewards."""
+        terminal_reward = trajectory.rewards[-1]
+        # Use rewards rather than flows for Z estimation
+        current_Z = terminal_reward
+
+        # Exponential moving average update
+        self.Z_estimate = (
+            self.Z_momentum * self.Z_estimate + (1 - self.Z_momentum) * current_Z
         )
 
-    def train_step(self) -> float:
+    def train_step(self, total_steps: int) -> float:
         """Perform single training step."""
         trajectory = self.collect_trajectory()
         self.replay_buffer.append(trajectory)
+
+        # Update Z estimate before loss computation
+        self.update_Z_estimate(trajectory)
 
         if len(self.replay_buffer) < self.batch_size:
             return 0.0
@@ -339,12 +322,9 @@ class GFlowNetTrainer:
         self.optimizer.zero_grad()
 
         for traj in batch:
-            states, actions, rewards = traj.to_tensors()
-            valid_actions = [self.env.get_valid_actions(s) for s in traj.states]
-
-            loss = self.compute_subtraj_balance_loss(
-                states, actions, rewards, valid_actions
-            )
+            # states, actions, rewards = traj.to_tensors()
+            # valid_actions = [self.env.get_valid_actions(s) for s in traj.states]
+            loss = self.compute_trajectory_balance_loss(traj)
             total_loss += loss
 
         avg_loss = total_loss / self.batch_size
@@ -352,7 +332,7 @@ class GFlowNetTrainer:
         self.optimizer.step()
 
         self.steps_done += 1
-        self.eps_threshold = max(0.01, 0.9 - 0.89 * self.steps_done / 10000)
+        self.eps_threshold = max(0.4, 0.9 - 0.89 * self.steps_done / total_steps)
 
         loss_value = avg_loss.item()
 
@@ -367,7 +347,7 @@ class GFlowNetTrainer:
         """Train for specified number of steps."""
         losses = []
         for step in range(num_steps):
-            loss = self.train_step()
+            loss = self.train_step(num_steps)
             losses.append(loss)
 
             if (step + 1) % 10 == 0:
