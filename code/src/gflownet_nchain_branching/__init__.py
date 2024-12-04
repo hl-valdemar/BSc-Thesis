@@ -10,7 +10,7 @@ def main():
 
     # Create model
     model = GFlowNet(
-        state_dim=env.n,
+        state_dim=env.state_dim,
         num_actions=env.num_actions,
     )
 
@@ -18,4 +18,7 @@ def main():
     trainer = GFlowNetTrainer(env=env, model=model)
 
     # Train the model
-    losses = trainer.train(num_steps=10_000)
+    losses = trainer.train(num_steps=1000)
+
+    # Plot the metrics
+    trainer.metrics.plot_training_curves()

@@ -30,6 +30,9 @@ class NChainState:
             1,
         ], "Branch must be -1 (pre-split), 0 (left), or 1 (right)"
 
+        # Add the state dim
+        self.state_dim = self.n * 2 + 3
+
     def to_tensor(self) -> Tensor:
         """Convert state to tensor representation.
 
@@ -38,9 +41,9 @@ class NChainState:
                 - one-hot position (n*2)
                 - one-hot branch encoding (3) for pre-split, left, right
         """
-        state_tensor = torch.zeros(self.n * 2 + 3)
+        state_tensor = torch.zeros(self.state_dim)
         state_tensor[self.position] = 1.0
-        state_tensor[self.n * 2 + (self.branch + 1)] = 1.0
+        state_tensor[self.state_dim - 3 + (self.branch + 1)] = 1.0
         return state_tensor
 
     @classmethod
@@ -105,7 +108,8 @@ class NChainEnv:
         self.left_reward = left_reward
         self.right_reward = right_reward
         self.split_point = n // 2  # Split occurs at n // 2 (the middle)
-        self.current_state: Optional[NChainState] = None
+        self.current_state = NChainState(position=0, n=self.n, branch=-1)
+        self.state_dim = self.current_state.state_dim
 
         # Actions: 0 = stay, 1 = right (pre-split)
         # At split: 0 = stay, 1 = choose left, 2 = choose right
@@ -125,70 +129,61 @@ class NChainEnv:
                 Pre-split: 0=stay, 1=right
                 At split: 0=stay, 1=left branch, 2=right branch
                 Post-split: 0=stay, 1=forward
-
-        Returns:
-            Tuple of (next_state, reward, done)
         """
-        assert self.current_state is not None
         assert action in self.get_valid_actions(self.current_state)
 
         position = self.current_state.position
         branch = self.current_state.branch
 
+        # Initialize new state variables
+        new_position = position
+        new_branch = branch
+
         # Handle pre-split movement
-        if branch == -1:
+        if branch == -1 and position < self.split_point:
             if action == 0:  # Stay
-                new_position = position
-                new_branch = -1
+                pass
             elif action == 1:  # Move right
                 new_position = position + 1
-                # Check if we've reached the split
-                if new_position == self.split_point:
-                    new_branch = -1
-                else:
-                    new_branch = -1
 
         # Handle at-split decisions
-        elif position == self.split_point:
-            if action == 0:  # Stay at split
-                new_position = position
-                new_branch = branch
+        elif branch == -1 and position == self.split_point:
+            if action == 0:  # Stay
+                pass
             elif action == 1:  # Choose left branch
                 new_position = position + 1
                 new_branch = 0
-            else:  # Choose right branch
+            elif action == 2:  # Choose right branch
                 new_position = position + 1
                 new_branch = 1
 
         # Handle post-split movement
-        else:
+        elif branch in [0, 1]:  # On either branch
             if action == 0:  # Stay
-                new_position = position
-                new_branch = branch
-            else:  # Move forward on chosen branch
+                pass
+            elif action == 1:  # Move forward
                 new_position = position + 1
-                new_branch = branch
 
         # Update state
         self.current_state = NChainState(
             position=new_position, n=self.n, branch=new_branch
         )
 
-        # Check if we've reached a terminal state
-        done = self.is_terminal(self.current_state)
+        # Terminal state is reached when we're on a branch and have moved
+        # n-split_point steps after the split point
+        done = branch in [0, 1] and position >= self.split_point + (
+            self.n - self.split_point
+        )
 
-        # Determine reward
+        reward = 0.0
         if done:
-            reward = self.left_reward if new_branch == 0 else self.right_reward
-        else:
-            reward = 0.0
+            reward = self.left_reward if branch == 0 else self.right_reward
 
         return self.current_state, reward, done
 
     def get_valid_actions(self, state: Optional[NChainState] = None) -> List[int]:
         """Get list of valid actions for given state."""
         if state is None:
-            assert self.current_state is not None
             state = self.current_state
 
         # Terminal states
@@ -204,6 +199,6 @@ class NChainEnv:
 
     def is_terminal(self, state: NChainState) -> bool:
         """Check if state is terminal (end of either branch)."""
-        return state.branch in [0, 1] and state.position == self.split_point + (
+        return state.branch in [0, 1] and state.position >= self.split_point + (
             self.n - self.split_point
         )

@@ -91,7 +91,7 @@ class GFlowNet(nn.Module):
         )  # Shape: [batch_size, num_actions]
 
         # Expand log_Z to batch dimension
-        log_Z = self.log_Z.expand(states.shape(0))
+        log_Z = self.log_Z.expand(states.shape[0])
 
         return GFlowNetOutput(
             logits_pf=logits_pf,
@@ -99,22 +99,16 @@ class GFlowNet(nn.Module):
             log_Z=log_Z,
         )
 
-    def get_forward_policy(
-        self,
-        states: Tensor,
-        valid_actions_mask: Tensor,
-    ) -> Tensor:
+    def get_forward_policy(self, states: Tensor) -> Tensor:
         """
         Args:
             states: States to get forward policy for, shape [batch_size, state_dim]
-            valid_actions: A valid action mask, shape [batch_size, num_actions]
 
         Returns:
             Tensor: Forward policy probabilities, shape [batch_size, num_actions]
         """
         output = self.forward(states)
         logits = output.logits_pf  # Shape: [batch_size, num_actions]
-        logits = logits.masked_fill(~valid_actions_mask, float("-inf"))
 
         # Return proper probabilities
         return F.softmax(logits, dim=-1)
@@ -176,7 +170,9 @@ class GFlowNet(nn.Module):
         for t, (output, action, mask) in enumerate(
             zip(outputs, actions, valid_actions_mask)
         ):
-            logits = output.logits_pf.squeeze(0)  # Remove batch dim
+            logits = output.logits_pf.squeeze(0)  # Remove batch dimension
+            mask = mask.squeeze(0)  # Also squeeze the mask
+
             logits = logits.masked_fill(~mask, float("-inf"))
             log_pf.append(F.log_softmax(logits, dim=-1)[action])
 
@@ -185,7 +181,7 @@ class GFlowNet(nn.Module):
         for t in range(len(states) - 1):  # No backward from initial state
             output = outputs[t + 1]
             prev_action = actions[t]
-            logits = output.logits_pb.squeeze(0)
+            logits = output.logits_pb.squeeze(0)  # Remove batch dimension
             log_pb.append(F.log_softmax(logits, dim=-1)[prev_action])
 
         # Compute loss components
