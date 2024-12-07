@@ -37,6 +37,56 @@ class MetricsTracker:
         self.window_size = window_size
         self.metrics_history: List[GFlowNetMetrics] = []
 
+    def to_json(self) -> str:
+        """Convert metrics history to JSON string.
+
+        Returns:
+            str: JSON representation of metrics history, with each entry containing:
+                - trajectory_balance_loss: float
+                - terminal_state_reached: bool
+                - terminal_reward: float
+                - log_Z: float
+                - trajectory_length: int
+                - branch_chosen: int
+                - forward_entropy: float
+                - backward_entropy: float
+        """
+        import json
+
+        # Convert metrics history to list of dicts
+        history = []
+        for metric in self.metrics_history:
+            history.append(
+                {
+                    "trajectory_balance_loss": metric.trajectory_balance_loss,
+                    "terminal_state_reached": metric.terminal_state_reached,
+                    "terminal_reward": metric.terminal_reward,
+                    "log_Z": metric.log_Z,
+                    "trajectory_length": metric.trajectory_length,
+                    "branch_chosen": metric.branch_chosen,
+                    "forward_entropy": metric.forward_entropy,
+                    "backward_entropy": metric.backward_entropy,
+                }
+            )
+
+        # Add summary statistics
+        summary_stats = self.get_summary_stats()
+
+        # Need to handle the branch_dist dictionary separately since
+        # its keys are integers which need to be converted to strings for JSON
+        if "branch_dist" in summary_stats:
+            summary_stats["branch_dist"] = {
+                str(k): v for k, v in summary_stats["branch_dist"].items()
+            }
+
+        output = {
+            "metrics_history": history,
+            "summary_stats": summary_stats,
+            "window_size": self.window_size,
+        }
+
+        return json.dumps(output, indent=2)
+
     def add_metrics(self, metrics: GFlowNetMetrics):
         """Add new metrics from a training episode."""
         self.metrics_history.append(metrics)

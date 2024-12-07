@@ -1,4 +1,4 @@
-from nchain_branching import NChainEnv
+from environments.nchain import NChainEnv
 
 from .model import GFlowNet
 from .train import GFlowNetTrainer
@@ -29,6 +29,11 @@ def main():
     print(f"  Branch count: {eval_metrics["branch_counts"]}")
     print(f"  Branch frequencies: {eval_metrics["branch_frequencies"]}\n")
     print(f"  Avg traj length: {eval_metrics["average_trajectory_length"]}")
+
+    # Save JSON formatted metrics to a file
+    metrics_json = trainer.metrics.to_json()
+    with open("gflownet_training_metrics.json", "w") as f:
+        f.write(metrics_json)
 
     # Plot the metrics
     trainer.metrics.plot_training_curves()

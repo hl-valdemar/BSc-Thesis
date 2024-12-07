@@ -1,4 +1,4 @@
-from nchain_branching.nchain_branching import (
+from .nchain import (
     NChainAction,
     NChainEnv,
     NChainState,

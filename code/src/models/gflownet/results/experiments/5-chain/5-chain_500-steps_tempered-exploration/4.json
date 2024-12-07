@@ -1,0 +1,5018 @@
+{
+  "metrics_history": [
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13807573318481445
+    },
+    {
+      "trajectory_balance_loss": 0.0,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 1.4286960363388062,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541302005449931,
+      "backward_entropy": 0.13810352087020875
+    },
+    {
+      "trajectory_balance_loss": 1.3671987056732178,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.00010000001202570274,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11542014280954997,
+      "backward_entropy": 0.13808096647262574
+    },
+    {
+      "trajectory_balance_loss": 1.305800199508667,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.00019993851310573518,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541964610417683,
+      "backward_entropy": 0.13805757761001586
+    },
+    {
+      "trajectory_balance_loss": 1.42645263671875,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.00029977119993418455,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541533470153809,
+      "backward_entropy": 0.1380344271659851
+    },
+    {
+      "trajectory_balance_loss": 1.364919662475586,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0003997328458353877,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541319886843364,
+      "backward_entropy": 0.13801063299179078
+    },
+    {
+      "trajectory_balance_loss": 1.425024151802063,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0004996749339625239,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541038751602173,
+      "backward_entropy": 0.13798621892929078
+    },
+    {
+      "trajectory_balance_loss": 1.4242693185806274,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0005997016560286283,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11540915568669637,
+      "backward_entropy": 0.13796123266220092
+    },
+    {
+      "trajectory_balance_loss": 1.3625867366790771,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0006997845484875143,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11540913581848145,
+      "backward_entropy": 0.13792071342468262
+    },
+    {
+      "trajectory_balance_loss": 1.3009068965911865,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0007997977081686258,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11540828148523967,
+      "backward_entropy": 0.13791067600250245
+    },
+    {
+      "trajectory_balance_loss": 1.3000519275665283,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0008996403776109219,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11540552973747253,
+      "backward_entropy": 0.13788603544235228
+    },
+    {
+      "trajectory_balance_loss": 1.5433902740478516,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0009993506828323007,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11540148655573527,
+      "backward_entropy": 0.1378502368927002
+    },
+    {
+      "trajectory_balance_loss": 1.3594268560409546,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0010994187323376536,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11540130774180095,
+      "backward_entropy": 0.13782622814178466
+    },
+    {
+      "trajectory_balance_loss": 1.3586350679397583,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0011994180968031287,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11540075143178304,
+      "backward_entropy": 0.13780170679092407
+    },
+    {
+      "trajectory_balance_loss": 1.2967948913574219,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.001299360184930265,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1153998573621114,
+      "backward_entropy": 0.13777668476104737
+    },
+    {
+      "trajectory_balance_loss": 1.4181463718414307,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0013991246232762933,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11539775133132935,
+      "backward_entropy": 0.13776030540466308
+    },
+    {
+      "trajectory_balance_loss": 1.3562413454055786,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0014990003546699882,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11539644002914429,
+      "backward_entropy": 0.13772544860839844
+    },
+    {
+      "trajectory_balance_loss": 1.5999829769134521,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0015988361556082964,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11539488037427266,
+      "backward_entropy": 0.13769934177398682
+    },
+    {
+      "trajectory_balance_loss": 1.5378668308258057,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0016991491429507732,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11539649963378906,
+      "backward_entropy": 0.13768272399902343
+    },
+    {
+      "trajectory_balance_loss": 1.5367733240127563,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0017997322138398886,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1153996189435323,
+      "backward_entropy": 0.13765616416931153
+    },
+    {
+      "trajectory_balance_loss": 1.2313880920410156,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.001900539151392877,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11540385087331136,
+      "backward_entropy": 0.1376291036605835
+    },
+    {
+      "trajectory_balance_loss": 1.595304250717163,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0020008475985378027,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11540595690409343,
+      "backward_entropy": 0.13759058713912964
+    },
+    {
+      "trajectory_balance_loss": 1.290810465812683,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0021015536040067673,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11540956298510234,
+      "backward_entropy": 0.13757357597351075
+    },
+    {
+      "trajectory_balance_loss": 1.5322840213775635,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.002201905706897378,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541197697321574,
+      "backward_entropy": 0.1375335931777954
+    },
+    {
+      "trajectory_balance_loss": 1.4102351665496826,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0023025136906653643,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541531483332317,
+      "backward_entropy": 0.13751600980758666
+    },
+    {
+      "trajectory_balance_loss": 1.469605565071106,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0024030585773289204,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11541854341824849,
+      "backward_entropy": 0.1374863862991333
+    },
+    {
+      "trajectory_balance_loss": 1.5287061929702759,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0025036882143467665,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11542210976282756,
+      "backward_entropy": 0.13744404315948486
+    },
+    {
+      "trajectory_balance_loss": 1.467368483543396,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0026045297272503376,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11542632182439168,
+      "backward_entropy": 0.13741301298141478
+    },
+    {
+      "trajectory_balance_loss": 1.46620774269104,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.002705408027395606,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11543067296346028,
+      "backward_entropy": 0.13738138675689698
+    },
+    {
+      "trajectory_balance_loss": 1.4650262594223022,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0028063147328794003,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11543512344360352,
+      "backward_entropy": 0.13734917640686034
+    },
+    {
+      "trajectory_balance_loss": 1.5829412937164307,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0029072423931211233,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11543975273768108,
+      "backward_entropy": 0.13731634616851807
+    },
+    {
+      "trajectory_balance_loss": 1.4625660181045532,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0030084752943366766,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11544511715571086,
+      "backward_entropy": 0.13728291988372804
+    },
+    {
+      "trajectory_balance_loss": 1.5204521417617798,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0031096769962459803,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11545039216677348,
+      "backward_entropy": 0.13726339340209961
+    },
+    {
+      "trajectory_balance_loss": 1.4600026607513428,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.003210995113477111,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11545586585998535,
+      "backward_entropy": 0.13721420764923095
+    },
+    {
+      "trajectory_balance_loss": 1.5174171924591064,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0033122622407972813,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11546111106872559,
+      "backward_entropy": 0.13717890977859498
+    },
+    {
+      "trajectory_balance_loss": 1.5158698558807373,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.00341362995095551,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11546643575032552,
+      "backward_entropy": 0.13715898990631104
+    },
+    {
+      "trajectory_balance_loss": 1.5143115520477295,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0035150812473148108,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11547173062960307,
+      "backward_entropy": 0.13712280988693237
+    },
+    {
+      "trajectory_balance_loss": 1.5707380771636963,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0036166009958833456,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11547694603602092,
+      "backward_entropy": 0.1370856285095215
+    },
+    {
+      "trajectory_balance_loss": 1.7421247959136963,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.003718325402587652,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11548219124476115,
+      "backward_entropy": 0.13704776763916016
+    },
+    {
+      "trajectory_balance_loss": 1.2795305252075195,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0038206640165299177,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11548769474029541,
+      "backward_entropy": 0.137000572681427
+    },
+    {
+      "trajectory_balance_loss": 1.4505950212478638,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.003922332543879747,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11549182732899983,
+      "backward_entropy": 0.13697030544281005
+    },
+    {
+      "trajectory_balance_loss": 1.5062586069107056,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.004023867659270763,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11549558242162068,
+      "backward_entropy": 0.13693015575408934
+    },
+    {
+      "trajectory_balance_loss": 1.4478825330734253,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.004125433042645454,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11549906929334004,
+      "backward_entropy": 0.13688921928405762
+    },
+    {
+      "trajectory_balance_loss": 1.2767835855484009,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.004226868040859699,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11550221840540568,
+      "backward_entropy": 0.13684794902801514
+    },
+    {
+      "trajectory_balance_loss": 1.5016047954559326,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.004327720031142235,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11550441384315491,
+      "backward_entropy": 0.13680825233459473
+    },
+    {
+      "trajectory_balance_loss": 1.6125551462173462,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0044286735355854034,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11550663908322652,
+      "backward_entropy": 0.13676095008850098
+    },
+    {
+      "trajectory_balance_loss": 1.442449688911438,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.004530016798526049,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11550913254419963,
+      "backward_entropy": 0.13671696186065674
+    },
+    {
+      "trajectory_balance_loss": 1.5527267456054688,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.004631239455193281,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11551134785016377,
+      "backward_entropy": 0.13668458461761473
+    },
+    {
+      "trajectory_balance_loss": 1.606498122215271,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0047326586209237576,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11551356315612793,
+      "backward_entropy": 0.13664157390594484
+    },
+    {
+      "trajectory_balance_loss": 1.3827828168869019,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.004834398627281189,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11551578839619954,
+      "backward_entropy": 0.136596941947937
+    },
+    {
+      "trajectory_balance_loss": 1.4918813705444336,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.004935800097882748,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11551754673322041,
+      "backward_entropy": 0.13655123710632325
+    },
+    {
+      "trajectory_balance_loss": 1.4901880025863647,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.005037208087742329,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11551912625630696,
+      "backward_entropy": 0.13650442361831666
+    },
+    {
+      "trajectory_balance_loss": 1.7074514627456665,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.005138617008924484,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11552050709724426,
+      "backward_entropy": 0.13643579483032225
+    },
+    {
+      "trajectory_balance_loss": 1.4866904020309448,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0052406322211027145,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1155218780040741,
+      "backward_entropy": 0.13638639450073242
+    },
+    {
+      "trajectory_balance_loss": 1.5391453504562378,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.005342565011233091,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11552295088768005,
+      "backward_entropy": 0.13635756969451904
+    },
+    {
+      "trajectory_balance_loss": 1.4290927648544312,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.005444572307169437,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1155237356821696,
+      "backward_entropy": 0.1363065719604492
+    },
+    {
+      "trajectory_balance_loss": 1.3737701177597046,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.005546332336962223,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11552423238754272,
+      "backward_entropy": 0.13623292446136476
+    },
+    {
+      "trajectory_balance_loss": 1.6402206420898438,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.00564771331846714,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11552447080612183,
+      "backward_entropy": 0.13617994785308837
+    },
+    {
+      "trajectory_balance_loss": 1.4243872165679932,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.005749522242695093,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11552452047665913,
+      "backward_entropy": 0.13614821434020996
+    },
+    {
+      "trajectory_balance_loss": 1.4759037494659424,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.005851089954376221,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11552436153093974,
+      "backward_entropy": 0.1360715389251709
+    },
+    {
+      "trajectory_balance_loss": 1.4741089344024658,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0059525934047997,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11552402377128601,
+      "backward_entropy": 0.1360378384590149
+    },
+    {
+      "trajectory_balance_loss": 1.6831506490707397,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.00605403445661068,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11552353700002034,
+      "backward_entropy": 0.1359614372253418
+    },
+    {
+      "trajectory_balance_loss": 1.417946696281433,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.006156024988740683,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1155227820078532,
+      "backward_entropy": 0.13592314720153809
+    },
+    {
+      "trajectory_balance_loss": 1.625410795211792,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.006257730536162853,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11552189787228902,
+      "backward_entropy": 0.13584740161895753
+    },
+    {
+      "trajectory_balance_loss": 1.6228420734405518,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.006359789054840803,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11552069584528606,
+      "backward_entropy": 0.1358041524887085
+    },
+    {
+      "trajectory_balance_loss": 1.6720179319381714,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.00646215258166194,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11551918586095174,
+      "backward_entropy": 0.13574318885803222
+    },
+    {
+      "trajectory_balance_loss": 1.6174863576889038,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0065649282187223434,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11551723877588908,
+      "backward_entropy": 0.13568148612976075
+    },
+    {
+      "trajectory_balance_loss": 1.3583475351333618,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.00666790921241045,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11551489432652791,
+      "backward_entropy": 0.13562140464782715
+    },
+    {
+      "trajectory_balance_loss": 1.3058468103408813,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.006770305801182985,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11551262935002644,
+      "backward_entropy": 0.13556215763092042
+    },
+    {
+      "trajectory_balance_loss": 1.5587300062179565,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0068720243871212006,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11551064252853394,
+      "backward_entropy": 0.1354912519454956
+    },
+    {
+      "trajectory_balance_loss": 1.4044729471206665,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.006973895709961653,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11550833781560262,
+      "backward_entropy": 0.1354261040687561
+    },
+    {
+      "trajectory_balance_loss": 1.7053006887435913,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.007075441535562277,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11550597349802653,
+      "backward_entropy": 0.13536009788513184
+    },
+    {
+      "trajectory_balance_loss": 1.6518852710723877,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.007177595514804125,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11550291379292806,
+      "backward_entropy": 0.1352924108505249
+    },
+    {
+      "trajectory_balance_loss": 1.5488710403442383,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.007280129939317703,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11549925804138184,
+      "backward_entropy": 0.1352231979370117
+    },
+    {
+      "trajectory_balance_loss": 1.695286512374878,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.007382694166153669,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11549524466196696,
+      "backward_entropy": 0.13515267372131348
+    },
+    {
+      "trajectory_balance_loss": 1.6422942876815796,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.007485721725970507,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11549046635627747,
+      "backward_entropy": 0.13509564399719237
+    },
+    {
+      "trajectory_balance_loss": 1.6879644393920898,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0075890012085437775,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11548486351966858,
+      "backward_entropy": 0.1350231170654297
+    },
+    {
+      "trajectory_balance_loss": 1.4889923334121704,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0076926397159695625,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11547826727231343,
+      "backward_entropy": 0.13493237495422364
+    },
+    {
+      "trajectory_balance_loss": 1.486445665359497,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.007795998360961676,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11547149221102397,
+      "backward_entropy": 0.1348569393157959
+    },
+    {
+      "trajectory_balance_loss": 1.6283626556396484,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.007899099960923195,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11546462774276733,
+      "backward_entropy": 0.1348017930984497
+    },
+    {
+      "trajectory_balance_loss": 1.481312870979309,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.008002402260899544,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11545706788698833,
+      "backward_entropy": 0.13470171689987182
+    },
+    {
+      "trajectory_balance_loss": 1.4787307977676392,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.008105436339974403,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11544940869013469,
+      "backward_entropy": 0.13464605808258057
+    },
+    {
+      "trajectory_balance_loss": 1.5234062671661377,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.00820822361856699,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11544169982274373,
+      "backward_entropy": 0.1345430374145508
+    },
+    {
+      "trajectory_balance_loss": 1.4265520572662354,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.008310928009450436,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11543367306391399,
+      "backward_entropy": 0.13446015119552612
+    },
+    {
+      "trajectory_balance_loss": 1.564299464225769,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.00841326080262661,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1154259741306305,
+      "backward_entropy": 0.1343758821487427
+    },
+    {
+      "trajectory_balance_loss": 1.5610793828964233,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.008515686728060246,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11541767915089925,
+      "backward_entropy": 0.13428981304168702
+    },
+    {
+      "trajectory_balance_loss": 1.557804822921753,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.008618186227977276,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11540881792704265,
+      "backward_entropy": 0.13420196771621704
+    },
+    {
+      "trajectory_balance_loss": 1.3710323572158813,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.008720740675926208,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11539942026138306,
+      "backward_entropy": 0.13411235809326172
+    },
+    {
+      "trajectory_balance_loss": 1.551235318183899,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.008822765201330185,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11539089679718018,
+      "backward_entropy": 0.13402163982391357
+    },
+    {
+      "trajectory_balance_loss": 1.68398916721344,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.008924879133701324,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11538190642992656,
+      "backward_entropy": 0.1339289665222168
+    },
+    {
+      "trajectory_balance_loss": 1.5445317029953003,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.009027482010424137,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11537142594655354,
+      "backward_entropy": 0.13385339975357055
+    },
+    {
+      "trajectory_balance_loss": 1.5410765409469604,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.009130089543759823,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11536042888959248,
+      "backward_entropy": 0.1337580919265747
+    },
+    {
+      "trajectory_balance_loss": 1.4486593008041382,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.009232690557837486,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11534895499547322,
+      "backward_entropy": 0.13363947868347167
+    },
+    {
+      "trajectory_balance_loss": 1.4899579286575317,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.009334997273981571,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1153377890586853,
+      "backward_entropy": 0.1335618019104004
+    },
+    {
+      "trajectory_balance_loss": 1.3989193439483643,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.009437170810997486,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11532670259475708,
+      "backward_entropy": 0.1334404468536377
+    },
+    {
+      "trajectory_balance_loss": 1.483583688735962,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.009538941085338593,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11531642079353333,
+      "backward_entropy": 0.1333385229110718
+    },
+    {
+      "trajectory_balance_loss": 1.3934985399246216,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.009640619158744812,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1153059999148051,
+      "backward_entropy": 0.13323432207107544
+    },
+    {
+      "trajectory_balance_loss": 1.477142095565796,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.009741930291056633,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11529642343521118,
+      "backward_entropy": 0.13312845230102538
+    },
+    {
+      "trajectory_balance_loss": 1.51685631275177,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.009843180887401104,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11528652906417847,
+      "backward_entropy": 0.1330204963684082
+    },
+    {
+      "trajectory_balance_loss": 1.5132920742034912,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.009944504126906395,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11527593930562337,
+      "backward_entropy": 0.13292059898376465
+    },
+    {
+      "trajectory_balance_loss": 1.382168173789978,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.010045881383121014,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11526445547739665,
+      "backward_entropy": 0.13280670642852782
+    },
+    {
+      "trajectory_balance_loss": 1.59052574634552,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.010146889835596085,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11525412400563557,
+      "backward_entropy": 0.1326901912689209
+    },
+    {
+      "trajectory_balance_loss": 1.670231580734253,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.010248235426843166,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11524174610773723,
+      "backward_entropy": 0.13256189823150635
+    },
+    {
+      "trajectory_balance_loss": 1.5399653911590576,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.010350136086344719,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11522674560546875,
+      "backward_entropy": 0.13243943452835083
+    },
+    {
+      "trajectory_balance_loss": 1.5770295858383179,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.010452117770910263,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11521072189013164,
+      "backward_entropy": 0.13231438398361206
+    },
+    {
+      "trajectory_balance_loss": 1.572197675704956,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.010554292239248753,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11519237359364827,
+      "backward_entropy": 0.1321863889694214
+    },
+    {
+      "trajectory_balance_loss": 1.3637617826461792,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.010656624101102352,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11517228682835896,
+      "backward_entropy": 0.13208223581314088
+    },
+    {
+      "trajectory_balance_loss": 1.5623910427093506,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01075842697173357,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11515397826830547,
+      "backward_entropy": 0.13192298412322997
+    },
+    {
+      "trajectory_balance_loss": 1.4373573064804077,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.010860400274395943,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11513476570447286,
+      "backward_entropy": 0.13178799152374268
+    },
+    {
+      "trajectory_balance_loss": 1.5128467082977295,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.010962123982608318,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1151159405708313,
+      "backward_entropy": 0.13165069818496705
+    },
+    {
+      "trajectory_balance_loss": 1.5869494676589966,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01106387097388506,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11509595314661662,
+      "backward_entropy": 0.13151030540466307
+    },
+    {
+      "trajectory_balance_loss": 1.386236548423767,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.011165880598127842,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11507392923037212,
+      "backward_entropy": 0.13141196966171265
+    },
+    {
+      "trajectory_balance_loss": 1.4598630666732788,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.011267473921179771,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11505343516667683,
+      "backward_entropy": 0.1312694787979126
+    },
+    {
+      "trajectory_balance_loss": 1.4169713258743286,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01136893779039383,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11503265301386516,
+      "backward_entropy": 0.13107035160064698
+    },
+    {
+      "trajectory_balance_loss": 1.5270055532455444,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.011470148339867592,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11501242717107137,
+      "backward_entropy": 0.13097561597824098
+    },
+    {
+      "trajectory_balance_loss": 1.408462405204773,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.011571493931114674,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11499037345250447,
+      "backward_entropy": 0.1307636022567749
+    },
+    {
+      "trajectory_balance_loss": 1.4790140390396118,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01167257409542799,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11496903498967488,
+      "backward_entropy": 0.1306060791015625
+    },
+    {
+      "trajectory_balance_loss": 1.5853370428085327,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.011773651465773582,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11494668324788411,
+      "backward_entropy": 0.1304454803466797
+    },
+    {
+      "trajectory_balance_loss": 1.542326807975769,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.011875078082084656,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11492148041725159,
+      "backward_entropy": 0.13028125762939452
+    },
+    {
+      "trajectory_balance_loss": 1.5726979970932007,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.011976677924394608,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11489427089691162,
+      "backward_entropy": 0.13018978834152223
+    },
+    {
+      "trajectory_balance_loss": 1.313974380493164,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.012078533880412579,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.114864448706309,
+      "backward_entropy": 0.12994136810302734
+    },
+    {
+      "trajectory_balance_loss": 1.4526921510696411,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.012179764918982983,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1148378849029541,
+      "backward_entropy": 0.1297676682472229
+    },
+    {
+      "trajectory_balance_loss": 1.3413010835647583,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.012280900962650776,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11481097340583801,
+      "backward_entropy": 0.12968320846557618
+    },
+    {
+      "trajectory_balance_loss": 1.33686363697052,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.012381582520902157,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11478636662165324,
+      "backward_entropy": 0.12950749397277833
+    },
+    {
+      "trajectory_balance_loss": 1.4018138647079468,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.012481845915317535,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11476401487986247,
+      "backward_entropy": 0.12923007011413573
+    },
+    {
+      "trajectory_balance_loss": 1.3621917963027954,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.012581955641508102,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11474196116129558,
+      "backward_entropy": 0.1291409730911255
+    },
+    {
+      "trajectory_balance_loss": 1.4939485788345337,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.01268179714679718,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11472119887669881,
+      "backward_entropy": 0.12894816398620607
+    },
+    {
+      "trajectory_balance_loss": 1.386025071144104,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.012781845405697823,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11469767491022746,
+      "backward_entropy": 0.12866594791412353
+    },
+    {
+      "trajectory_balance_loss": 1.3132942914962769,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.012881716713309288,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11467464764912923,
+      "backward_entropy": 0.12846658229827881
+    },
+    {
+      "trajectory_balance_loss": 1.4750627279281616,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.01298118568956852,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11465428272883098,
+      "backward_entropy": 0.12834441661834717
+    },
+    {
+      "trajectory_balance_loss": 1.4023674726486206,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.013080847449600697,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11463089783986409,
+      "backward_entropy": 0.1280561566352844
+    },
+    {
+      "trajectory_balance_loss": 1.429078221321106,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.013180436566472054,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11460685729980469,
+      "backward_entropy": 0.12784346342086791
+    },
+    {
+      "trajectory_balance_loss": 1.1950877904891968,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.013280055485665798,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11458112796147664,
+      "backward_entropy": 0.1277008295059204
+    },
+    {
+      "trajectory_balance_loss": 1.4161769151687622,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.013378899544477463,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11456233263015747,
+      "backward_entropy": 0.1274052619934082
+    },
+    {
+      "trajectory_balance_loss": 1.4096097946166992,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.013477815315127373,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11454137166341145,
+      "backward_entropy": 0.12717974185943604
+    },
+    {
+      "trajectory_balance_loss": 1.4980882406234741,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.013576775789260864,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1145184834798177,
+      "backward_entropy": 0.12700555324554444
+    },
+    {
+      "trajectory_balance_loss": 1.332925796508789,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.013676084578037262,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11449062824249268,
+      "backward_entropy": 0.12671267986297607
+    },
+    {
+      "trajectory_balance_loss": 1.3264789581298828,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01377513725310564,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11446372667948405,
+      "backward_entropy": 0.12647544145584105
+    },
+    {
+      "trajectory_balance_loss": 1.4434503316879272,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.013873941265046597,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11443771918614705,
+      "backward_entropy": 0.12625648975372314
+    },
+    {
+      "trajectory_balance_loss": 1.2215569019317627,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0139729343354702,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11440801620483398,
+      "backward_entropy": 0.12599722146987916
+    },
+    {
+      "trajectory_balance_loss": 1.3368091583251953,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.014071322046220303,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11438341935475667,
+      "backward_entropy": 0.125734543800354
+    },
+    {
+      "trajectory_balance_loss": 1.2695614099502563,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.014169576577842236,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11435846487681071,
+      "backward_entropy": 0.1254739999771118
+    },
+    {
+      "trajectory_balance_loss": 1.1734462976455688,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.014267479069530964,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11433594425519307,
+      "backward_entropy": 0.12518649101257323
+    },
+    {
+      "trajectory_balance_loss": 1.403830885887146,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.014364726841449738,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11431955297787984,
+      "backward_entropy": 0.12493729591369629
+    },
+    {
+      "trajectory_balance_loss": 1.3369194269180298,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.014462212100625038,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11429846286773682,
+      "backward_entropy": 0.12465848922729492
+    },
+    {
+      "trajectory_balance_loss": 1.3871861696243286,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.014559675008058548,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11427552501360576,
+      "backward_entropy": 0.12437357902526855
+    },
+    {
+      "trajectory_balance_loss": 1.320880651473999,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.014657302759587765,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11424845457077026,
+      "backward_entropy": 0.12408187389373779
+    },
+    {
+      "trajectory_balance_loss": 1.141565203666687,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.014754844829440117,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11422000328699748,
+      "backward_entropy": 0.12378431558609009
+    },
+    {
+      "trajectory_balance_loss": 1.3608933687210083,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.014851665124297142,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11419848601023357,
+      "backward_entropy": 0.12342573404312134
+    },
+    {
+      "trajectory_balance_loss": 1.3238433599472046,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.014948639087378979,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1141724983851115,
+      "backward_entropy": 0.12310671806335449
+    },
+    {
+      "trajectory_balance_loss": 1.3148912191390991,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.015045620501041412,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11414375901222229,
+      "backward_entropy": 0.12286627292633057
+    },
+    {
+      "trajectory_balance_loss": 1.278335690498352,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.015142581425607204,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11411251624425252,
+      "backward_entropy": 0.12244894504547119
+    },
+    {
+      "trajectory_balance_loss": 1.1880186796188354,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.015239394269883633,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11408029993375142,
+      "backward_entropy": 0.12211043834686279
+    },
+    {
+      "trajectory_balance_loss": 1.2335091829299927,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0153357470408082,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11405136187871297,
+      "backward_entropy": 0.12176494598388672
+    },
+    {
+      "trajectory_balance_loss": 1.3043545484542847,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.015431860461831093,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11402265230814616,
+      "backward_entropy": 0.12157096862792968
+    },
+    {
+      "trajectory_balance_loss": 1.163086175918579,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.015528027899563313,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11399014790852864,
+      "backward_entropy": 0.12105598449707031
+    },
+    {
+      "trajectory_balance_loss": 1.3104946613311768,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.015623720362782478,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11396114031473796,
+      "backward_entropy": 0.12069199085235596
+    },
+    {
+      "trajectory_balance_loss": 1.2485830783843994,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.015719547867774963,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1139269471168518,
+      "backward_entropy": 0.12053905725479126
+    },
+    {
+      "trajectory_balance_loss": 1.1116265058517456,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.015815267339348793,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11389065782229106,
+      "backward_entropy": 0.12018210887908935
+    },
+    {
+      "trajectory_balance_loss": 1.1531143188476562,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.015910375863313675,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11385983228683472,
+      "backward_entropy": 0.11956233978271484
+    },
+    {
+      "trajectory_balance_loss": 1.2182528972625732,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.016005100682377815,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11383100350697835,
+      "backward_entropy": 0.11945680379867554
+    },
+    {
+      "trajectory_balance_loss": 1.1587878465652466,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.016099736094474792,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1137995719909668,
+      "backward_entropy": 0.1187707543373108
+    },
+    {
+      "trajectory_balance_loss": 1.1974661350250244,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.016194069758057594,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11376879612604777,
+      "backward_entropy": 0.11870814561843872
+    },
+    {
+      "trajectory_balance_loss": 1.1388274431228638,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.016288287937641144,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11373555660247803,
+      "backward_entropy": 0.1183246374130249
+    },
+    {
+      "trajectory_balance_loss": 1.128665566444397,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.016382180154323578,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11370307207107544,
+      "backward_entropy": 0.11753689050674439
+    },
+    {
+      "trajectory_balance_loss": 1.0714658498764038,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.016475746408104897,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11367140213648479,
+      "backward_entropy": 0.11711297035217286
+    },
+    {
+      "trajectory_balance_loss": 1.1312603950500488,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.016568800434470177,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11364372571309407,
+      "backward_entropy": 0.11668207645416259
+    },
+    {
+      "trajectory_balance_loss": 1.097561001777649,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.016661636531352997,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.113614817460378,
+      "backward_entropy": 0.11624529361724853
+    },
+    {
+      "trajectory_balance_loss": 1.0869694948196411,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.016754150390625,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11358638604482015,
+      "backward_entropy": 0.11633114814758301
+    },
+    {
+      "trajectory_balance_loss": 1.0088168382644653,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.016846340149641037,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11355847120285034,
+      "backward_entropy": 0.11535309553146363
+    },
+    {
+      "trajectory_balance_loss": 1.0432292222976685,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.016937926411628723,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11353613932927449,
+      "backward_entropy": 0.11549890041351318
+    },
+    {
+      "trajectory_balance_loss": 1.0104905366897583,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.017029117792844772,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1135154664516449,
+      "backward_entropy": 0.11443456411361694
+    },
+    {
+      "trajectory_balance_loss": 0.999907374382019,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.01711982488632202,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11349847912788391,
+      "backward_entropy": 0.11396572589874268
+    },
+    {
+      "trajectory_balance_loss": 0.9674390554428101,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.017210060730576515,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11348726352055867,
+      "backward_entropy": 0.11349056959152222
+    },
+    {
+      "trajectory_balance_loss": 1.043271541595459,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.017299741506576538,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11348082621892293,
+      "backward_entropy": 0.11300897598266602
+    },
+    {
+      "trajectory_balance_loss": 0.9674381017684937,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.017389247193932533,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11347077290217082,
+      "backward_entropy": 0.11334314346313476
+    },
+    {
+      "trajectory_balance_loss": 0.9991349577903748,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.017478283494710922,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1134634514649709,
+      "backward_entropy": 0.11289763450622559
+    },
+    {
+      "trajectory_balance_loss": 1.0089526176452637,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.017567036673426628,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11345462004343669,
+      "backward_entropy": 0.11153161525726318
+    },
+    {
+      "trajectory_balance_loss": 0.9550310969352722,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01765558496117592,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11344256003697713,
+      "backward_entropy": 0.11198785305023193
+    },
+    {
+      "trajectory_balance_loss": 0.859737753868103,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.017743723466992378,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11343155304590861,
+      "backward_entropy": 0.11152441501617431
+    },
+    {
+      "trajectory_balance_loss": 1.0151673555374146,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01783108338713646,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11342917879422505,
+      "backward_entropy": 0.11105993986129761
+    },
+    {
+      "trajectory_balance_loss": 0.9200857281684875,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.017918430268764496,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11341947317123413,
+      "backward_entropy": 0.11058647632598877
+    },
+    {
+      "trajectory_balance_loss": 0.9698744416236877,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.018005354329943657,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11341041326522827,
+      "backward_entropy": 0.11010775566101075
+    },
+    {
+      "trajectory_balance_loss": 0.9777663946151733,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.01809212751686573,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1133954127629598,
+      "backward_entropy": 0.1083815336227417
+    },
+    {
+      "trajectory_balance_loss": 0.8438532948493958,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01817880943417549,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11337201793988545,
+      "backward_entropy": 0.10912879705429077
+    },
+    {
+      "trajectory_balance_loss": 0.892002284526825,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.018264809623360634,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11335416634877522,
+      "backward_entropy": 0.10863300561904907
+    },
+    {
+      "trajectory_balance_loss": 0.8597978949546814,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.018350426107645035,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11333537101745605,
+      "backward_entropy": 0.10673632621765136
+    },
+    {
+      "trajectory_balance_loss": 0.7691134214401245,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.018435556441545486,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11331766843795776,
+      "backward_entropy": 0.10762677192687989
+    },
+    {
+      "trajectory_balance_loss": 0.8740805983543396,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.01851983182132244,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11330962181091309,
+      "backward_entropy": 0.1056105613708496
+    },
+    {
+      "trajectory_balance_loss": 0.8419488668441772,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.018603838980197906,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11329782009124756,
+      "backward_entropy": 0.10660873651504517
+    },
+    {
+      "trajectory_balance_loss": 0.886608898639679,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01868746243417263,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11328450838724773,
+      "backward_entropy": 0.10609092712402343
+    },
+    {
+      "trajectory_balance_loss": 0.8541612029075623,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.018770961090922356,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11326418320337932,
+      "backward_entropy": 0.10385065078735352
+    },
+    {
+      "trajectory_balance_loss": 0.8594350814819336,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.018854202702641487,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1132395068804423,
+      "backward_entropy": 0.10503319501876832
+    },
+    {
+      "trajectory_balance_loss": 0.7900999784469604,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.01893724873661995,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11320904890696208,
+      "backward_entropy": 0.10265542268753051
+    },
+    {
+      "trajectory_balance_loss": 0.8134039640426636,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.01901978813111782,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11317865053812663,
+      "backward_entropy": 0.10205093622207642
+    },
+    {
+      "trajectory_balance_loss": 0.7816306948661804,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.019101997837424278,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1131448249022166,
+      "backward_entropy": 0.10340244770050049
+    },
+    {
+      "trajectory_balance_loss": 0.714867889881134,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01918376237154007,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11310950915018718,
+      "backward_entropy": 0.1028497576713562
+    },
+    {
+      "trajectory_balance_loss": 0.7545008063316345,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.019264796748757362,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11307852466901143,
+      "backward_entropy": 0.10021201372146607
+    },
+    {
+      "trajectory_balance_loss": 0.7235068678855896,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.019345387816429138,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11304579178492229,
+      "backward_entropy": 0.10172507762908936
+    },
+    {
+      "trajectory_balance_loss": 0.6249911189079285,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.01942542940378189,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11301310857137044,
+      "backward_entropy": 0.09896388649940491
+    },
+    {
+      "trajectory_balance_loss": 0.7130292057991028,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.019504467025399208,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11299045880635579,
+      "backward_entropy": 0.09833143353462219
+    },
+    {
+      "trajectory_balance_loss": 0.7983299493789673,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.019583076238632202,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11296512683232625,
+      "backward_entropy": 0.09997587203979492
+    },
+    {
+      "trajectory_balance_loss": 0.7013242840766907,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01966177299618721,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11292710900306702,
+      "backward_entropy": 0.09937818050384521
+    },
+    {
+      "trajectory_balance_loss": 0.6709450483322144,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.019740035757422447,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11288619041442871,
+      "backward_entropy": 0.09877532124519348
+    },
+    {
+      "trajectory_balance_loss": 0.6254835724830627,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.01981775276362896,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11284428834915161,
+      "backward_entropy": 0.09816875457763671
+    },
+    {
+      "trajectory_balance_loss": 0.658101499080658,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.019894735887646675,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11280521750450134,
+      "backward_entropy": 0.0975608468055725
+    },
+    {
+      "trajectory_balance_loss": 0.6286147236824036,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.019971255213022232,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11276322603225708,
+      "backward_entropy": 0.09694876670837402
+    },
+    {
+      "trajectory_balance_loss": 0.6737281680107117,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.020047200843691826,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1127204696337382,
+      "backward_entropy": 0.09382539391517639
+    },
+    {
+      "trajectory_balance_loss": 0.5713961720466614,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02012290619313717,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11267013351122539,
+      "backward_entropy": 0.09317284822463989
+    },
+    {
+      "trajectory_balance_loss": 0.6288532018661499,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.020197806879878044,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1126233736673991,
+      "backward_entropy": 0.09508980512619018
+    },
+    {
+      "trajectory_balance_loss": 0.6415511965751648,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02027234062552452,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11257094144821167,
+      "backward_entropy": 0.09186198711395263
+    },
+    {
+      "trajectory_balance_loss": 0.5445679426193237,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.020346637815237045,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11251026391983032,
+      "backward_entropy": 0.09383013844490051
+    },
+    {
+      "trajectory_balance_loss": 0.5704621076583862,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.020420143380761147,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11245230833689372,
+      "backward_entropy": 0.09319766759872436
+    },
+    {
+      "trajectory_balance_loss": 0.5686833262443542,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02049311250448227,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11239149173100789,
+      "backward_entropy": 0.0898911714553833
+    },
+    {
+      "trajectory_balance_loss": 0.4661153256893158,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02056560292840004,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11232643326123555,
+      "backward_entropy": 0.08923335671424866
+    },
+    {
+      "trajectory_balance_loss": 0.52686607837677,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.020637016743421555,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1122702956199646,
+      "backward_entropy": 0.08857362270355225
+    },
+    {
+      "trajectory_balance_loss": 0.4887964427471161,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0207078717648983,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11221128702163696,
+      "backward_entropy": 0.09065540432929993
+    },
+    {
+      "trajectory_balance_loss": 0.44049814343452454,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.020777985453605652,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11215362946192424,
+      "backward_entropy": 0.09002031087875366
+    },
+    {
+      "trajectory_balance_loss": 0.3940662443637848,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02084711752831936,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11210304498672485,
+      "backward_entropy": 0.0865939736366272
+    },
+    {
+      "trajectory_balance_loss": 0.41562560200691223,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02091505564749241,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11206441124280293,
+      "backward_entropy": 0.08876514434814453
+    },
+    {
+      "trajectory_balance_loss": 0.41421225666999817,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.020982075482606888,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11203189690907796,
+      "backward_entropy": 0.08527182340621949
+    },
+    {
+      "trajectory_balance_loss": 0.391208678483963,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02104826830327511,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11200241247812907,
+      "backward_entropy": 0.08752046823501587
+    },
+    {
+      "trajectory_balance_loss": 0.3896314799785614,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.021113557741045952,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1119772990544637,
+      "backward_entropy": 0.08395206332206726
+    },
+    {
+      "trajectory_balance_loss": 0.3775598406791687,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.021178029477596283,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11195409297943115,
+      "backward_entropy": 0.0862835168838501
+    },
+    {
+      "trajectory_balance_loss": 0.3554769456386566,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0212416835129261,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11193252603212993,
+      "backward_entropy": 0.08566777110099792
+    },
+    {
+      "trajectory_balance_loss": 0.3932490050792694,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02130444161593914,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1119143267472585,
+      "backward_entropy": 0.08195435404777526
+    },
+    {
+      "trajectory_balance_loss": 0.36132121086120605,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.021366696804761887,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11188941200574239,
+      "backward_entropy": 0.08128628730773926
+    },
+    {
+      "trajectory_balance_loss": 0.3398071229457855,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02142825722694397,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11186223228772481,
+      "backward_entropy": 0.08062035441398621
+    },
+    {
+      "trajectory_balance_loss": 0.3095426559448242,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.021489029750227928,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11183473467826843,
+      "backward_entropy": 0.07995690107345581
+    },
+    {
+      "trajectory_balance_loss": 0.344098299741745,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02154885046184063,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11181061466534932,
+      "backward_entropy": 0.08260036706924438
+    },
+    {
+      "trajectory_balance_loss": 0.2875960171222687,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02160811610519886,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11178035537401836,
+      "backward_entropy": 0.08198987245559693
+    },
+    {
+      "trajectory_balance_loss": 0.2943684756755829,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.021666405722498894,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11175346374511719,
+      "backward_entropy": 0.08138453364372253
+    },
+    {
+      "trajectory_balance_loss": 0.28349652886390686,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.021723883226513863,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1117258866628011,
+      "backward_entropy": 0.08078212141990662
+    },
+    {
+      "trajectory_balance_loss": 0.2561527192592621,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02178054116666317,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11169747511545818,
+      "backward_entropy": 0.08018290400505065
+    },
+    {
+      "trajectory_balance_loss": 0.26239722967147827,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.021836217492818832,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11167195439338684,
+      "backward_entropy": 0.07606121301651
+    },
+    {
+      "trajectory_balance_loss": 0.2362605780363083,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.021891076117753983,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11164510250091553,
+      "backward_entropy": 0.07899945378303527
+    },
+    {
+      "trajectory_balance_loss": 0.22665859758853912,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.021944953128695488,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1116206447283427,
+      "backward_entropy": 0.07480115294456482
+    },
+    {
+      "trajectory_balance_loss": 0.2248924970626831,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.021997855976223946,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11159821351369222,
+      "backward_entropy": 0.07417982220649719
+    },
+    {
+      "trajectory_balance_loss": 0.2081689089536667,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02204987034201622,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11157564322153728,
+      "backward_entropy": 0.07356471419334412
+    },
+    {
+      "trajectory_balance_loss": 0.2065296173095703,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022100916132330894,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11155458291371663,
+      "backward_entropy": 0.07669904232025146
+    },
+    {
+      "trajectory_balance_loss": 0.21184267103672028,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022151077166199684,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1115329662958781,
+      "backward_entropy": 0.07613805532455445
+    },
+    {
+      "trajectory_balance_loss": 0.20286591351032257,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022200509905815125,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11150747537612915,
+      "backward_entropy": 0.07558014392852783
+    },
+    {
+      "trajectory_balance_loss": 0.1739983707666397,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022249195724725723,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11147839824358623,
+      "backward_entropy": 0.07502573728561401
+    },
+    {
+      "trajectory_balance_loss": 0.1920977383852005,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022296883165836334,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11145066221555074,
+      "backward_entropy": 0.07447894215583802
+    },
+    {
+      "trajectory_balance_loss": 0.1962306648492813,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.022343896329402924,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11141790946324666,
+      "backward_entropy": 0.07001919746398926
+    },
+    {
+      "trajectory_balance_loss": 0.1507275104522705,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022390369325876236,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11137779553731282,
+      "backward_entropy": 0.07339169979095458
+    },
+    {
+      "trajectory_balance_loss": 0.16713319718837738,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02243579737842083,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11133952935536702,
+      "backward_entropy": 0.06889700889587402
+    },
+    {
+      "trajectory_balance_loss": 0.1420689970254898,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02248050644993782,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11129715045293172,
+      "backward_entropy": 0.0683481216430664
+    },
+    {
+      "trajectory_balance_loss": 0.14057236909866333,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022524245083332062,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11125514904658,
+      "backward_entropy": 0.07180504202842712
+    },
+    {
+      "trajectory_balance_loss": 0.1282498687505722,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02256709896028042,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11121195554733276,
+      "backward_entropy": 0.07128976583480835
+    },
+    {
+      "trajectory_balance_loss": 0.12686079740524292,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022608989849686623,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1111688216527303,
+      "backward_entropy": 0.07078293561935425
+    },
+    {
+      "trajectory_balance_loss": 0.11540580540895462,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02265000529587269,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11112439632415771,
+      "backward_entropy": 0.06624164581298828
+    },
+    {
+      "trajectory_balance_loss": 0.09024111926555634,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022690067067742348,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11108000079790752,
+      "backward_entropy": 0.06979151964187622
+    },
+    {
+      "trajectory_balance_loss": 0.11279667913913727,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022728880867362022,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11104082067807515,
+      "backward_entropy": 0.06931347846984863
+    },
+    {
+      "trajectory_balance_loss": 0.08917374908924103,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02276694029569626,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11099851131439209,
+      "backward_entropy": 0.06884106397628784
+    },
+    {
+      "trajectory_balance_loss": 0.11831225454807281,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.022803936153650284,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.110958198706309,
+      "backward_entropy": 0.0642877459526062
+    },
+    {
+      "trajectory_balance_loss": 0.09166818857192993,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.022840486839413643,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11091026663780212,
+      "backward_entropy": 0.06382161974906922
+    },
+    {
+      "trajectory_balance_loss": 0.09830838441848755,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022876180708408356,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11086104313532512,
+      "backward_entropy": 0.067466139793396
+    },
+    {
+      "trajectory_balance_loss": 0.08535735309123993,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02291124127805233,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11080733935038249,
+      "backward_entropy": 0.06701786518096924
+    },
+    {
+      "trajectory_balance_loss": 0.06971808522939682,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.022945500910282135,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11075166861216228,
+      "backward_entropy": 0.06657683253288268
+    },
+    {
+      "trajectory_balance_loss": 0.07919777929782867,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02297874167561531,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11069732904434204,
+      "backward_entropy": 0.06205129027366638
+    },
+    {
+      "trajectory_balance_loss": 0.06479847431182861,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02301127277314663,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11064010858535767,
+      "backward_entropy": 0.06572291254997253
+    },
+    {
+      "trajectory_balance_loss": 0.07013779133558273,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023042872548103333,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11058320601781209,
+      "backward_entropy": 0.061225080490112306
+    },
+    {
+      "trajectory_balance_loss": 0.06295514851808548,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023073764517903328,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11052367091178894,
+      "backward_entropy": 0.06082618236541748
+    },
+    {
+      "trajectory_balance_loss": 0.05067893862724304,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023103874176740646,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11046276489893596,
+      "backward_entropy": 0.06450187563896179
+    },
+    {
+      "trajectory_balance_loss": 0.03418303653597832,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023132994771003723,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11040327946345012,
+      "backward_entropy": 0.06411346793174744
+    },
+    {
+      "trajectory_balance_loss": 0.044419318437576294,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023160815238952637,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11034947633743286,
+      "backward_entropy": 0.059694862365722655
+    },
+    {
+      "trajectory_balance_loss": 0.036806371062994,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023187732324004173,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11029626925786336,
+      "backward_entropy": 0.06337992548942566
+    },
+    {
+      "trajectory_balance_loss": 0.04573655128479004,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02321363240480423,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11024438341458638,
+      "backward_entropy": 0.06303057670593262
+    },
+    {
+      "trajectory_balance_loss": 0.04283858463168144,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023238878697156906,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.11018560330073039,
+      "backward_entropy": 0.058667194843292234
+    },
+    {
+      "trajectory_balance_loss": 0.044129129499197006,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023263469338417053,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.11012405157089233,
+      "backward_entropy": 0.06235119700431824
+    },
+    {
+      "trajectory_balance_loss": 0.027864055708050728,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02328752912580967,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1100585659344991,
+      "backward_entropy": 0.062019485235214236
+    },
+    {
+      "trajectory_balance_loss": 0.029544470831751823,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023310601711273193,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10999512672424316,
+      "backward_entropy": 0.06170015335083008
+    },
+    {
+      "trajectory_balance_loss": 0.03601657599210739,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023332851007580757,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10993188619613647,
+      "backward_entropy": 0.061390674114227294
+    },
+    {
+      "trajectory_balance_loss": 0.030401630327105522,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023354602977633476,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10986526807149251,
+      "backward_entropy": 0.06108580827713013
+    },
+    {
+      "trajectory_balance_loss": 0.023815182968974113,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023375723510980606,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10979704062143962,
+      "backward_entropy": 0.06078794002532959
+    },
+    {
+      "trajectory_balance_loss": 0.019330427050590515,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023396039381623268,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10972944895426433,
+      "backward_entropy": 0.06050006151199341
+    },
+    {
+      "trajectory_balance_loss": 0.02581159770488739,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02341545931994915,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10966368516286214,
+      "backward_entropy": 0.06022394299507141
+    },
+    {
+      "trajectory_balance_loss": 0.025217479094862938,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023434361442923546,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10959592461585999,
+      "backward_entropy": 0.05608258843421936
+    },
+    {
+      "trajectory_balance_loss": 0.023401128128170967,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023452796041965485,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10952585935592651,
+      "backward_entropy": 0.05968750715255737
+    },
+    {
+      "trajectory_balance_loss": 0.021674050018191338,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02347075380384922,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10945384701093037,
+      "backward_entropy": 0.05942680835723877
+    },
+    {
+      "trajectory_balance_loss": 0.024969562888145447,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023488225415349007,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10938018560409546,
+      "backward_entropy": 0.059171587228775024
+    },
+    {
+      "trajectory_balance_loss": 0.01844562590122223,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02350546605885029,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1093026598294576,
+      "backward_entropy": 0.05514582395553589
+    },
+    {
+      "trajectory_balance_loss": 0.017780104652047157,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023522181436419487,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10922408103942871,
+      "backward_entropy": 0.05492687225341797
+    },
+    {
+      "trajectory_balance_loss": 0.010891400277614594,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02353842183947563,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.109144260485967,
+      "backward_entropy": 0.05841662883758545
+    },
+    {
+      "trajectory_balance_loss": 0.011381693184375763,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023553842678666115,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10906658569971721,
+      "backward_entropy": 0.05818083882331848
+    },
+    {
+      "trajectory_balance_loss": 0.014305232092738152,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023568574339151382,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10899006326993306,
+      "backward_entropy": 0.05795412063598633
+    },
+    {
+      "trajectory_balance_loss": 0.010683977976441383,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02358291484415531,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10891230901082356,
+      "backward_entropy": 0.0577316164970398
+    },
+    {
+      "trajectory_balance_loss": 0.009193758480250835,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02359667420387268,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1088351309299469,
+      "backward_entropy": 0.05392985343933106
+    },
+    {
+      "trajectory_balance_loss": 0.010829082690179348,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02360982447862625,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10875903566678365,
+      "backward_entropy": 0.05731019973754883
+    },
+    {
+      "trajectory_balance_loss": 0.008041099645197392,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02362259104847908,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10868237415949504,
+      "backward_entropy": 0.057108163833618164
+    },
+    {
+      "trajectory_balance_loss": 0.007287426386028528,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023634804412722588,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1086066762606303,
+      "backward_entropy": 0.05341837406158447
+    },
+    {
+      "trajectory_balance_loss": 0.007325388956815004,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023646479472517967,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10853202144304912,
+      "backward_entropy": 0.056726717948913576
+    },
+    {
+      "trajectory_balance_loss": 0.00595545768737793,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023657703772187233,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10845790306727092,
+      "backward_entropy": 0.05654582977294922
+    },
+    {
+      "trajectory_balance_loss": 0.0053702304139733315,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023668412119150162,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10838493704795837,
+      "backward_entropy": 0.05637232661247253
+    },
+    {
+      "trajectory_balance_loss": 0.004835429135710001,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023678619414567947,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10831319292386372,
+      "backward_entropy": 0.056206023693084715
+    },
+    {
+      "trajectory_balance_loss": 0.00339876557700336,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023688340559601784,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10824272036552429,
+      "backward_entropy": 0.05604676604270935
+    },
+    {
+      "trajectory_balance_loss": 0.004332969430834055,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023697461932897568,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1081743836402893,
+      "backward_entropy": 0.05589659214019775
+    },
+    {
+      "trajectory_balance_loss": 0.003506511216983199,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02370620332658291,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10810695091883342,
+      "backward_entropy": 0.05246467590332031
+    },
+    {
+      "trajectory_balance_loss": 0.00330853508785367,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02371450886130333,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10804086923599243,
+      "backward_entropy": 0.05235452651977539
+    },
+    {
+      "trajectory_balance_loss": 0.002510055899620056,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023722423240542412,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10797599951426189,
+      "backward_entropy": 0.05548098087310791
+    },
+    {
+      "trajectory_balance_loss": 0.0022444985806941986,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023729875683784485,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10791289806365967,
+      "backward_entropy": 0.05535551905632019
+    },
+    {
+      "trajectory_balance_loss": 0.0021216340828686953,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02373688668012619,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1078515350818634,
+      "backward_entropy": 0.052059388160705565
+    },
+    {
+      "trajectory_balance_loss": 0.0020966941956430674,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023743504658341408,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10779175162315369,
+      "backward_entropy": 0.055124157667160036
+    },
+    {
+      "trajectory_balance_loss": 0.0015940323937684298,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02374979294836521,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10773332913716634,
+      "backward_entropy": 0.0518906831741333
+    },
+    {
+      "trajectory_balance_loss": 0.0018117877189069986,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023755693808197975,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1076766053835551,
+      "backward_entropy": 0.054914796352386476
+    },
+    {
+      "trajectory_balance_loss": 0.0014644894981756806,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023761335760354996,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10762112339337666,
+      "backward_entropy": 0.05481703877449036
+    },
+    {
+      "trajectory_balance_loss": 0.0011742187198251486,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02376668155193329,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10756709178288777,
+      "backward_entropy": 0.054723930358886716
+    },
+    {
+      "trajectory_balance_loss": 0.001088764751330018,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023771699517965317,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10751467943191528,
+      "backward_entropy": 0.05160706639289856
+    },
+    {
+      "trajectory_balance_loss": 0.0011368045816197991,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023776425048708916,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10746383666992188,
+      "backward_entropy": 0.054552704095840454
+    },
+    {
+      "trajectory_balance_loss": 0.0009559951722621918,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0237809419631958,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10741431514422099,
+      "backward_entropy": 0.05447266101837158
+    },
+    {
+      "trajectory_balance_loss": 0.0007688292535021901,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023785235360264778,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10736623406410217,
+      "backward_entropy": 0.054396212100982666
+    },
+    {
+      "trajectory_balance_loss": 0.00072520412504673,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02378927543759346,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10731969277064006,
+      "backward_entropy": 0.05432391166687012
+    },
+    {
+      "trajectory_balance_loss": 0.0005590904620476067,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02379310503602028,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10727461179097493,
+      "backward_entropy": 0.051333898305892946
+    },
+    {
+      "trajectory_balance_loss": 0.0005626784986816347,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02379668317735195,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10723112026850383,
+      "backward_entropy": 0.05419051647186279
+    },
+    {
+      "trajectory_balance_loss": 0.0004679185221903026,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023800078779459,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10718913873036702,
+      "backward_entropy": 0.054129117727279664
+    },
+    {
+      "trajectory_balance_loss": 0.00036204297794029117,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023803280666470528,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10714865724245708,
+      "backward_entropy": 0.051205819845199584
+    },
+    {
+      "trajectory_balance_loss": 0.00029001847724430263,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023806259036064148,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1071097453435262,
+      "backward_entropy": 0.05401633977890015
+    },
+    {
+      "trajectory_balance_loss": 0.0002756126632448286,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023809002712368965,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10707241296768188,
+      "backward_entropy": 0.05396579504013062
+    },
+    {
+      "trajectory_balance_loss": 0.0002419392258161679,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02381155826151371,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10703658064206441,
+      "backward_entropy": 0.05391841530799866
+    },
+    {
+      "trajectory_balance_loss": 0.000194576641661115,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023813944309949875,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10700225830078125,
+      "backward_entropy": 0.051074635982513425
+    },
+    {
+      "trajectory_balance_loss": 0.0001611967891221866,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023816149681806564,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10696942607561748,
+      "backward_entropy": 0.05383249521255493
+    },
+    {
+      "trajectory_balance_loss": 0.00014289702812675387,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023818176239728928,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10693803429603577,
+      "backward_entropy": 0.05379417538642883
+    },
+    {
+      "trajectory_balance_loss": 0.00010917719919234514,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023820051923394203,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10690806309382121,
+      "backward_entropy": 0.05375843644142151
+    },
+    {
+      "trajectory_balance_loss": 0.00010363897308707237,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023821746930480003,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10687945286432902,
+      "backward_entropy": 0.05372588634490967
+    },
+    {
+      "trajectory_balance_loss": 8.384248212678358e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023823322728276253,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10685224334398906,
+      "backward_entropy": 0.05369543433189392
+    },
+    {
+      "trajectory_balance_loss": 7.066084071993828e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023824773728847504,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10682637492815654,
+      "backward_entropy": 0.05366722345352173
+    },
+    {
+      "trajectory_balance_loss": 5.674898056895472e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0238261166960001,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10680185755093892,
+      "backward_entropy": 0.053640973567962644
+    },
+    {
+      "trajectory_balance_loss": 4.716009789262898e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02382732927799225,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10677856206893921,
+      "backward_entropy": 0.0509203314781189
+    },
+    {
+      "trajectory_balance_loss": 3.953837585868314e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023828431963920593,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10675650835037231,
+      "backward_entropy": 0.053595048189163205
+    },
+    {
+      "trajectory_balance_loss": 3.0221615816117264e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023829415440559387,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10673556725184123,
+      "backward_entropy": 0.05089859962463379
+    },
+    {
+      "trajectory_balance_loss": 2.764757846307475e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023830320686101913,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10671587785085042,
+      "backward_entropy": 0.05355691909790039
+    },
+    {
+      "trajectory_balance_loss": 2.0152097931713797e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023831117898225784,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1066972017288208,
+      "backward_entropy": 0.050881922245025635
+    },
+    {
+      "trajectory_balance_loss": 1.6485309970448725e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023831836879253387,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10667967796325684,
+      "backward_entropy": 0.05087525248527527
+    },
+    {
+      "trajectory_balance_loss": 1.2191825589979999e-05,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383248135447502,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10666320721308391,
+      "backward_entropy": 0.05086955428123474
+    },
+    {
+      "trajectory_balance_loss": 9.064203368325252e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833060637116432,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10664779941240947,
+      "backward_entropy": 0.053499847650527954
+    },
+    {
+      "trajectory_balance_loss": 7.777052815072238e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833582177758217,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1066334346930186,
+      "backward_entropy": 0.05086030960083008
+    },
+    {
+      "trajectory_balance_loss": 6.07647098149755e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023834044113755226,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10662005345026652,
+      "backward_entropy": 0.05347874164581299
+    },
+    {
+      "trajectory_balance_loss": 5.401183898356976e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023834452033042908,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.106607586145401,
+      "backward_entropy": 0.0534698486328125
+    },
+    {
+      "trajectory_balance_loss": 3.192048779965262e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383480593562126,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10659597317377727,
+      "backward_entropy": 0.0508513867855072
+    },
+    {
+      "trajectory_balance_loss": 4.149763753957814e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835116997361183,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10658526420593262,
+      "backward_entropy": 0.05345494151115417
+    },
+    {
+      "trajectory_balance_loss": 2.816616415657336e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023835379630327225,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10657527049382527,
+      "backward_entropy": 0.0508482813835144
+    },
+    {
+      "trajectory_balance_loss": 2.626209834488691e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023835601285099983,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10656603177388509,
+      "backward_entropy": 0.05084744691848755
+    },
+    {
+      "trajectory_balance_loss": 1.7128895706264302e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835785686969757,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10655748844146729,
+      "backward_entropy": 0.05343907475471497
+    },
+    {
+      "trajectory_balance_loss": 1.9084293398918817e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835938423871994,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10654969016710918,
+      "backward_entropy": 0.053435230255126955
+    },
+    {
+      "trajectory_balance_loss": 1.5706293652328895e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023836059495806694,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10654250780741374,
+      "backward_entropy": 0.05084729790687561
+    },
+    {
+      "trajectory_balance_loss": 1.597030632183305e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023836154490709305,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653600096702576,
+      "backward_entropy": 0.05084781646728516
+    },
+    {
+      "trajectory_balance_loss": 1.6262150666079833e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023836225271224976,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653013984362285,
+      "backward_entropy": 0.05342717170715332
+    },
+    {
+      "trajectory_balance_loss": 1.587375663802959e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023836275562644005,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10652486483256023,
+      "backward_entropy": 0.05084947347640991
+    },
+    {
+      "trajectory_balance_loss": 1.8374961427980452e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023836305364966393,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10652011632919312,
+      "backward_entropy": 0.05342420339584351
+    },
+    {
+      "trajectory_balance_loss": 1.8539684560892056e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023836318403482437,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10651590426762898,
+      "backward_entropy": 0.05342333316802979
+    },
+    {
+      "trajectory_balance_loss": 1.939469029821339e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383631467819214,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10651217897733052,
+      "backward_entropy": 0.053422820568084714
+    },
+    {
+      "trajectory_balance_loss": 2.640196044012555e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023836297914385796,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10650891065597534,
+      "backward_entropy": 0.053422605991363524
+    },
+    {
+      "trajectory_balance_loss": 1.864316232058627e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383626438677311,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10650612910588582,
+      "backward_entropy": 0.05342275500297546
+    },
+    {
+      "trajectory_balance_loss": 2.249994849989889e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023836221545934677,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10650370518366496,
+      "backward_entropy": 0.05342310667037964
+    },
+    {
+      "trajectory_balance_loss": 2.2892249944561627e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0238361693918705,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065016786257426,
+      "backward_entropy": 0.053423696756362916
+    },
+    {
+      "trajectory_balance_loss": 1.4055640349397436e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023836109787225723,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10650000969568889,
+      "backward_entropy": 0.050861024856567384
+    },
+    {
+      "trajectory_balance_loss": 1.8795229834722704e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0238360483199358,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1064985990524292,
+      "backward_entropy": 0.050862628221511844
+    },
+    {
+      "trajectory_balance_loss": 2.108776243403554e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835983127355576,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649748643239339,
+      "backward_entropy": 0.053426343202590945
+    },
+    {
+      "trajectory_balance_loss": 2.3116917873267084e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835914209485054,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649665196736653,
+      "backward_entropy": 0.05342743992805481
+    },
+    {
+      "trajectory_balance_loss": 1.773564918039483e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835839703679085,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649605592091878,
+      "backward_entropy": 0.05342867970466614
+    },
+    {
+      "trajectory_balance_loss": 2.0469171886361437e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835765197873116,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649569829305013,
+      "backward_entropy": 0.05342995524406433
+    },
+    {
+      "trajectory_balance_loss": 1.5445112921952386e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835688829421997,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649553934733073,
+      "backward_entropy": 0.05343129634857178
+    },
+    {
+      "trajectory_balance_loss": 1.6077552800197736e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835614323616028,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649557908376057,
+      "backward_entropy": 0.05343263149261475
+    },
+    {
+      "trajectory_balance_loss": 1.737188313200022e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835541680455208,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649576783180237,
+      "backward_entropy": 0.05343395471572876
+    },
+    {
+      "trajectory_balance_loss": 1.8411345763524878e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023835470899939537,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10649611552556355,
+      "backward_entropy": 0.050874173641204834
+    },
+    {
+      "trajectory_balance_loss": 1.554040295559389e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835398256778717,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649661223093669,
+      "backward_entropy": 0.05343663692474365
+    },
+    {
+      "trajectory_balance_loss": 1.7001348169287667e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023835327476263046,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10649722814559937,
+      "backward_entropy": 0.0508764386177063
+    },
+    {
+      "trajectory_balance_loss": 1.5585201253998093e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835256695747375,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649796326955159,
+      "backward_entropy": 0.05343939065933227
+    },
+    {
+      "trajectory_balance_loss": 1.423781327503093e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835185915231705,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649879773457845,
+      "backward_entropy": 0.05344077944755554
+    },
+    {
+      "trajectory_balance_loss": 1.350215143247624e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023835116997361183,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10649973154067993,
+      "backward_entropy": 0.05344215631484985
+    },
+    {
+      "trajectory_balance_loss": 1.3756574617218575e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383504994213581,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10650072495142619,
+      "backward_entropy": 0.05088040232658386
+    },
+    {
+      "trajectory_balance_loss": 1.3389289961196482e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383498288691044,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10650177796681722,
+      "backward_entropy": 0.05088129043579102
+    },
+    {
+      "trajectory_balance_loss": 1.0798565881486866e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023834915831685066,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10650289058685303,
+      "backward_entropy": 0.0508821427822113
+    },
+    {
+      "trajectory_balance_loss": 1.1655913567665266e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023834852501749992,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10650406281153361,
+      "backward_entropy": 0.053447604179382324
+    },
+    {
+      "trajectory_balance_loss": 9.729777730171918e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383478917181492,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10650527477264404,
+      "backward_entropy": 0.053448939323425294
+    },
+    {
+      "trajectory_balance_loss": 1.0650002195689012e-06,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023834727704524994,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1065065066019694,
+      "backward_entropy": 0.05088443160057068
+    },
+    {
+      "trajectory_balance_loss": 8.292014399557956e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383466623723507,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10650774836540222,
+      "backward_entropy": 0.050885170698165894
+    },
+    {
+      "trajectory_balance_loss": 8.71394433943351e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023834606632590294,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10650900999704997,
+      "backward_entropy": 0.053452837467193606
+    },
+    {
+      "trajectory_balance_loss": 7.46068337775796e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383454702794552,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10651029149691264,
+      "backward_entropy": 0.053454113006591794
+    },
+    {
+      "trajectory_balance_loss": 6.123427738202736e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023834489285945892,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10651155312856038,
+      "backward_entropy": 0.05345537066459656
+    },
+    {
+      "trajectory_balance_loss": 6.583924800906971e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023834435269236565,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10651281476020813,
+      "backward_entropy": 0.05345654487609863
+    },
+    {
+      "trajectory_balance_loss": 5.94701361933403e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023834381252527237,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10651407639185588,
+      "backward_entropy": 0.05345773696899414
+    },
+    {
+      "trajectory_balance_loss": 4.859498403675389e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383432723581791,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10651530822118123,
+      "backward_entropy": 0.05345889925956726
+    },
+    {
+      "trajectory_balance_loss": 4.661082471102418e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383427694439888,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10651654005050659,
+      "backward_entropy": 0.05088945031166077
+    },
+    {
+      "trajectory_balance_loss": 3.633368237387913e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383422665297985,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10651774207750957,
+      "backward_entropy": 0.050890004634857176
+    },
+    {
+      "trajectory_balance_loss": 3.830568573448545e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383418008685112,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10651892423629761,
+      "backward_entropy": 0.05346217155456543
+    },
+    {
+      "trajectory_balance_loss": 3.506847860990092e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383413352072239,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10652006665865581,
+      "backward_entropy": 0.05346320271492004
+    },
+    {
+      "trajectory_balance_loss": 2.440550588289625e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023834088817238808,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10652116934458415,
+      "backward_entropy": 0.05089141726493836
+    },
+    {
+      "trajectory_balance_loss": 2.481208696281101e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023834045976400375,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10652226209640503,
+      "backward_entropy": 0.053465145826339724
+    },
+    {
+      "trajectory_balance_loss": 2.2511520114676387e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023834004998207092,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10652331511179607,
+      "backward_entropy": 0.050892263650894165
+    },
+    {
+      "trajectory_balance_loss": 1.838058807379639e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383396588265896,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10652432839075725,
+      "backward_entropy": 0.05346692204475403
+    },
+    {
+      "trajectory_balance_loss": 1.5382285312171007e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833928629755974,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10652530193328857,
+      "backward_entropy": 0.05089304447174072
+    },
+    {
+      "trajectory_balance_loss": 1.4314413476768095e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383389323949814,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10652624567349751,
+      "backward_entropy": 0.05346857309341431
+    },
+    {
+      "trajectory_balance_loss": 1.0131735450613633e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833859711885452,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10652714967727661,
+      "backward_entropy": 0.053469330072402954
+    },
+    {
+      "trajectory_balance_loss": 1.1860917226158563e-07,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833828046917915,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10652802387873332,
+      "backward_entropy": 0.05347003936767578
+    },
+    {
+      "trajectory_balance_loss": 9.109744070201486e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833798244595528,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10652884840965271,
+      "backward_entropy": 0.0534707248210907
+    },
+    {
+      "trajectory_balance_loss": 8.935190720649189e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383376844227314,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10652963320414226,
+      "backward_entropy": 0.05089458227157593
+    },
+    {
+      "trajectory_balance_loss": 6.30445455840345e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.0238337405025959,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653039813041687,
+      "backward_entropy": 0.05089486241340637
+    },
+    {
+      "trajectory_balance_loss": 5.724559315467559e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833712562918663,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653110345204671,
+      "backward_entropy": 0.053472644090652464
+    },
+    {
+      "trajectory_balance_loss": 4.407616671642245e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833686485886574,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653178890546162,
+      "backward_entropy": 0.05347322225570679
+    },
+    {
+      "trajectory_balance_loss": 4.14738678955473e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833662271499634,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065324346224467,
+      "backward_entropy": 0.053473788499832156
+    },
+    {
+      "trajectory_balance_loss": 3.418199412408285e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833638057112694,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653302073478699,
+      "backward_entropy": 0.0534743070602417
+    },
+    {
+      "trajectory_balance_loss": 2.6695952115574073e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833615705370903,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653360684712727,
+      "backward_entropy": 0.05347484350204468
+    },
+    {
+      "trajectory_balance_loss": 1.975627483830067e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833593353629112,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1065341333548228,
+      "backward_entropy": 0.05089634656906128
+    },
+    {
+      "trajectory_balance_loss": 1.6664371216279505e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383357286453247,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653463006019592,
+      "backward_entropy": 0.05089657306671143
+    },
+    {
+      "trajectory_balance_loss": 1.3257205999650523e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383355423808098,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653510689735413,
+      "backward_entropy": 0.05089676976203918
+    },
+    {
+      "trajectory_balance_loss": 1.0911143988323602e-08,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833535611629486,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653555393218994,
+      "backward_entropy": 0.05089694261550903
+    },
+    {
+      "trajectory_balance_loss": 8.093271830489357e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833518847823143,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065359612305959,
+      "backward_entropy": 0.05347697734832764
+    },
+    {
+      "trajectory_balance_loss": 8.464210665692917e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.0238335020840168,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653632879257202,
+      "backward_entropy": 0.05347732305526733
+    },
+    {
+      "trajectory_balance_loss": 4.920376550643368e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833487182855606,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653668642044067,
+      "backward_entropy": 0.05347766876220703
+    },
+    {
+      "trajectory_balance_loss": 2.639577445506802e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833472281694412,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653700431187947,
+      "backward_entropy": 0.05089766979217529
+    },
+    {
+      "trajectory_balance_loss": 2.453464986729159e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833459243178368,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653731226921082,
+      "backward_entropy": 0.053478282690048215
+    },
+    {
+      "trajectory_balance_loss": 2.0529267175106725e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833446204662323,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065375804901123,
+      "backward_entropy": 0.053478562831878663
+    },
+    {
+      "trajectory_balance_loss": 1.4540937343099358e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383343316614628,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653782884279887,
+      "backward_entropy": 0.05347882509231568
+    },
+    {
+      "trajectory_balance_loss": 9.685550139693078e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833421990275383,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653807719548543,
+      "backward_entropy": 0.05089823007583618
+    },
+    {
+      "trajectory_balance_loss": 5.452420737128705e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833410814404488,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653827587763469,
+      "backward_entropy": 0.05347929000854492
+    },
+    {
+      "trajectory_balance_loss": 3.582076857355787e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383340150117874,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653845469156902,
+      "backward_entropy": 0.05347950458526611
+    },
+    {
+      "trajectory_balance_loss": 2.686704192456091e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833392187952995,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653862357139587,
+      "backward_entropy": 0.053479695320129396
+    },
+    {
+      "trajectory_balance_loss": 2.374260787973981e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383338287472725,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653879245122273,
+      "backward_entropy": 0.053479868173599246
+    },
+    {
+      "trajectory_balance_loss": 1.8000001489326678e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833375424146652,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653891166051228,
+      "backward_entropy": 0.053480017185211184
+    },
+    {
+      "trajectory_balance_loss": 2.7684876613420784e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833367973566055,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065390408039093,
+      "backward_entropy": 0.05348016619682312
+    },
+    {
+      "trajectory_balance_loss": 2.0876100847999624e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383336052298546,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653915007909139,
+      "backward_entropy": 0.05089900493621826
+    },
+    {
+      "trajectory_balance_loss": 4.163211997365579e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383335493505001,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653923948605855,
+      "backward_entropy": 0.05348042845726013
+    },
+    {
+      "trajectory_balance_loss": 4.616822479874827e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833349347114563,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653931895891826,
+      "backward_entropy": 0.05348052978515625
+    },
+    {
+      "trajectory_balance_loss": 6.050768774912285e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833343759179115,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653938849767049,
+      "backward_entropy": 0.05348063707351684
+    },
+    {
+      "trajectory_balance_loss": 6.403446661806811e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833340033888817,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653944810231526,
+      "backward_entropy": 0.05348072052001953
+    },
+    {
+      "trajectory_balance_loss": 7.74708297512916e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383333630859852,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653948783874512,
+      "backward_entropy": 0.053480780124664305
+    },
+    {
+      "trajectory_balance_loss": 8.39833091959008e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383333258330822,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653952757517497,
+      "backward_entropy": 0.05089935064315796
+    },
+    {
+      "trajectory_balance_loss": 8.91958507054369e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383332885801792,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653955737749736,
+      "backward_entropy": 0.05348091721534729
+    },
+    {
+      "trajectory_balance_loss": 9.281961865781341e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833326995372772,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653957724571228,
+      "backward_entropy": 0.05348098278045654
+    },
+    {
+      "trajectory_balance_loss": 1.0068248457173468e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833325132727623,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653958717981975,
+      "backward_entropy": 0.053481006622314455
+    },
+    {
+      "trajectory_balance_loss": 1.090342038878589e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833323270082474,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065395971139272,
+      "backward_entropy": 0.053481030464172366
+    },
+    {
+      "trajectory_balance_loss": 1.0493863555893768e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833321407437325,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.1065395971139272,
+      "backward_entropy": 0.05089954137802124
+    },
+    {
+      "trajectory_balance_loss": 1.0338112588215154e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653958717981975,
+      "backward_entropy": 0.05348107814788818
+    },
+    {
+      "trajectory_balance_loss": 9.890310792570745e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653958717981975,
+      "backward_entropy": 0.05348107814788818
+    },
+    {
+      "trajectory_balance_loss": 1.038634067640487e-09,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653958717981975,
+      "backward_entropy": 0.05348109006881714
+    },
+    {
+      "trajectory_balance_loss": 8.990923561214004e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653954744338989,
+      "backward_entropy": 0.05089958906173706
+    },
+    {
+      "trajectory_balance_loss": 9.068816808621705e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653952757517497,
+      "backward_entropy": 0.05348109006881714
+    },
+    {
+      "trajectory_balance_loss": 8.946656748776149e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653950770696004,
+      "backward_entropy": 0.05089960694313049
+    },
+    {
+      "trajectory_balance_loss": 8.530989248356491e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653948783874512,
+      "backward_entropy": 0.05348107814788818
+    },
+    {
+      "trajectory_balance_loss": 8.378631122241131e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065394679705302,
+      "backward_entropy": 0.05348107814788818
+    },
+    {
+      "trajectory_balance_loss": 7.752873898425605e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653941829999287,
+      "backward_entropy": 0.05348106622695923
+    },
+    {
+      "trajectory_balance_loss": 7.334435281336482e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653938849767049,
+      "backward_entropy": 0.05348106622695923
+    },
+    {
+      "trajectory_balance_loss": 6.881020198079568e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065393586953481,
+      "backward_entropy": 0.05348104238510132
+    },
+    {
+      "trajectory_balance_loss": 6.693241516586568e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653932889302571,
+      "backward_entropy": 0.05348102450370788
+    },
+    {
+      "trajectory_balance_loss": 6.222862225513381e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833319544792175,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653928915659587,
+      "backward_entropy": 0.05089960694313049
+    },
+    {
+      "trajectory_balance_loss": 5.245528456043758e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833321407437325,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653924942016602,
+      "backward_entropy": 0.05348098278045654
+    },
+    {
+      "trajectory_balance_loss": 4.747562343254685e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833323270082474,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653921961784363,
+      "backward_entropy": 0.05348097681999207
+    },
+    {
+      "trajectory_balance_loss": 4.799236563712839e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833325132727623,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653917988141377,
+      "backward_entropy": 0.05089960694313049
+    },
+    {
+      "trajectory_balance_loss": 4.718287982541369e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833326995372772,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653915007909139,
+      "backward_entropy": 0.050899600982666014
+    },
+    {
+      "trajectory_balance_loss": 3.622684374704477e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383332885801792,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653911034266154,
+      "backward_entropy": 0.053480887413024904
+    },
+    {
+      "trajectory_balance_loss": 2.9595526029879693e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383333072066307,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653908054033916,
+      "backward_entropy": 0.053480875492095944
+    },
+    {
+      "trajectory_balance_loss": 2.3578650143463165e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383333258330822,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065390408039093,
+      "backward_entropy": 0.05348084568977356
+    },
+    {
+      "trajectory_balance_loss": 2.680735633475706e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383333444595337,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653901100158691,
+      "backward_entropy": 0.05089956521987915
+    },
+    {
+      "trajectory_balance_loss": 2.1748292056145146e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383333630859852,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653898119926453,
+      "backward_entropy": 0.05348078608512878
+    },
+    {
+      "trajectory_balance_loss": 2.503739437997865e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833338171243668,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653895139694214,
+      "backward_entropy": 0.0508995532989502
+    },
+    {
+      "trajectory_balance_loss": 2.0336621275873767e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833340033888817,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653891166051228,
+      "backward_entropy": 0.05089954137802124
+    },
+    {
+      "trajectory_balance_loss": 1.9093704395345412e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833341896533966,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653889179229736,
+      "backward_entropy": 0.05348072052001953
+    },
+    {
+      "trajectory_balance_loss": 1.3434942047751974e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833343759179115,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653886198997498,
+      "backward_entropy": 0.05348070859909058
+    },
+    {
+      "trajectory_balance_loss": 1.5758416793687502e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833345621824265,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653883218765259,
+      "backward_entropy": 0.053480684757232666
+    },
+    {
+      "trajectory_balance_loss": 1.0152234608540311e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833347484469414,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.1065388023853302,
+      "backward_entropy": 0.05348066687583923
+    },
+    {
+      "trajectory_balance_loss": 1.0420464491289749e-10,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.023833349347114563,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653879245122273,
+      "backward_entropy": 0.0508994996547699
+    },
+    {
+      "trajectory_balance_loss": 6.832934218437003e-11,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.023833351209759712,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653875271479289,
+      "backward_entropy": 0.05348061323165894
+    },
+    {
+      "trajectory_balance_loss": 6.391687179529981e-11,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383335307240486,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653873284657796,
+      "backward_entropy": 0.05348058938980103
+    },
+    {
+      "trajectory_balance_loss": 5.786660040030256e-11,
+      "terminal_state_reached": true,
+      "terminal_reward": 10.0,
+      "log_Z": 0.02383335493505001,
+      "trajectory_length": 7,
+      "branch_chosen": 1,
+      "forward_entropy": 0.10653871297836304,
+      "backward_entropy": 0.05348057150840759
+    },
+    {
+      "trajectory_balance_loss": 4.403233333505341e-11,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383335679769516,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653869311014812,
+      "backward_entropy": 0.05089948177337646
+    },
+    {
+      "trajectory_balance_loss": 5.019273885409348e-11,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383335866034031,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653868317604065,
+      "backward_entropy": 0.050899451971054076
+    },
+    {
+      "trajectory_balance_loss": 3.2642333280819e-11,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383336052298546,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653865337371826,
+      "backward_entropy": 0.0508994460105896
+    },
+    {
+      "trajectory_balance_loss": 3.007016857736744e-11,
+      "terminal_state_reached": true,
+      "terminal_reward": 5.0,
+      "log_Z": 0.02383336052298546,
+      "trajectory_length": 7,
+      "branch_chosen": 0,
+      "forward_entropy": 0.10653863350550334,
+      "backward_entropy": 0.05089943408966065
+    }
+  ],
+  "summary_stats": {
+    "avg_loss": 1.6692799754469688e-07,
+    "avg_log_Z": 0.023833663295954467,
+    "success_rate": 1.0,
+    "avg_reward": 8.3,
+    "branch_dist": {
+      "-1": 0.0,
+      "0": 0.34,
+      "1": 0.66
+    },
+    "avg_forward_entropy": 0.10653173466523487,
+    "avg_backward_entropy": 0.052597464084625234
+  },
+  "window_size": 100
+}

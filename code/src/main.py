@@ -1,4 +1,4 @@
-import gflownet_nchain_branching
+from models import gflownet
 
 if __name__ == "__main__":
-    gflownet_nchain_branching.main()
+    gflownet.main()

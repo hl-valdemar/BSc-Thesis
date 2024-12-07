@@ -4,11 +4,9 @@ from typing import Deque, Dict, List, Tuple
 
 import numpy as np
 import torch
+from environments.nchain import NChainAction, NChainEnv, NChainState, NChainTrajectory
 from torch import Tensor
 from torch.optim import Adam
-
-from nchain_branching import NChainEnv, NChainState, NChainTrajectory
-from nchain_branching.nchain_branching import NChainAction
 
 from .metrics import GFlowNetMetrics, MetricsTracker
 from .model import GFlowNet

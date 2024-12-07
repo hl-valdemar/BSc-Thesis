@@ -204,24 +204,11 @@ class GFlowNet(nn.Module):
             output = outputs[t + 1]
             logits = output.logits_pb.squeeze(0)  # Remove batch dimension
 
-            # Use the mask from the previous state
             mask = backward_masks[t + 1].squeeze(0)
-
-            # print(f"\nBackward step {t}:")
-            # print(f"  Raw logits: {logits}")
-            # print(f"  Mask: {mask}")
-
             logits = logits.masked_fill(~mask, float("-inf"))
 
-            # print(f"  Masked logits: {logits}")
-
             prev_action = actions[t]
-            prob = F.log_softmax(logits, dim=-1)[prev_action]
-            # print(f"  Action {prev_action}: log_prob = {prob}")
-
-            log_pb.append(prob)
-
-        # print(f"\nlog_pb: {log_pb}")
+            log_pb.append(F.log_softmax(logits, dim=-1)[prev_action])
 
         # Compute loss components
         log_Z = outputs[0].log_Z[0]  # From initial state
@@ -234,15 +221,6 @@ class GFlowNet(nn.Module):
         log_R = torch.tensor(terminal_reward).log()
 
         # Trajectory balance loss
-        loss = (log_Z + sum_log_pf - log_R - sum_log_pb).pow(
-            2
-        )  # NOTE: Maybe take mean here?
-
-        # print("\nLoss components:")
-        # print(f"  log_Z: {log_Z}")
-        # print(f"  sum_log_pf: {sum_log_pf}")
-        # print(f"  log_R: {log_R}")
-        # print(f"  sum_log_pb: {sum_log_pb}")
-        # print(f"  total_loss: {loss}")
+        loss = (log_Z + sum_log_pf - log_R - sum_log_pb).pow(2)
 
         return loss
