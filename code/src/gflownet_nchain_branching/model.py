@@ -99,16 +99,29 @@ class GFlowNet(nn.Module):
             log_Z=log_Z,
         )
 
-    def get_forward_policy(self, states: Tensor) -> Tensor:
+    def get_forward_policy(
+        self,
+        states: Tensor,
+        forward_mask: Tensor,
+    ) -> Tensor:
         """
         Args:
             states: States to get forward policy for, shape [batch_size, state_dim]
+            forward_mask: Mask of valid actions for state [batch_size, num_actions]
 
         Returns:
             Tensor: Forward policy probabilities, shape [batch_size, num_actions]
         """
         output = self.forward(states)
         logits = output.logits_pf  # Shape: [batch_size, num_actions]
+        # print(f"Raw logits: {output.logits_pf}")  # Check pre-mask logits
+
+        # Mask pre-softmax to preserve normalization
+        logits = logits.masked_fill(~forward_mask, float("-inf"))
+        # print(f"Masked logits: {logits}")  # Check post-mask logits
+
+        # probs = F.softmax(logits, dim=-1)
+        # print(f"Probabilities: {probs}")  # Check final probabilities
 
         # Return proper probabilities
         return F.softmax(logits, dim=-1)
@@ -116,16 +129,21 @@ class GFlowNet(nn.Module):
     def get_backward_policy(
         self,
         states: Tensor,
+        backward_mask: Tensor,
     ) -> Tensor:
         """
         Args:
             states: States to get backward policy for, shape [batch_size, state_dim]
+            backward_mask: Mask of valid actions from previous state to this state [batch_size, num_actions]
 
         Returns:
             Tensor: Backward policy probabilities, shape [batch_size, num_actions]
         """
         output = self.forward(states)
         logits = output.logits_pb  # Shape: [batch_size, num_actions]
+
+        # Mask pre-softmax to preserve normalization
+        logits = logits.masked_fill(~backward_mask, float("-inf"))
 
         # Return proper probabilities
         return F.softmax(logits, dim=-1)
@@ -136,7 +154,9 @@ class GFlowNet(nn.Module):
         actions: List[int],
         rewards: List[float],
         terminated: bool,
-        valid_actions_mask: List[Tensor],
+        forward_masks: List[Tensor],
+        backward_masks: List[Tensor],
+        max_reward: float,
     ) -> Tensor:
         """
         Compute trajectory balance loss for a single trajectory.
@@ -148,7 +168,9 @@ class GFlowNet(nn.Module):
             actions: List of actions taken
             rewards: List of rewards received
             terminated: Whether trajectory reached terminal
-            valid_actions_mask: List of masks, each with shape [num_actions]
+            forward_masks: List of forward masks, each with shape [1, num_actions]
+            backward_masks: List of backward masks, each with shape [1, num_actions]
+            max_reward: maximum possible reward (for normalization)
 
         Returns:
             Tensor: The trajectory balance loss
@@ -168,7 +190,7 @@ class GFlowNet(nn.Module):
         # Forward log-probabilities
         log_pf = []
         for t, (output, action, mask) in enumerate(
-            zip(outputs, actions, valid_actions_mask)
+            zip(outputs, actions, forward_masks)
         ):
             logits = output.logits_pf.squeeze(0)  # Remove batch dimension
             mask = mask.squeeze(0)  # Also squeeze the mask
@@ -178,11 +200,28 @@ class GFlowNet(nn.Module):
 
         # Backward log-probabilities
         log_pb = []
-        for t in range(len(states) - 1):  # No backward from initial state
+        for t in range(len(states) - 1):
             output = outputs[t + 1]
-            prev_action = actions[t]
             logits = output.logits_pb.squeeze(0)  # Remove batch dimension
-            log_pb.append(F.log_softmax(logits, dim=-1)[prev_action])
+
+            # Use the mask from the previous state
+            mask = backward_masks[t + 1].squeeze(0)
+
+            # print(f"\nBackward step {t}:")
+            # print(f"  Raw logits: {logits}")
+            # print(f"  Mask: {mask}")
+
+            logits = logits.masked_fill(~mask, float("-inf"))
+
+            # print(f"  Masked logits: {logits}")
+
+            prev_action = actions[t]
+            prob = F.log_softmax(logits, dim=-1)[prev_action]
+            # print(f"  Action {prev_action}: log_prob = {prob}")
+
+            log_pb.append(prob)
+
+        # print(f"\nlog_pb: {log_pb}")
 
         # Compute loss components
         log_Z = outputs[0].log_Z[0]  # From initial state
@@ -190,9 +229,20 @@ class GFlowNet(nn.Module):
         sum_log_pb = torch.stack(log_pb).sum()
 
         # Final reward is at terminal state
-        log_R = torch.log(torch.tensor(rewards[-1]))
+        terminal_reward = rewards[-1] + 1e-10
+        # norm_reward = terminal_reward / max_reward
+        log_R = torch.tensor(terminal_reward).log()
 
         # Trajectory balance loss
-        loss = (log_Z + sum_log_pf - log_R - sum_log_pb).pow(2)
+        loss = (log_Z + sum_log_pf - log_R - sum_log_pb).pow(
+            2
+        )  # NOTE: Maybe take mean here?
+
+        # print("\nLoss components:")
+        # print(f"  log_Z: {log_Z}")
+        # print(f"  sum_log_pf: {sum_log_pf}")
+        # print(f"  log_R: {log_R}")
+        # print(f"  sum_log_pb: {sum_log_pb}")
+        # print(f"  total_loss: {loss}")
 
         return loss

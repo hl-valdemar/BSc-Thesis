@@ -1,0 +1,8 @@
+Evaluation metrics:
+  Reward count: {10.0: 323, 5.0: 177}
+  Reward frequencies: {10.0: 0.646, 5.0: 0.354}
+
+  Branch count: {0: 177, 1: 323}
+  Branch frequencies: {0: 0.354, 1: 0.646}
+
+  Avg traj length: 6.0

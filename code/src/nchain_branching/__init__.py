@@ -1,1 +1,6 @@
-from nchain_branching.nchain_branching import NChainEnv, NChainState, NChainTrajectory
+from nchain_branching.nchain_branching import (
+    NChainAction,
+    NChainEnv,
+    NChainState,
+    NChainTrajectory,
+)

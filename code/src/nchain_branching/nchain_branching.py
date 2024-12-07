@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import IntEnum
 from typing import List, Optional, Tuple
 
 import torch
@@ -65,14 +66,15 @@ class NChainTrajectory:
         actions: List of actions taken
         rewards: List of rewards received
         done: Whether trajectory ended at terminal state
-        valid_actions_masks: List of masks over valid actions
+        forward_masks: List of masks over forward actions
     """
 
     states: List[NChainState]
     actions: List[int]
     rewards: List[float]
     done: bool
-    valid_actions_masks: List[Tensor]
+    forward_masks: List[Tensor]
+    backward_masks: List[Tensor]
 
     def to_tensors(self) -> Tuple[Tensor, Tensor, Tensor]:
         """Convert trajectory to tensor format.
@@ -87,6 +89,13 @@ class NChainTrajectory:
         actions_tensor = torch.tensor(self.actions)
         rewards_tensor = torch.tensor(self.rewards)
         return states_tensor, actions_tensor, rewards_tensor
+
+
+class NChainAction(IntEnum):
+    FORWARD = 0
+    BRANCH_LEFT = 1
+    BRANCH_RIGHT = 2
+    TERMINAL_STAY = 3
 
 
 class NChainEnv:
@@ -111,10 +120,11 @@ class NChainEnv:
         self.current_state = NChainState(position=0, n=self.n, branch=-1)
         self.state_dim = self.current_state.state_dim
 
-        # Actions: 0 = stay, 1 = right (pre-split)
-        # At split: 0 = stay, 1 = choose left, 2 = choose right
-        # Post-split: 0 = stay, 1 = forward on chosen branch
-        self.num_actions = 3  # Maximum number of actions available
+        # Actions: forward (pre-split)
+        # At split: choose left, choose right
+        # Post-split: forward on chosen branch
+        # At terminal: stay
+        self.num_actions = 4  # Maximum number of actions available per state
 
     def reset(self) -> NChainState:
         """Reset environment to initial state (position 0)."""
@@ -125,10 +135,13 @@ class NChainEnv:
         """Take a step in the environment.
 
         Args:
-            action: Integer action
-                Pre-split: 0=stay, 1=right
-                At split: 0=stay, 1=left branch, 2=right branch
-                Post-split: 0=stay, 1=forward
+            action: NChainAction to take in environment
+
+        Returns:
+            Tuple containing:
+            - Resulting state
+            - Reward
+            - Done - whether terminal was reached
         """
         assert action in self.get_valid_actions(self.current_state)
 
@@ -141,28 +154,26 @@ class NChainEnv:
 
         # Handle pre-split movement
         if branch == -1 and position < self.split_point:
-            if action == 0:  # Stay
-                pass
-            elif action == 1:  # Move right
+            if action == NChainAction.FORWARD:  # Move right
                 new_position = position + 1
 
         # Handle at-split decisions
         elif branch == -1 and position == self.split_point:
-            if action == 0:  # Stay
-                pass
-            elif action == 1:  # Choose left branch
+            if action == NChainAction.BRANCH_LEFT:  # Choose left branch
                 new_position = position + 1
                 new_branch = 0
-            elif action == 2:  # Choose right branch
+            elif action == NChainAction.BRANCH_RIGHT:  # Choose right branch
                 new_position = position + 1
                 new_branch = 1
 
         # Handle post-split movement
         elif branch in [0, 1]:  # On either branch
-            if action == 0:  # Stay
-                pass
-            elif action == 1:  # Move forward
-                new_position = position + 1
+            if self.is_terminal(self.current_state):
+                if action == NChainAction.TERMINAL_STAY:
+                    new_position = position
+            elif not self.is_terminal(self.current_state):
+                if action == NChainAction.FORWARD:  # Move forward
+                    new_position = position + 1
 
         # Update state
         self.current_state = NChainState(
@@ -182,23 +193,43 @@ class NChainEnv:
         return self.current_state, reward, done
 
     def get_valid_actions(self, state: Optional[NChainState] = None) -> List[int]:
-        """Get list of valid actions for given state."""
+        """
+        Get list of valid actions for given state.
+
+        Args:
+            state: Optional state - if not specified, current state is used
+
+        Returns:
+            List[int]: List of valid actions for given state
+        """
         if state is None:
             state = self.current_state
 
         # Terminal states
         if self.is_terminal(state):
-            return [0]  # Can only stay
+            return [NChainAction.TERMINAL_STAY]
 
         # At split point
         if state.position == self.split_point and state.branch == -1:
-            return [0, 1, 2]  # Stay, left branch, right branch
+            return [
+                NChainAction.BRANCH_LEFT,
+                NChainAction.BRANCH_RIGHT,
+            ]  # left branch, right branch
 
         # Pre-split or post-split
-        return [0, 1]  # Stay or move forward
+        return [NChainAction.FORWARD]  # Move forward
 
     def is_terminal(self, state: NChainState) -> bool:
         """Check if state is terminal (end of either branch)."""
         return state.branch in [0, 1] and state.position >= self.split_point + (
             self.n - self.split_point
         )
+
+    def max_reward(self) -> float:
+        """
+        Returns the maximum possible reward in the environment.
+
+        Returns:
+            float: Maximum reward possible
+        """
+        return max(self.left_reward, self.right_reward)

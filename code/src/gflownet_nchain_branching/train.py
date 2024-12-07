@@ -8,6 +8,7 @@ from torch import Tensor
 from torch.optim import Adam
 
 from nchain_branching import NChainEnv, NChainState, NChainTrajectory
+from nchain_branching.nchain_branching import NChainAction
 
 from .metrics import GFlowNetMetrics, MetricsTracker
 from .model import GFlowNet
@@ -36,7 +37,7 @@ class GFlowNetTrainer:
         self.replay_buffer: Deque[NChainTrajectory] = deque(maxlen=buffer_size)
         self.metrics = MetricsTracker(window_size=metrics_window)
 
-    def get_tempered_policy(
+    def get_tempered_forward_policy(
         self,
         state_tensor: Tensor,
         action_mask: Tensor,
@@ -45,95 +46,60 @@ class GFlowNetTrainer:
         """Get exploration-enabled policy probabilities.
 
         Args:
-            state_tensor: Current state [1, state_dim]
-            action_mask: Valid actions mask [1, num_actions]
-            temperature: Softmax temperature (higher = more uniform)
+            state_tensor: Current state [batch_size, state_dim]
+            action_mask: Valid actions mask [batch_size, num_actions]
             epsilon: Probability of random action
         """
-        policy = self.model.get_forward_policy(state_tensor)
-        policy = policy * action_mask
+        policy = self.model.get_forward_policy(state_tensor, action_mask)
 
         # Add exploration through epsilon-random
         num_valid = action_mask.sum().item()
         random_policy = action_mask / num_valid
         return (1 - epsilon) * policy + epsilon * random_policy
 
-    def collect_trajectory(self) -> NChainTrajectory:
+    def create_forward_mask(self, state: NChainState) -> Tensor:
         """
-        Collect a single trajectory using current policy.
+        Returns a forward action mask.
 
         Returns:
-            NChainTrajectory
+            Tensor: The forward action mask
         """
-        state = self.env.reset()
-        done = False
+        valid_actions = [int(a) for a in self.env.get_valid_actions(state)]
+        mask = torch.zeros(1, self.env.num_actions, dtype=bool)
+        mask[0, valid_actions] = True
+        return mask
 
-        states = [state]
-        actions = []
-        rewards = []
-        action_masks = []
-
-        while not done:
-            valid_actions = self.env.get_valid_actions(state)
-            state_tensor = state.to_tensor().unsqueeze(
-                0
-            )  # Shape: [batch_dim = 1, state_dim]
-
-            # Create action mask
-            action_mask = torch.zeros(
-                1,
-                self.env.num_actions,
-                dtype=bool,
-            )  # Shape: [1, self.env.num_actions]
-            action_mask[0, valid_actions] = 1.0
-
-            # Get masked action probabilities
-            # action_probs = self.model.get_forward_policy(state_tensor)
-            # action_probs = action_probs * action_mask
-
-            action_probs = self.get_tempered_policy(
-                state_tensor=state_tensor,
-                action_mask=action_mask,
-            )
-
-            action = torch.multinomial(
-                input=action_probs,
-                num_samples=1,
-            ).item()  # NOTE: make sure this samples from the correct dimension
-
-            next_state, reward, done = self.env.step(action)
-
-            states.append(next_state)
-            actions.append(action)
-            rewards.append(reward)
-            action_masks.append(action_mask)
-
-            state = next_state
-
-        return NChainTrajectory(
-            states=states,
-            actions=actions,
-            rewards=rewards,
-            done=done,
-            valid_actions_masks=action_masks,
-        )
-
-    def _create_action_mask(self, state: NChainState) -> Tensor:
+    def create_backward_mask(self, state: NChainState) -> Tensor:
         """
-        Returns an action mask.
+        Returns a backward action mask.
 
         Returns:
-            Tensor: The action mask
+            Tensor: The backward action mask
         """
-        valid_actions = self.env.get_valid_actions(state)
-        action_mask = torch.zeros(
-            1,
-            self.env.num_actions,
-            dtype=bool,
-        )  # Shape: [1, self.env.num_actions]
-        action_mask[0, valid_actions] = 1.0
+        mask = torch.zeros(1, self.env.num_actions, dtype=bool)
 
-        return action_mask
+        if state.position == 0:  # Initial state has no parents
+            return mask
+
+        if state.branch == -1:  # Pre-split states
+            if state.position > 0:  # Only forward action possible
+                mask[0, int(NChainAction.FORWARD)] = True
+
+        elif state.position == self.env.split_point + 1:  # Just after split
+            # The mask should indicate which branch selection brought us here
+            if state.branch == 0:  # Left branch was chosen
+                mask[0, int(NChainAction.BRANCH_LEFT)] = True
+            elif state.branch == 1:  # Right branch was chosen
+                mask[0, int(NChainAction.BRANCH_RIGHT)] = True
+
+        elif self.env.is_terminal(state):  # Reached the terminal state
+            mask[0, int(NChainAction.FORWARD)] = True
+            mask[0, int(NChainAction.TERMINAL_STAY)] = True
+
+        else:  # On branch after split point
+            mask[0, int(NChainAction.FORWARD)] = True
+
+        return mask
 
     def collect_trajectory_with_metrics(
         self,
@@ -145,47 +111,60 @@ class GFlowNetTrainer:
         states = [state]
         actions = []
         rewards = []
-        action_masks = []
+        forward_masks = []
+        backward_masks = []
 
         # Track policy entropy during collection
         forward_entropies = []
         backward_entropies = []
 
         while not done:
-            state_tensor = state.to_tensor().unsqueeze(0)
-            action_mask = self._create_action_mask(state)
+            state_tensor = state.to_tensor().unsqueeze(
+                0
+            )  # Shape: [batch_dim = 1, state_dim]
+            forward_mask = self.create_forward_mask(state)
+            backward_mask = self.create_backward_mask(state)
 
             # Get policies and compute entropies
-            forward_policy = self.get_tempered_policy(
-                state_tensor=state_tensor,
-                action_mask=action_mask,
+            # forward_policy = self.model.get_forward_policy(state_tensor, forward_mask)
+            forward_policy = self.get_tempered_forward_policy(
+                state_tensor, forward_mask
             )
-            backward_policy = self.model.get_backward_policy(state_tensor)
-
             forward_entropies.append(
                 -(forward_policy * torch.log(forward_policy + 1e-10)).sum().item()
             )
-            backward_entropies.append(
-                -(backward_policy * torch.log(backward_policy + 1e-10)).sum().item()
-            )
+
+            if len(actions) > 0:  # Backward policy doesn't exist for the initial state
+                backward_policy = self.model.get_backward_policy(
+                    state_tensor, backward_mask
+                )
+                backward_entropies.append(
+                    -(backward_policy * torch.log(backward_policy + 1e-10)).sum().item()
+                )
 
             # Sample action and step environment
             action = torch.multinomial(forward_policy, 1).item()
-            next_state, reward, done = self.env.step(action)
+            next_state, reward, done = self.env.step(NChainAction(action))
 
             states.append(next_state)
             actions.append(action)
             rewards.append(reward)
-            action_masks.append(action_mask)
+            forward_masks.append(forward_mask)
+            backward_masks.append(backward_mask)
 
             state = next_state
+
+        # Add the backward mask for the terminal state
+        terminal_backward_mask = self.create_backward_mask(state)
+        backward_masks.append(terminal_backward_mask)
 
         trajectory = NChainTrajectory(
             states=states,
             actions=actions,
             rewards=rewards,
             done=done,
-            valid_actions_masks=action_masks,
+            forward_masks=forward_masks,
+            backward_masks=backward_masks,
         )
 
         # Compute episode metrics
@@ -223,7 +202,9 @@ class GFlowNetTrainer:
                 actions=trajectory.actions,
                 rewards=trajectory.rewards,
                 terminated=trajectory.done,
-                valid_actions_mask=trajectory.valid_actions_masks,
+                forward_masks=trajectory.forward_masks,
+                backward_masks=trajectory.backward_masks,
+                max_reward=self.env.max_reward(),
             )
 
             # Weight by trajectory length to balance short/long paths
@@ -252,7 +233,8 @@ class GFlowNetTrainer:
         self.replay_buffer.append(trajectory)
 
     def train_step(self) -> Dict[str, float]:
-        """Perform single training step and return metrics.
+        """
+        Perform single training step and return metrics.
 
         Returns:
             Dict: Train step metrics
@@ -277,7 +259,6 @@ class GFlowNetTrainer:
         self.metrics.add_metrics(metrics)
 
         # Optimize
-        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
         self.optimizer.step()
 
         return {
@@ -300,3 +281,63 @@ class GFlowNetTrainer:
                     "Branch Distribution:",
                     {k: f"{v:.2%}" for k, v in summary["branch_dist"].items()},
                 )
+
+    def evaluate_learned_policy(
+        self,
+        num_trajectories: int = 200,
+    ) -> Dict[str, float]:
+        """
+        Evaluate the learned policy by sampling trajectories.
+
+        Args:
+            num_trajectories: Number of trajectories to sample
+
+        Returns:
+            Dictionary containing:
+                - reward_counts: Number of times each reward was reached
+                - reward_frequencies: Distribution of terminal rewards
+                - branch_count: Number of times each branch was selected
+                - branch_frequencies: Distribution of branch selections
+                - average_trajectory_length: Mean steps to completion
+        """
+        rewards = []
+        branches = []
+        trajectory_lengths = []
+
+        # Turn off gradients for evaluation
+        with torch.no_grad():
+            for _ in range(num_trajectories):
+                state = self.env.reset()
+                done = False
+                steps = 0
+
+                while not done:
+                    state_tensor = state.to_tensor().unsqueeze(0)
+                    action_mask = self.create_forward_mask(state)
+
+                    # Use learned policy directly (no exploration)
+                    policy = self.model.get_forward_policy(state_tensor, action_mask)
+                    action = torch.multinomial(policy, 1).item()
+
+                    next_state, reward, done = self.env.step(NChainAction(action))
+                    state = next_state
+                    steps += 1
+
+                rewards.append(reward)
+                branches.append(state.branch)
+                trajectory_lengths.append(steps)
+
+        # Compute statistics
+        reward_counts = {r: rewards.count(r) for r in set(rewards)}
+        reward_freqs = {r: c / num_trajectories for r, c in reward_counts.items()}
+
+        branch_counts = {b: branches.count(b) for b in set(branches)}
+        branch_freqs = {b: c / num_trajectories for b, c in branch_counts.items()}
+
+        return {
+            "reward_counts": reward_counts,
+            "reward_frequencies": reward_freqs,
+            "branch_counts": branch_counts,
+            "branch_frequencies": branch_freqs,
+            "average_trajectory_length": np.mean(trajectory_lengths),
+        }
