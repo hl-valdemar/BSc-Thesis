@@ -107,7 +107,12 @@ class MetricsTracker:
         avg_reward = np.mean([m.terminal_reward for m in recent])
 
         # Branch selection metrics
-        branch_dist = {-1: 0, 0: 0, 1: 0}  # Count of no-branch, left, right
+        branch_dist = {
+            -1: 0,
+            0: 0,
+            1: 0,
+            2: 0,
+        }  # Count of no-branch, left, right
         for m in recent:
             branch_dist[m.branch_chosen] += 1
         branch_dist = {k: v / len(recent) for k, v in branch_dist.items()}
@@ -147,7 +152,7 @@ class MetricsTracker:
         # Plot 3: Branch distribution
         steps = list(range(len(self.metrics_history)))
         branches = [m.branch_chosen for m in self.metrics_history]
-        for b in [-1, 0, 1]:
+        for b in [-1, 0, 1, 2]:
             mask = [br == b for br in branches]
             axes[1, 0].scatter(
                 [s for s, m in zip(steps, mask) if m],

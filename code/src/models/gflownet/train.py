@@ -4,9 +4,10 @@ from typing import Deque, Dict, List, Tuple
 
 import numpy as np
 import torch
-from environments.nchain import NChainAction, NChainEnv, NChainState, NChainTrajectory
 from torch import Tensor
 from torch.optim import Adam
+
+from environments.nchain import NChainAction, NChainEnv, NChainState, NChainTrajectory
 
 from .metrics import GFlowNetMetrics, MetricsTracker
 from .model import GFlowNet
@@ -18,6 +19,7 @@ class GFlowNetTrainer:
         env: NChainEnv,
         model: GFlowNet,
         learning_rate: float = 1e-4,
+        epsilon: float = 0.1,
         batch_size: int = 32,
         buffer_size: int = 10_000,
         metrics_window: int = 100,
@@ -30,6 +32,7 @@ class GFlowNetTrainer:
         self.env = env
         self.model = model
         self.optimizer = Adam(model.parameters(), lr=learning_rate)
+        self.epsilon = epsilon
         self.batch_size = batch_size
         self.buffer_size = buffer_size
         self.replay_buffer: Deque[NChainTrajectory] = deque(maxlen=buffer_size)
@@ -39,21 +42,19 @@ class GFlowNetTrainer:
         self,
         state_tensor: Tensor,
         action_mask: Tensor,
-        epsilon: float = 0.1,
     ) -> Tensor:
         """Get exploration-enabled policy probabilities.
 
         Args:
             state_tensor: Current state [batch_size, state_dim]
             action_mask: Valid actions mask [batch_size, num_actions]
-            epsilon: Probability of random action
         """
         policy = self.model.get_forward_policy(state_tensor, action_mask)
 
         # Add exploration through epsilon-random
         num_valid = action_mask.sum().item()
         random_policy = action_mask / num_valid
-        return (1 - epsilon) * policy + epsilon * random_policy
+        return (1 - self.epsilon) * policy + self.epsilon * random_policy
 
     def create_forward_mask(self, state: NChainState) -> Tensor:
         """
@@ -85,10 +86,12 @@ class GFlowNetTrainer:
 
         elif state.position == self.env.split_point + 1:  # Just after split
             # The mask should indicate which branch selection brought us here
-            if state.branch == 0:  # Left branch was chosen
-                mask[0, int(NChainAction.BRANCH_LEFT)] = True
-            elif state.branch == 1:  # Right branch was chosen
-                mask[0, int(NChainAction.BRANCH_RIGHT)] = True
+            if state.branch == 0:  # Branch 0 was chosen
+                mask[0, int(NChainAction.BRANCH_0)] = True
+            elif state.branch == 1:  # Branch 1 was chosen
+                mask[0, int(NChainAction.BRANCH_1)] = True
+            elif state.branch == 2:
+                mask[0, int(NChainAction.BRANCH_2)] = True
 
         elif self.env.is_terminal(state):  # Reached the terminal state
             mask[0, int(NChainAction.FORWARD)] = True
@@ -202,7 +205,6 @@ class GFlowNetTrainer:
                 terminated=trajectory.done,
                 forward_masks=trajectory.forward_masks,
                 backward_masks=trajectory.backward_masks,
-                max_reward=self.env.max_reward(),
             )
 
             # Weight by trajectory length to balance short/long paths

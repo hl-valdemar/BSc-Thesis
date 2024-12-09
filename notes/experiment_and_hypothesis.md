@@ -5,9 +5,9 @@
 1. Compare GFlowNets and BEN on both n-chain and GridWorld with varying degrees of reward sparcity.
 
 2. Metrics to measure:
-    * Sample efficiency (steps needed to reach optimal policy)
-    * Final performance (average reward/success rate)
-    * Exploration behavior (state coverage over time)
+    1. Sample efficiency (steps needed to reach optimal policy) - note: measure partly by training loss?
+    2. Final performance (average reward/success rate) - note: measure by difference between sample distribution and true distributions? Otherwise, this probably doesn't make sense for the semi-deterministic n-chain environment, as we know we'll succeed in n steps.
+    3. Exploration behavior (state coverage over time)
 
 ## Possible hypothesis
 

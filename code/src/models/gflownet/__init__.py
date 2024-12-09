@@ -15,13 +15,17 @@ def main():
     )
 
     # Create trainer
-    trainer = GFlowNetTrainer(env=env, model=model)
+    trainer = GFlowNetTrainer(
+        env=env,
+        model=model,
+        epsilon=0.2,
+    )
 
     # Train the model
-    losses = trainer.train(num_steps=500)
+    losses = trainer.train(num_steps=1000)
 
     # Evaluate the model
-    eval_metrics = trainer.evaluate_learned_policy(num_trajectories=500)
+    eval_metrics = trainer.evaluate_learned_policy(num_trajectories=1000)
 
     print("\nEvaluation metrics:")
     print(f"  Reward count: {eval_metrics["reward_counts"]}")

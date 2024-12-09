@@ -23,36 +23,37 @@ class NChainState:
 
     def __post_init__(self):
         assert (
-            0 <= self.position < self.n * 2
-        ), f"Position {self.position} must be in [0, {self.n * 2 - 1}]"
+            0 <= self.position < self.n * 3
+        ), f"Position {self.position} must be in [0, {self.n * 3 - 1}]"
         assert self.branch in [
             -1,
             0,
             1,
-        ], "Branch must be -1 (pre-split), 0 (left), or 1 (right)"
+            2,
+        ], "Branch must be -1 (pre-split), 0 (first branch), 1 (second branch), ..."
 
         # Add the state dim
-        self.state_dim = self.n * 2 + 3
+        self.state_dim = self.n * 3 + 4
 
     def to_tensor(self) -> Tensor:
         """Convert state to tensor representation.
 
         Returns:
-            Tensor: Shape [n*2 + 3], concatenation of:
-                - one-hot position (n*2)
-                - one-hot branch encoding (3) for pre-split, left, right
+            Tensor: Shape [n*3 + 4], concatenation of:
+                - one-hot position (n*3)
+                - one-hot branch encoding (4) for pre-split, first branch, second branch, ...
         """
         state_tensor = torch.zeros(self.state_dim)
         state_tensor[self.position] = 1.0
-        state_tensor[self.state_dim - 3 + (self.branch + 1)] = 1.0
+        state_tensor[self.state_dim - 4 + (self.branch + 1)] = 1.0
         return state_tensor
 
     @classmethod
     def from_tensor(cls, tensor: Tensor) -> "NChainState":
         """Convert tensor back to BranchingState."""
-        n = (len(tensor) - 3) // 2
-        position = torch.argmax(tensor[: n * 2]).item()
-        branch = torch.argmax(tensor[n * 2 :]).item() - 1
+        n = (len(tensor) - 4) // 2
+        position = torch.argmax(tensor[: n * 3]).item()
+        branch = torch.argmax(tensor[n * 3 :]).item() - 1
         return cls(position=position, n=n, branch=branch)
 
 
@@ -92,10 +93,11 @@ class NChainTrajectory:
 
 
 class NChainAction(IntEnum):
-    FORWARD = 0
-    BRANCH_LEFT = 1
-    BRANCH_RIGHT = 2
-    TERMINAL_STAY = 3
+    TERMINAL_STAY = 0
+    FORWARD = 1
+    BRANCH_0 = 2
+    BRANCH_1 = 3
+    BRANCH_2 = 4
 
 
 class NChainEnv:
@@ -110,21 +112,19 @@ class NChainEnv:
     def __init__(
         self,
         n: int = 5,  # Length of each branch
-        left_reward: float = 5.0,
-        right_reward: float = 10.0,
+        rewards: List[float] = [5.0, 10.0, 15.0],
     ):
         self.n = n
-        self.left_reward = left_reward
-        self.right_reward = right_reward
+        self.rewards = rewards
         self.split_point = n // 2  # Split occurs at n // 2 (the middle)
         self.current_state = NChainState(position=0, n=self.n, branch=-1)
         self.state_dim = self.current_state.state_dim
 
         # Actions: forward (pre-split)
-        # At split: choose left, choose right
+        # At split: choose one of 3 branches [0..2]
         # Post-split: forward on chosen branch
         # At terminal: stay
-        self.num_actions = 4  # Maximum number of actions available per state
+        self.num_actions = 5
 
     def reset(self) -> NChainState:
         """Reset environment to initial state (position 0)."""
@@ -159,15 +159,18 @@ class NChainEnv:
 
         # Handle at-split decisions
         elif branch == -1 and position == self.split_point:
-            if action == NChainAction.BRANCH_LEFT:  # Choose left branch
+            if action == NChainAction.BRANCH_0:  # Choose first branch
                 new_position = position + 1
                 new_branch = 0
-            elif action == NChainAction.BRANCH_RIGHT:  # Choose right branch
+            elif action == NChainAction.BRANCH_1:  # Choose second branch
                 new_position = position + 1
                 new_branch = 1
+            elif action == NChainAction.BRANCH_2:  # ...
+                new_position = position + 1
+                new_branch = 2
 
         # Handle post-split movement
-        elif branch in [0, 1]:  # On either branch
+        elif branch in [0, 1, 2]:  # On either branch
             if self.is_terminal(self.current_state):
                 if action == NChainAction.TERMINAL_STAY:
                     new_position = position
@@ -182,13 +185,13 @@ class NChainEnv:
 
         # Terminal state is reached when we're on a branch and have moved
         # n-split_point steps after the split point
-        done = branch in [0, 1] and position >= self.split_point + (
+        done = branch in [0, 1, 2] and position >= self.split_point + (
             self.n - self.split_point
         )
 
         reward = 0.0
         if done:
-            reward = self.left_reward if branch == 0 else self.right_reward
+            reward = self.rewards[branch]
 
         return self.current_state, reward, done
 
@@ -212,16 +215,17 @@ class NChainEnv:
         # At split point
         if state.position == self.split_point and state.branch == -1:
             return [
-                NChainAction.BRANCH_LEFT,
-                NChainAction.BRANCH_RIGHT,
-            ]  # left branch, right branch
+                NChainAction.BRANCH_0,
+                NChainAction.BRANCH_1,
+                NChainAction.BRANCH_2,
+            ]
 
         # Pre-split or post-split
         return [NChainAction.FORWARD]  # Move forward
 
     def is_terminal(self, state: NChainState) -> bool:
         """Check if state is terminal (end of either branch)."""
-        return state.branch in [0, 1] and state.position >= self.split_point + (
+        return state.branch in [0, 1, 2] and state.position >= self.split_point + (
             self.n - self.split_point
         )
 
@@ -232,4 +236,4 @@ class NChainEnv:
         Returns:
             float: Maximum reward possible
         """
-        return max(self.left_reward, self.right_reward)
+        return reduce(lambda x, y: max(x, y), self.rewards)

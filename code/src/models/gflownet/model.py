@@ -114,14 +114,9 @@ class GFlowNet(nn.Module):
         """
         output = self.forward(states)
         logits = output.logits_pf  # Shape: [batch_size, num_actions]
-        # print(f"Raw logits: {output.logits_pf}")  # Check pre-mask logits
 
         # Mask pre-softmax to preserve normalization
         logits = logits.masked_fill(~forward_mask, float("-inf"))
-        # print(f"Masked logits: {logits}")  # Check post-mask logits
-
-        # probs = F.softmax(logits, dim=-1)
-        # print(f"Probabilities: {probs}")  # Check final probabilities
 
         # Return proper probabilities
         return F.softmax(logits, dim=-1)
@@ -156,7 +151,6 @@ class GFlowNet(nn.Module):
         terminated: bool,
         forward_masks: List[Tensor],
         backward_masks: List[Tensor],
-        max_reward: float,
     ) -> Tensor:
         """
         Compute trajectory balance loss for a single trajectory.
@@ -217,7 +211,6 @@ class GFlowNet(nn.Module):
 
         # Final reward is at terminal state
         terminal_reward = rewards[-1] + 1e-10
-        # norm_reward = terminal_reward / max_reward
         log_R = torch.tensor(terminal_reward).log()
 
         # Trajectory balance loss
