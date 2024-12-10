@@ -1,24 +1,49 @@
 #import "@preview/showybox:2.0.3": showybox
 
+#set page(
+    header: context {
+      if counter(page).get().first() > 1 [
+        #grid(
+          columns: (1fr, 1fr, 1fr),
+          box(width: 100%)[#align(left)[Valdemar H. Lorenzen]],
+          box(width: 100%)[#align(center)[BSc Thesis]],
+          box(width: 100%)[#align(right)[IMADA, SDU]],
+        )
+      ]
+    },
+    footer: context {
+        if here().page() != 1 {
+            align(center)[#counter(page).get().first()]
+        }
+    }
+)
+
+#set page(
+    numbering: "1",
+    margin: (
+      top: 4cm,
+      bottom: 4cm,
+      x: 2.5cm,
+    ),
+)
 #set heading(numbering: "1.1")
+#set math.equation(numbering: "(1)")
 
 #let note(body, fill: yellow) = {
   set text(black)
-  rect(
+  box(
     fill: fill,
     inset: 12pt,
-    radius: 4pt,
-    [*NOTE:\ \ #body*],
+    [_NOTE:_\ \ #body],
   )
 }
 
 #let todo(body, fill: orange.lighten(50%)) = {
   set text(black)
-  rect(
+  box(
     fill: fill,
     inset: 12pt,
-    radius: 4pt,
-    [*TODO:\ \ #body*],
+    [_TODO:_\ \ #body],
   )
 }
 
@@ -30,11 +55,7 @@
     highlight(fill: fill, extent: 1pt)[[CITATION NEEDED]]
 }
 
-#let toc(fill: red) = {
-    highlight(fill: fill, extent: 1pt)[#outline()]
-}
-
-#let definition(title, body) = {
+#let attention(title, body) = {
     showybox(
         title-style: (
             weight: 900,
@@ -59,15 +80,19 @@
 - Writing style: maintain an academic tone while ensuring readability. Use precise technical language but explain complex concepts clearly. Include examples and visualizations to aid understanding.
 ]
 
-#todo[Add an abstract covering the paper.]
+#todo[Add title page.]
+#todo[Add an abstract covering the thesis.]
 
-#toc()
+#pagebreak()
+#counter(page).update(1)
 
-= Introduction
+#outline()
+
+= Introduction <introduction>
 
 Many real-world applications present a fundamental challenge that current reinforcement learning (RL) methods struggle to address effectively: the problem of delayed and sparse rewards.
 
-#definition("Delayed and Sparse Rewards")[
+#attention([Delayed and Sparse Rewards])[
     Learning scenarios where meaningful feedback signals (rewards) are provided only far after a long sequence of actions, and where most actions yeild no immediate feedback.
 
     _Example: In drug discovery, the effectiveness of a designed molecule can only be evaluated after its complete synthesis, with no intermediate feedback during the design process._
@@ -85,7 +110,7 @@ Traditional reinforcement learning algorithms face two critical limitations in s
 + *Exploration Efficiency:* With sparse rewards, random exploration becomes highly inefficient.
     An agent might need to execute precisely the right sequence of actions to receive any feedback at all, making random exploration about as effective as searching for a needle in a haystack.
 
-This thesis investigates a novel approach to addressing these challenges through the comparison of two promising methodologies: *Generative Flow Networks* (GFlowNets) #citation_needed() and *Bayesian Exploration Networks* (BEN) #citation_needed().
+This thesis investigates a novel approach to addressing these challenges through the comparison of two promising methodologies: *Generative Flow Networks* (GFlowNets) @bengio2021flownetworkbasedgenerative and *Bayesian Exploration Networks* (BEN) #citation_needed().
 These approaches represent fundamentally different perspectives on handling uncertainty and exploration in reinforcement learning:
 
 + GFlowNets frame the learning process as a flow network, potentially offering more robust learning in situations with multiple viable solutions.
@@ -117,22 +142,26 @@ The contributions of this work include:
 
 The remainder of this thesis is structured as follows:
 
-*Section 2: Background and Related Work* provides the theoretical foundations of reinforcement learning and explores existing approaches to handling sparse rewards.
+#note[Check that these titles correctly correspond to their reference.]
+
+*@preliminaries: Preliminaries* provides the theoretical foundations of reinforcement learning and explores existing approaches to handling sparse rewards.
 This chapter establishes the mathematical framework and notation used throughout the thesis.
 
-*Section 3: Theoretical Framework* presents our hypothesis and analytical approach.
+*@theoretical_framework: Theoretical Framework* presents our hypothesis and analytical approach.
 #maybe[We develop the mathematical foundations for comparing GFlowNets and BEN, with particular attention to their theoretical guarantees and limitations.]
 
-*Section 4: Experimental Design* details our testing methodology, including environment specifications, evaluation metrics, and implementation details.
+*@experimental_design: Experimental Design* details our testing methodology, including environment specifications, evaluation metrics, and implementation details.
 #maybe[This chapter ensures reproducibility and clarity in our experimental approach.]
 
-*Section 5: Results and Analysis* presents our findings, including both quantitative performance metrics #maybe[and qualitative analysis of learning behaviors].
+*@results_and_analysis: Results and Analysis* presents our findings, including both quantitative performance metrics #maybe[and qualitative analysis of learning behaviors].
 We examine how each algorithm handles the exploration-exploitation trade-off and adapts to varying levels of reward sparsity.
 
-*Section 6: Conclusion* summarizes our findings, discusses their implications for the field, and suggests directions for future research.
+*@future_research: Future Research* #maybe[...]
+
+*@conclusion: Conclusion* summarizes our findings, discusses their implications for the field, and suggests directions for future research.
 
 
-= Preliminaries
+= Preliminaries <preliminaries>
 
 #note[
 - Fundamentals of reinforcement learning
@@ -145,13 +174,11 @@ We examine how each algorithm handles the exploration-exploitation trade-off and
     - Comparison of methodologies
 ]
 
-== Markovian Flows
+== Flow Networks
 
-#maybe[*REMEMBER CITATIONS*]
+GFlowNets @bengio2021flownetworkbasedgenerative rely on the concept of flow networks. A flow network is represented as a directed acyclic graph $G = (cal(S), cal(A))$, where $cal(S)$ represents the state space and $cal(A)$ represents the action space.
 
-GFlowNets rely on the concept of flow networks. A flow network is represented as a directed acyclic graph $G = (cal(S), cal(A))$, where $cal(S)$ represents the state space and $cal(A)$ represents the action space.
-
-#definition("Flow Network")[
+#attention([Flow Network])[
     A directed acyclic graph with a single source node (initial state) and one or more sink nodes (terminal states), where flow is conserved at each intermediate node.
 
     _Example: In molecular design, states represent partial molecules and actions represent adding molecular fragments._
@@ -160,8 +187,9 @@ GFlowNets rely on the concept of flow networks. A flow network is represented as
 === States and Trajectories
 
 We distinguish severel types of states:
-- An initial state $s_0 in cal(S)$ (the source)
-- Terminal states $x in cal(X) subset cal(S)$ (sinks)
+
+- An initial state $s_0 in cal(S)$ (the source);
+- Terminal states $x in cal(X) subset cal(S)$ (sinks);
 - Intermediate states that form the pathways from source to sinks.
 
 A trajectory $tau$ represents a complete path through the network, starting at $s_0$ and ending at some terminal state $x$.
@@ -178,59 +206,98 @@ From this flow function, two important quantities are derived:
 
 These flows must satisfy a conservation principle known as the _flow matching constraint_:
 
-#definition("Flow Matching")[
+#attention([Flow Matching])[
     For any non-terminal state $s$, the total incoming flow must equal the total outgoing flow: $ F(s) = sum_((s'' -> s) in cal(A)) F(s'' -> s) = sum_((s -> s') in cal(A)) F(s -> s'). $
 ]
 
-=== #maybe[Probabilistic Interpretation]
+=== Markovian Flow
 
 The flow function induces a probability distribution over trajectories.
-Given a flow function $F$, we define $P(tau) = 1 / Z F(tau)$, where $Z = F(s_0) = sum_(tau in cal(T)) F(tau)$ is the _partition function_ --- the total flow through the network.
+Given a flow function $F$, we define $P(tau) = 1 / Z F(tau)$, where $Z = F(s_0) = sum_(tau in cal(T)) F(tau)$ is the _partition function_ --- i.e., the total flow through the network.
 
-A flow is _Markovian_ if when it can be factored into local decisions at each state.
-This occurs when there exist:
+#attention([Markovian Flow])[
+    A flow is _Markovian_ when it can be factored into local decisions at each state.
+    This occurs when the following exist:
 
-+ Forward policies $P_F (- | s)$ over children of each non-terminal state s.t. $ P(tau = (s_0 -> ... -> s_n)) = product_(t = 1)^n P_F (s_t | s_(t - 1)). $
+    + Forward policies $P_F (- | s)$ over children of each non-terminal state s.t. $ P(tau = (s_0 -> ... -> s_n)) = product_(t = 1)^n P_F (s_t | s_(t - 1)). $
 
-+ Backward policies $P_B (- | s)$ over parents of each non-initial state s.t. $ P(tau = (s_0 -> ... -> s_n) | s_n = x) = product_(t = 1)^n P_B (s_(t - 1) | s_(t)). $
+    + Backward policies $P_B (- | s)$ over parents of each non-initial state s.t. $ P(tau = (s_0 -> ... -> s_n) | s_n = x) = product_(t = 1)^n P_B (s_(t - 1) | s_(t)). $
+]
 
 The Markovian property allows us to decompose complex trajectory distributions into simple local decisions, making learning tractable while maintaining the global flow constraints #citation_needed().
 
 
-== GFlowNets #citation_needed()
+== GFlowNets
 
-#todo([
-    - Describe reward function and set of terminal states. $R: cal(X) -> RR_(>= 0)$.
-    - GFlowNets aim to approximate a _Markovian flow_ $F$ on $G$ such that $F(x) = R(x) "  " forall x in cal(X)$.
-    - @malkin2023trajectorybalanceimprovedcredit defines a GFlowNet as any learning consisting of:
-        - a model capable of providing the initial state flow $Z = F(s_0)$ as well as the forward action distributions $P_F (- | s)$ for any nonterminal state $s$ (and therefore, by the above, uniquely but possibly in an implicit way determining a Markovian flow $F$);
-        - an objective function, such that if the model is capable of expressing any action distribution and the objective function is globally minimized, then the constraint $F(x) = R(x) "  " forall x in cal(X)$ is satisfied for the corresponding Markovian flow $F$.
-    - The forward policy of a GFlowNet can be used to sample trajectories from the corresponding Markovian flow $F$ by iteratively taking actions according to policy $P(- | s)$. If the objective function is globally minimized, then the likelihood of terminating at $x$ is proportional to $R(x)$.
-])
+GFlowNets @bengio2021flownetworkbasedgenerative are a novel approach to learning policies that sample from desired probability distributions.
+They frame the learning process as the discovering of a flow function that makes the probability of generating any particular object proportional to its reward.
+
+Given a reward function $R: cal(X) -> RR_(>= 0)$ defined over the set of terminal states $cal(X)$, GFlowNets aim to approximate a Markovian flow $F$ on the graph $G$ s.t. $F(x) = R(x)$ for all $x in cal(X)$.
+
+#attention([GFlowNet])[
+    @malkin2023trajectorybalanceimprovedcredit defines a GFlowNet as any learning algorithm that discovers flow functions matching terminal state rewards, consisting of: 
+
+    + A model that outputs:
+        - Initial state flow $Z = F(s_0)$;
+        - Forward action distributions $P_F (- | s)$ for non-terminal states.
+    + An objective function that, when globally minimized, guarantees $F(x) = R(x)$ for all terminal states.
+
+    _Example: In molecular design, this ensures that high-reward molecules are genered more frequently, while maintaining diversity through exploration of multiple pathways._
+]
+
+The power of GFlowNets lies in their ability to handle situations where multiple action sequences can lead to the same terminal state --- a common scenario in real-world applications like molecular design #maybe[or image synthesis]. 
+Unlike traditional RL methods that focus on finding a single optimal path, GFlowNets learn a distribution over all possible paths proportional to their rewards.
+
+=== Learning Process
+
+The learning process of GFlowNets involves iteratively improving both flow estimates and the policies.
+The forward policy of a GFlowNet can sample trajectories from the learned Markovian flow $F$ by sequentially selecting actions according to $P_F (- | s)$.
+When the training converges to a global minimum of the objective function, this sampling process guarantees that $P(x) prop R(x)$.
+#maybe[That is, the probability of generating any terminal state $x$ is proportional to its reward $R(x)$.]
+This property makes GFlowNets particularly well-suited for:
+
++ *Diverse Candidate Generation:* Rather than converging to a single solution, GFlowNets maintain a distribution over solutions weighted by their rewards.
+
++ *Multi-Modal Exploration:* The flow-based approach naturally handles problems with multiple distinct solutions of similar quality.
+
++ *Compositional-Structure Learning:* By learning flows over sequences of actions, GFlowNets can capture and generalize compositional patterns in the solution space.
+
+To achieve this, GFlowNets employ various training objectives, with _trajectory balance_ @malkin2023trajectorybalanceimprovedcredit being one such particularly effective objective.
 
 === Trajectory Balance
 
-#todo([
-    - Cite this paper: @malkin2023trajectorybalanceimprovedcredit.
-    - Let $F$ be a Markovian flow and $P$ the corresponding distribution over complete trajectories: $P(tau) = 1 / Z F(tau)$, and let $P_F$ and $P_B$ be forward and backward policies determined by $F$.
-    - Manipulate following equations to derive the _trajectory balance constraint_:
-        - $P(tau) = 1 / Z F(tau), "  " Z = F(s_0) = sum_(tau in cal(T)) F(tau)$;
-        -  $P(tau = (s_0 -> ... -> s_n)) = product_(t = 1)^n P_F (s_t | s_(t - 1))$;
-        - $P(tau = (s_0 -> ... -> s_n) | s_n = x) = product_(t = 1)^n P_B (s_(t - 1) | s_t)$,
-    - to get:
-        - $Z product_(t = 1)^n P_F (s_t | s_(t - 1)) = F(x) product_(t = 1)^n P_B (s_(t - 1) | s_t)$, where we've used that $P(s_n = x) = F(x) / Z$ (this is the trajectory balance constraint).
-    - This essentially denotes the equivalence between forward and backward policies.
+Trajectory balance focuses on ensuring consistency across entire trajectories, instead of matching flows at every state (which can be computationally expensive).
 
-    - Now introduce Trajectory balance as an objective to be optimized along trajectories sampled from a training policy
-        - Suppose that a model with parameters $theta$ outputs estimated forward policy $P_F (- | s; theta)$ and backward policy $P_B (- | s; theta)$ for states $s$, as well as a global scalar $Z_theta$ estimating $F(s_0)$.
-        - The scalar $Z_theta$ and forward policy $P_F (- | -; theta)$ uniquely determine an implicit Markovian flow $F_theta$.
-        - For a trajectory $tau = (s_0 -> s_1 -> ... -> s_n = x)$, define the _trajectory loss_ $ cal(L)_"TB" (tau) = (log (Z_theta product_(t = 1)^n P_F (s_t | s_(t - 1); theta)) / (R(x) product_(t = 1)^n P_B (s_(t - 1) | s_t; theta)))^2 \ = (log Z_theta + log sum_(t = 1)^n P_F (s_t | s_(t - 1); theta) - log R(x) - log sum_(t = 1)^n P_B (s_(t - 1) | s_t; theta))^2. $ 
-        - If $pi_theta$ is a training policy --- usually that given by $P_F(- | -; theta)$ or a tempered version of it --- then the trajectory loss is updated along trajectories sampled from $pi_theta$, i.e., with stochastic gradient $EE_(tau ~ pi_theta) nabla_theta cal(L)_"TB" (tau)$.
+#attention([Trajectory Balance])[
+    A principle that ensures the probability of generating a trajectory matches its reward by maintaining consistency between forward generation and backward reconstruction probabilities.
+]
 
-    - It is worth noting that @malkin2023trajectorybalanceimprovedcredit remarks that when $G$ (the flow graph) is a directed tree, where each $s in cal(S)$ has a single parent state, $P_B$ is trivially $P_B = 1 "  " forall s in cal(S)$, and so we get $ cal(L)_"TB" (tau) = (log (Z_theta product_(t = 1)^n P_F (s_t | s_(t - 1); theta)) / (R(x)))^2. $
-])
+Consider a Markovian flow $F$ that induces a distribution $P$ over trajectories according to $P(tau) = 1/Z F(tau)$.
+The forward policy $P_F$ and backward policy $P_B$ must satisfy the following _trajectory balance constraint_ @malkin2023trajectorybalanceimprovedcredit $ Z product_(t = 1)^n P_F (s_t | s_(t - 1)) = F(x) product_(t = 1)^n P_B (s_(t - 1) | s_t) . $
 
-= Theoretical Framework
+That is to say, the probability of constructing a trajectory forward should match the probability of reconstructing it backward, scaled by the appropriate rewards.
+
+
+=== Trajectory Balance as an Objective
+
+To convert the trajectory balance function into a training objective, we introduce a parametrized model with parameters $theta$ that outputs:
+
++ A forward policy $P_F (- | s; theta)$;
++ A backward policy $P_B (- | s; theta)$;
++ A scalar estimate $Z_theta$ of the partition function.
+
+For any complete trajectory $tau = (s_0 -> ... -> s_n = x)$, we define the _trajectory balance loss_ as $ cal(L)_"TB" (tau) = (log (Z_theta product_(t=1)^n P_F (s_t | s_(t-1); theta)) / (R(x) product_(t=1)^n P_B (s_(t-1) | s_t; theta)))^2. $ <trajectory_balance_loss>
+
+This loss captures how well our model satisfies the trajectory balance constraint.
+When the loss approaches zero, our model has learned to generate samples proportional to their rewards.
+In practice, we compute this loss in the log domain to avoid numerical stability, as suggested by @malkin2023trajectorybalanceimprovedcredit: $ cal(L)_"TB" (tau) = (log Z_theta + log sum_(t = 1)^n P_F (s_t | s_(t - 1); theta) - log R(x) - log sum_(t = 1)^n P_B (s_(t - 1) | s_t; theta))^2. $
+
+@malkin2023trajectorybalanceimprovedcredit also remarks that a simplificatoin of @trajectory_balance_loss occurs in tree-structured state spaces (when $G$ is a directed tree), where each state has exactly one parent.
+In such cases, the backward policy becomes deterministic ($P_B = 1$), reducing the loss function to $ cal(L)_"TB" (tau) = (log (Z_theta product_(t = 1)^n P_F (s_t | s_(t - 1); theta)) / (R(x)))^2, $ which can be exploited for the n-chain environment.
+
+The model is trained by sampling trajectories from a training policy $pi_theta$ --- typically a tempered version of $P_F (- | -; theta)$ to encourage exploration --- and updating parameters using stochastic gradient descent: $theta <- theta - alpha EE_(tau ~ pi_theta) nabla_theta cal(L)_"TB" (tau).$
+
+= Theoretical Framework <theoretical_framework>
 
 #note[
 - Hypothesis development
@@ -240,7 +307,7 @@ The Markovian property allows us to decompose complex trajectory distributions i
 - Proposed solution approach
 ]
 
-= Experimental Design
+= Experimental Design <experimental_design>
 
 #note[
 - Test environments
@@ -308,7 +375,7 @@ The Markovian property allows us to decompose complex trajectory distributions i
     - Hyperparameter selection
 ]
 
-= Results and Analysis
+= Results and Analysis <results_and_analysis>
 
 #note[
 - Quantitative results
@@ -320,11 +387,11 @@ The Markovian property allows us to decompose complex trajectory distributions i
 - Discussion of findings
 ]
 
-= Future Research
+= Future Research <future_research>
 
 #note[Everything I think I could have done better essentially.]
 
-= Conclusion 
+= Conclusion <conclusion>
 
 #note[
 - Summary of contributions
