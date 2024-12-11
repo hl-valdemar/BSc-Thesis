@@ -165,6 +165,8 @@ We examine how each algorithm handles the exploration-exploitation trade-off and
 
 #note[
 - Fundamentals of reinforcement learning
+    - Contextual reinforcement learning
+    - Bayesian reinforcement learning
     - Markov Decision Processes
     - Q-learning and temporal difference methods
 - Sparse reward challenges
