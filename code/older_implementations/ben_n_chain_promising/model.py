@@ -37,7 +37,9 @@ class RecurrentQNetwork(nn.Module):
 
         # GRU for processing history
         self.gru = nn.GRU(
-            input_size=hidden_dim, hidden_size=hidden_dim, batch_first=True
+            input_size=hidden_dim,
+            hidden_size=hidden_dim,
+            batch_first=True,
         )
 
         # Q-value head

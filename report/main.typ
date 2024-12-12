@@ -5,9 +5,9 @@
       if counter(page).get().first() > 1 [
         #grid(
           columns: (1fr, 1fr, 1fr),
-          box(width: 100%)[#align(left)[Valdemar H. Lorenzen]],
-          box(width: 100%)[#align(center)[BSc Thesis]],
-          box(width: 100%)[#align(right)[IMADA, SDU]],
+          box(width: 100%, align(left)[Valdemar H. Lorenzen]),
+          box(width: 100%, align(center)[BSc Thesis]),
+          box(width: 100%, align(right)[IMADA, SDU]),
         )
       ]
     },
@@ -15,19 +15,23 @@
         if here().page() != 1 {
             align(center)[#counter(page).get().first()]
         }
-    }
-)
-
-#set page(
+    },
     numbering: "1",
     margin: (
       top: 4cm,
       bottom: 4cm,
-      x: 2.5cm,
+      x: 2.75cm,
     ),
 )
+
 #set heading(numbering: "1.1")
 #set math.equation(numbering: "(1)")
+#set text(size: 11pt)
+#set par(
+  //first-line-indent: 1em,
+  //spacing: 1em,
+  justify: true,
+)
 
 #let note(body, fill: yellow) = {
   set text(black)
@@ -52,7 +56,7 @@
 }
 
 #let citation_needed(fill: red) = {
-    highlight(fill: fill, extent: 1pt)[[CITATION NEEDED]]
+    highlight(fill: fill, extent: 1pt, "[CITATION NEEDED]")
 }
 
 #let attention(title, body) = {
@@ -72,6 +76,38 @@
     )[*#title:* #body]
 }
 
+#let make_title(title, authors, supervisors) = {
+    align(center)[#text(size: 18pt, weight: 900)[#title]]
+    align(center)[
+        #for (i, name) in authors.enumerate() {
+            name
+
+            // Spacing between names (if not last name in list)
+            if i + 1 != authors.len() {
+                h(1em)
+            }
+        }
+    ]
+    align(center)[
+        #for (i, name) in supervisors.enumerate() {
+            [\*#name]
+
+            // Spacing between names (if not last name in list)
+            if i + 1 != supervisors.len() {
+                h(1em)
+            }
+        }
+    ]
+}
+
+#let make_abstract(content) = {
+    align(center)[
+        #text(size: 16pt, weight: 900)[Abstract]
+        \ \
+        #content
+    ]
+}
+
 #note[
 - Use consistent mathematical notation throughout
 - Include clear figures and diagrams
@@ -80,8 +116,29 @@
 - Writing style: maintain an academic tone while ensuring readability. Use precise technical language but explain complex concepts clearly. Include examples and visualizations to aid understanding.
 ]
 
+#note[
+    Maybe there is not enough natural stochasticiy in the environment's reward-state transition dynamics to make this interesting.
+    Maybe this could remidied by:
+    - Making the chain length random between episodes?
+    - Making the reward for reaching a terminal state random following a pre-determined distribution (by sampling the rewards from pre-determined distributions corresponding to each terminal state, we can still make assumptions about the desired behavior --- bigger mean rewards $=>$ higher desired sample rates for trained model).
+]
+
 #todo[Add title page.]
-#todo[Add an abstract covering the thesis.]
+#todo[Add an abstract.]
+
+#let title = "BSc Thesis"
+#let authors = (
+    "Valdemar H. Lorenzen",
+)
+#let supervisors = (
+    "Melih Kandemir",
+)
+
+#make_title(title, authors, supervisors)
+#v(1cm)
+#make_abstract[Abstract goes here.]
+
+//#set page(columns: 2)
 
 #pagebreak()
 #counter(page).update(1)
@@ -110,7 +167,7 @@ Traditional reinforcement learning algorithms face two critical limitations in s
 + *Exploration Efficiency:* With sparse rewards, random exploration becomes highly inefficient.
     An agent might need to execute precisely the right sequence of actions to receive any feedback at all, making random exploration about as effective as searching for a needle in a haystack.
 
-This thesis investigates a novel approach to addressing these challenges through the comparison of two promising methodologies: *Generative Flow Networks* (GFlowNets) @bengio2021flownetworkbasedgenerative and *Bayesian Exploration Networks* (BEN) #citation_needed().
+This thesis investigates a novel approach to addressing these challenges through the comparison of two promising methodologies: *Generative Flow Networks* (GFlowNets) @bengio2021flownetworkbasedgenerative and *Bayesian Exploration Networks* (BEN) @fellows2024bayesianexplorationnetworks.
 These approaches represent fundamentally different perspectives on handling uncertainty and exploration in reinforcement learning:
 
 + GFlowNets frame the learning process as a flow network, potentially offering more robust learning in situations with multiple viable solutions.
@@ -209,21 +266,21 @@ From this flow function, two important quantities are derived:
 These flows must satisfy a conservation principle known as the _flow matching constraint_:
 
 #attention([Flow Matching])[
-    For any non-terminal state $s$, the total incoming flow must equal the total outgoing flow: $ F(s) = sum_((s'' -> s) in cal(A)) F(s'' -> s) = sum_((s -> s') in cal(A)) F(s -> s'). $
+    For any non-terminal state $s$, the total incoming flow must equal the total outgoing flow: $ F(s) & = sum_((s'' -> s) in cal(A)) F(s'' -> s) & = sum_((s -> s') in cal(A)) F(s -> s'). $
 ]
 
 === Markovian Flow
 
 The flow function induces a probability distribution over trajectories.
-Given a flow function $F$, we define $P(tau) = 1 / Z F(tau)$, where $Z = F(s_0) = sum_(tau in cal(T)) F(tau)$ is the _partition function_ --- i.e., the total flow through the network.
+Given a flow function $F$, we define $P(tau) = 1 / Z F(tau)$, where $Z = F(s_0) = sum_(tau in cal(T)) F(tau)$ is the _partition function_ @malkin2023trajectorybalanceimprovedcredit --- i.e., the total flow through the network.
 
 #attention([Markovian Flow])[
     A flow is _Markovian_ when it can be factored into local decisions at each state.
-    This occurs when the following exist:
+    This occurs when the following exist @malkin2023trajectorybalanceimprovedcredit:
 
-    + Forward policies $P_F (- | s)$ over children of each non-terminal state s.t. $ P(tau = (s_0 -> ... -> s_n)) = product_(t = 1)^n P_F (s_t | s_(t - 1)). $
+    + Forward policies $P_F (- | s)$ over children of each non-terminal state s.t. $ & P(tau = (s_0 -> ... -> s_n)) & = product_(t = 1)^n P_F (s_t | s_(t - 1)). $
 
-    + Backward policies $P_B (- | s)$ over parents of each non-initial state s.t. $ P(tau = (s_0 -> ... -> s_n) | s_n = x) = product_(t = 1)^n P_B (s_(t - 1) | s_(t)). $
+    + Backward policies $P_B (- | s)$ over parents of each non-initial state s.t. $ & P(tau = (s_0 -> ... -> s_n) | s_n = x) & = product_(t = 1)^n P_B (s_(t - 1) | s_(t)). $
 ]
 
 The Markovian property allows us to decompose complex trajectory distributions into simple local decisions, making learning tractable while maintaining the global flow constraints #citation_needed().
@@ -293,6 +350,13 @@ For any complete trajectory $tau = (s_0 -> ... -> s_n = x)$, we define the _traj
 This loss captures how well our model satisfies the trajectory balance constraint.
 When the loss approaches zero, our model has learned to generate samples proportional to their rewards.
 In practice, we compute this loss in the log domain to avoid numerical stability, as suggested by @malkin2023trajectorybalanceimprovedcredit: $ cal(L)_"TB" (tau) = (log Z_theta + log sum_(t = 1)^n P_F (s_t | s_(t - 1); theta) - log R(x) - log sum_(t = 1)^n P_B (s_(t - 1) | s_t; theta))^2. $
+
+//#place(
+//  auto,
+//  scope: "parent",
+//  float: true,
+//  [ $ cal(L)_"TB" (tau) = (log Z_theta + log sum_(t = 1)^n P_F (s_t | s_(t - 1); theta) - log R(x) - log sum_(t = 1)^n P_B (s_(t - 1) | s_t; theta))^2. $ <loss_log_domain> ],
+//)
 
 @malkin2023trajectorybalanceimprovedcredit also remarks that a simplificatoin of @trajectory_balance_loss occurs in tree-structured state spaces (when $G$ is a directed tree), where each state has exactly one parent.
 In such cases, the backward policy becomes deterministic ($P_B = 1$), reducing the loss function to $ cal(L)_"TB" (tau) = (log (Z_theta product_(t = 1)^n P_F (s_t | s_(t - 1); theta)) / (R(x)))^2, $ which can be exploited for the n-chain environment.

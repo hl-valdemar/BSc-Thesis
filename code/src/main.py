@@ -1,4 +1,4 @@
-from models import gflownet
+from models import ben
 
 if __name__ == "__main__":
-    gflownet.main()
+    ben.main()
