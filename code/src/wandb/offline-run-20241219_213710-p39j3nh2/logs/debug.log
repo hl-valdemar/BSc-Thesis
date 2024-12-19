@@ -1,0 +1,28 @@
+2024-12-19 21:37:10,807 INFO    MainThread:3161057 [wandb_setup.py:_flush():79] Current SDK version is 0.18.5
+2024-12-19 21:37:10,807 INFO    MainThread:3161057 [wandb_setup.py:_flush():79] Configure stats pid to 3161057
+2024-12-19 21:37:10,808 INFO    MainThread:3161057 [wandb_setup.py:_flush():79] Loading settings from /home/hl-valdemar/.config/wandb/settings
+2024-12-19 21:37:10,808 INFO    MainThread:3161057 [wandb_setup.py:_flush():79] Loading settings from /home/hl-valdemar/Dev/Projects/University/BSc/code/src/wandb/settings
+2024-12-19 21:37:10,808 INFO    MainThread:3161057 [wandb_setup.py:_flush():79] Loading settings from environment variables: {}
+2024-12-19 21:37:10,808 INFO    MainThread:3161057 [wandb_setup.py:_flush():79] Applying setup settings: {'mode': None, '_disable_service': None}
+2024-12-19 21:37:10,808 INFO    MainThread:3161057 [wandb_setup.py:_flush():79] Inferring run settings from compute environment: {'program_relpath': 'code/src/main.py', 'program_abspath': '/home/hl-valdemar/Dev/Projects/University/BSc/code/src/main.py', 'program': '/home/hl-valdemar/Dev/Projects/University/BSc/code/src/main.py'}
+2024-12-19 21:37:10,808 INFO    MainThread:3161057 [wandb_setup.py:_flush():79] Applying login settings: {}
+2024-12-19 21:37:10,808 INFO    MainThread:3161057 [wandb_setup.py:_flush():79] Applying login settings: {'mode': 'offline'}
+2024-12-19 21:37:10,808 INFO    MainThread:3161057 [wandb_init.py:_log_setup():534] Logging user logs to /home/hl-valdemar/Dev/Projects/University/BSc/code/src/wandb/offline-run-20241219_213710-p39j3nh2/logs/debug.log
+2024-12-19 21:37:10,809 INFO    MainThread:3161057 [wandb_init.py:_log_setup():535] Logging internal logs to /home/hl-valdemar/Dev/Projects/University/BSc/code/src/wandb/offline-run-20241219_213710-p39j3nh2/logs/debug-internal.log
+2024-12-19 21:37:10,809 INFO    MainThread:3161057 [wandb_init.py:init():621] calling init triggers
+2024-12-19 21:37:10,809 INFO    MainThread:3161057 [wandb_init.py:init():628] wandb.init called with sweep_config: {}
+config: {}
+2024-12-19 21:37:10,809 INFO    MainThread:3161057 [wandb_init.py:init():671] starting backend
+2024-12-19 21:37:10,809 INFO    MainThread:3161057 [wandb_init.py:init():675] sending inform_init request
+2024-12-19 21:37:10,820 INFO    MainThread:3161057 [backend.py:_multiprocessing_setup():104] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2024-12-19 21:37:10,821 INFO    MainThread:3161057 [wandb_init.py:init():688] backend started and connected
+2024-12-19 21:37:10,844 INFO    MainThread:3161057 [wandb_init.py:init():783] updated telemetry
+2024-12-19 21:37:10,859 INFO    MainThread:3161057 [wandb_init.py:init():816] communicating run to backend with 90.0 second timeout
+2024-12-19 21:37:10,965 INFO    MainThread:3161057 [wandb_init.py:init():867] starting run threads in backend
+2024-12-19 21:37:11,349 INFO    MainThread:3161057 [wandb_run.py:_console_start():2463] atexit reg
+2024-12-19 21:37:11,350 INFO    MainThread:3161057 [wandb_run.py:_redirect():2311] redirect: wrap_raw
+2024-12-19 21:37:11,350 INFO    MainThread:3161057 [wandb_run.py:_redirect():2376] Wrapping output streams.
+2024-12-19 21:37:11,350 INFO    MainThread:3161057 [wandb_run.py:_redirect():2401] Redirects installed.
+2024-12-19 21:37:11,354 INFO    MainThread:3161057 [wandb_init.py:init():911] run started, returning control to user process
+2024-12-19 21:37:11,356 INFO    MainThread:3161057 [wandb_run.py:_config_callback():1390] config_cb None None {'gamma': 0.9, 'lr_q': 0.0001, 'device': 'cpu', 'lr_phi': 0.0001, 'exp_name': 'training', 'seed': 1, 'torch_deterministic': True, 'track': True, 'wandb_project_name': 'cleanRL', 'wandb_entity': 'rl-world', 'prior_initialization': True}
+2024-12-19 21:37:17,763 WARNING MsgRouterThr:3161057 [router.py:message_loop():77] message_loop has been closed

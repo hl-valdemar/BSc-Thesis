@@ -1,0 +1,42 @@
+{
+    "os": "macOS-13.3.1-x86_64-i386-64bit",
+    "python": "3.11.3",
+    "heartbeatAt": "2023-05-24T16:25:50.295496",
+    "startedAt": "2023-05-24T16:25:49.646670",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/brandonkaplowitz/Documents/Documents-Comp/graduate_research/my_projects/bayesian_rl/Bayesian_Exploration_Networks/submission/SearchAndRescue/search_and_rescue_simple_train.py",
+    "codePath": "submission/SearchAndRescue/search_and_rescue_simple_train.py",
+    "git": {
+        "remote": "https://github.com/bkaplowitz/Bayesian_Exploration_Networks",
+        "commit": "5279bc5ece12ecab75ce950b9d8c1b346e588665"
+    },
+    "email": "bkaplowitzbk@gmail.com",
+    "root": "/Users/brandonkaplowitz/Documents/Documents-Comp/graduate_research/my_projects/bayesian_rl/Bayesian_Exploration_Networks",
+    "host": "MacBook-Pro-8.lan",
+    "username": "brandonkaplowitz",
+    "executable": "/Users/brandonkaplowitz/Library/Caches/pypoetry/virtualenvs/cleanrl-NHlDmXv5-py3.11/bin/python",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 2600,
+        "min": 2600,
+        "max": 2600
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2600,
+            "min": 2600,
+            "max": 2600
+        }
+    ],
+    "disk": {
+        "total": 465.62699127197266,
+        "used": 8.456707000732422
+    },
+    "memory": {
+        "total": 32.0
+    }
+}

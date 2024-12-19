@@ -1,0 +1,61 @@
+[tool.poetry]
+name = "cleanrl"
+version = "1.1.0"
+description = "High-quality single file implementation of Deep Reinforcement Learning algorithms with research-friendly features"
+authors = ["Costa Huang <costa.huang@outlook.com>"]
+packages = [
+    { include = "cleanrl" },
+    { include = "cleanrl_utils" },
+]
+keywords = ["reinforcement", "machine", "learning", "research"]
+license="MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+tensorboard = "^2.10.0"
+wandb = "^0.13.6"
+gym = "0.23.1"
+torch = ">=1.12.1"
+stable-baselines3 = "1.2.0"
+moviepy = "^1.0.3"
+pygame = ">=2.1.0"
+huggingface-hub = "^0.11.1"
+ruff= ">=0.0.260"
+mypy = "^1.2.0"
+pylint = "^2.11.1"
+line-profiler-pycharm = "^1.1.0"
+#gym-ben = {path = "gym-ben", develop = true}
+normflows = "^1.6.0" # for time being, we use this dependency # for time being, we use this dependency
+scikit-learn = "^1.2.2"
+seaborn = "^0.12"
+gymnasium = "^0.28.1"
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^2.20.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.extras]
+plot = ["pandas", "seaborn"]
+pytest = ["pytest"]
+debug=["mypy", "pylint", "ruff"]
+
+# dependencies for algorithm variant (useful when you want to run a specific algorithm)
+dqn = []
+
+[tool.ruff]
+# Enable flake8-bugbear (`B`) rules.
+select = ["E", "F"]
+fixable = ["E", "ERA001"]
+
+# Never enforce `E501` (line length violations).
+ignore = ["E402", "E501"]
+
+# Avoid trying to fix flake8-bugbear (`B`) violations.
+
+# Ignore `E402` (import violations) in all `__init__.py` files, and in `path/to/file.py`.
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["E402"]

@@ -1,9 +1,14 @@
+import random
 from dataclasses import dataclass
 from enum import IntEnum
 from typing import List, Optional, Tuple
 
+import numpy as np
+import numpy.typing as npt
 import torch
-from torch import Tensor
+from torch import Tensor, dtype
+
+MaskNDArray = npt.NDArray[np.int8]
 
 
 @dataclass
@@ -35,7 +40,7 @@ class NChainState:
         # Add the state dim
         self.state_dim = self.n * 3 + 4
 
-    def to_tensor(self) -> Tensor:
+    def to_tensor(self, dtype: Optional[dtype] = None) -> Tensor:
         """Convert state to tensor representation.
 
         Returns:
@@ -43,7 +48,7 @@ class NChainState:
                 - one-hot position (n*3)
                 - one-hot branch encoding (4) for pre-split, first branch, second branch, ...
         """
-        state_tensor = torch.zeros(self.state_dim)
+        state_tensor = torch.zeros(self.state_dim, dtype=dtype)
         state_tensor[self.position] = 1.0
         state_tensor[self.state_dim - 4 + (self.branch + 1)] = 1.0
         return state_tensor
@@ -237,3 +242,63 @@ class NChainEnv:
             float: Maximum reward possible
         """
         return reduce(lambda x, y: max(x, y), self.rewards)
+
+    def sample(self, mask: MaskNDArray | None = None) -> np.int64:
+        """Generates a single random sample from this space.
+
+        A sample will be chosen uniformly at random with the mask if provided
+
+        Args:
+            mask: An optional mask for if an action can be selected.
+                Expected `np.ndarray` of shape ``(n,)`` and dtype ``np.int8`` where ``1`` represents valid actions and ``0`` invalid / infeasible actions.
+                If there are no possible actions (i.e. ``np.all(mask == 0)``) then ``space.start`` will be returned.
+
+        Returns:
+            A sampled integer from the space
+        """
+        if mask is not None:
+            assert isinstance(
+                mask, np.ndarray
+            ), f"The expected type of the mask is np.ndarray, actual type: {type(mask)}"
+            assert (
+                mask.dtype == np.int8
+            ), f"The expected dtype of the mask is np.int8, actual dtype: {mask.dtype}"
+            assert (
+                mask.shape == (self.n,)
+            ), f"The expected shape of the mask is {(self.n,)}, actual shape: {mask.shape}"
+            valid_action_mask = mask == 1
+            assert np.all(
+                np.logical_or(mask == 0, valid_action_mask)
+            ), f"All values of a mask should be 0 or 1, actual values: {mask}"
+            if np.any(valid_action_mask):
+                return np.random.choice(np.where(valid_action_mask)[0])
+            else:
+                return 0
+
+        return random.randint(0, self.num_actions)
+
+    def sample_valid_actions(
+        self,
+        k: int,
+        state: Optional[NChainState] = None,
+    ) -> List[NChainAction]:
+        if state is None:
+            state = self.current_state
+
+        valid_actions = self.get_valid_actions(state)
+        return random.sample(valid_actions, k=k)
+
+    def translate_action(self, action: NChainAction) -> str:
+        """Translates an action (int) to it's descriptor/name."""
+        name = "UNKNOWN_ACTION"
+        if action == NChainAction.TERMINAL_STAY:
+            name = "TERMINAL_STAY"
+        elif action == NChainAction.FORWARD:
+            name = "FORWARD"
+        elif action == NChainAction.BRANCH_0:
+            name = "BRANCH_0"
+        elif action == NChainAction.BRANCH_1:
+            name = "BRANCH_1"
+        elif action == NChainAction.BRANCH_2:
+            name = "BRANCH_2"
+        return name

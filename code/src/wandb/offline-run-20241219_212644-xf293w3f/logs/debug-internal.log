@@ -1,0 +1,15 @@
+{"time":"2024-12-19T21:26:44.964091683+01:00","level":"INFO","msg":"using version","core version":"0.18.5"}
+{"time":"2024-12-19T21:26:44.964161201+01:00","level":"INFO","msg":"created symlink","path":"/home/hl-valdemar/Dev/Projects/University/BSc/code/src/wandb/offline-run-20241219_212644-xf293w3f/logs/debug-core.log"}
+{"time":"2024-12-19T21:26:45.071374267+01:00","level":"INFO","msg":"created new stream","id":"xf293w3f"}
+{"time":"2024-12-19T21:26:45.071452979+01:00","level":"INFO","msg":"stream: started","id":"xf293w3f"}
+{"time":"2024-12-19T21:26:45.071692079+01:00","level":"INFO","msg":"sender: started","stream_id":"xf293w3f"}
+{"time":"2024-12-19T21:26:45.071614833+01:00","level":"INFO","msg":"handler: started","stream_id":{"value":"xf293w3f"}}
+{"time":"2024-12-19T21:26:45.071560813+01:00","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"xf293w3f"}}
+{"time":"2024-12-19T21:26:45.108779246+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-19T21:27:01.259587195+01:00","level":"INFO","msg":"stream: closing","id":"xf293w3f"}
+{"time":"2024-12-19T21:27:01.259755627+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-19T21:27:01.261925938+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-19T21:27:01.262538357+01:00","level":"INFO","msg":"handler: closed","stream_id":{"value":"xf293w3f"}}
+{"time":"2024-12-19T21:27:01.262619957+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"xf293w3f"}}
+{"time":"2024-12-19T21:27:01.26301535+01:00","level":"INFO","msg":"sender: closed","stream_id":"xf293w3f"}
+{"time":"2024-12-19T21:27:01.263129368+01:00","level":"INFO","msg":"stream: closed","id":"xf293w3f"}

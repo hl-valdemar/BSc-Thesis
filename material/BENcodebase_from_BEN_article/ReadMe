@@ -1,0 +1,9 @@
+Use poetry or requirements.txt to install dependencies.
+Run `python3 -m pip install -r requirements.txt` to install dependencies.
+Or run `python3 -m pip install poetry` to install poetry.
+Then run `poetry install` to install dependencies.
+To execute code for Tiger Environment run tiger_train.py
+To execute code for search and rescue using partial prior run `search_and_rescue_simple_train.py`
+For full prior run `search_and_rescue_simple_train_w_new_prior_init.py`
+Both can be run as modules in the form of python3 -m {FILENAME}
+Code was tested using CUDA and requires python 3.10 or higher.

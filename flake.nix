@@ -24,7 +24,18 @@
             torch
             matplotlib
             seaborn
+            distutils
+            wandb
           ]))
+      ];
+
+      # Virtual env necessary as nix doesn't have the normflows package...
+      buildInputs = with pkgs; [
+        (python3.withPackages (ps: [
+          # nix-managed packages
+        ]))
+        python3Packages.pip
+        python3Packages.virtualenv
       ];
 
       shellHook = ''

@@ -1,0 +1,15 @@
+{"time":"2024-12-19T21:37:10.841088992+01:00","level":"INFO","msg":"using version","core version":"0.18.5"}
+{"time":"2024-12-19T21:37:10.841155057+01:00","level":"INFO","msg":"created symlink","path":"/home/hl-valdemar/Dev/Projects/University/BSc/code/src/wandb/offline-run-20241219_213710-p39j3nh2/logs/debug-core.log"}
+{"time":"2024-12-19T21:37:10.946930593+01:00","level":"INFO","msg":"created new stream","id":"p39j3nh2"}
+{"time":"2024-12-19T21:37:10.946997483+01:00","level":"INFO","msg":"stream: started","id":"p39j3nh2"}
+{"time":"2024-12-19T21:37:10.947105072+01:00","level":"INFO","msg":"handler: started","stream_id":{"value":"p39j3nh2"}}
+{"time":"2024-12-19T21:37:10.947092811+01:00","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"p39j3nh2"}}
+{"time":"2024-12-19T21:37:10.947301975+01:00","level":"INFO","msg":"sender: started","stream_id":"p39j3nh2"}
+{"time":"2024-12-19T21:37:10.981469562+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-19T21:37:17.762798938+01:00","level":"INFO","msg":"stream: closing","id":"p39j3nh2"}
+{"time":"2024-12-19T21:37:17.762944106+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-19T21:37:17.764251672+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-19T21:37:17.765198475+01:00","level":"INFO","msg":"handler: closed","stream_id":{"value":"p39j3nh2"}}
+{"time":"2024-12-19T21:37:17.765287758+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"p39j3nh2"}}
+{"time":"2024-12-19T21:37:17.765335613+01:00","level":"INFO","msg":"sender: closed","stream_id":"p39j3nh2"}
+{"time":"2024-12-19T21:37:17.765449939+01:00","level":"INFO","msg":"stream: closed","id":"p39j3nh2"}

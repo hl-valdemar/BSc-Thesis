@@ -1,0 +1,91 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.13.11
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.11.3
+    start_time: 1684945549.665007
+    t:
+      1:
+      - 1
+      - 55
+      2:
+      - 1
+      - 55
+      3:
+      - 23
+      4: 3.11.3
+      5: 0.13.11
+      8:
+      - 5
+    visualize:
+      custom_plot:
+        panel_config:
+          fieldSettings:
+            stroke: null
+            x: Episodes
+            y: Cumulative Returns for Episode
+          panelDefId: wandb/line/v0
+          stringSettings:
+            title: Cumulative Returns for Episode
+          transform:
+            name: tableWithLeafColNames
+          userQuery:
+            queryFields:
+            - args:
+              - name: runSets
+                value: ${runSets}
+              fields:
+              - fields: []
+                name: id
+              - fields: []
+                name: name
+              - fields: []
+                name: _defaultColorIndex
+              - args:
+                - name: tableKey
+                  value: custom_plot_table
+                fields: []
+                name: summaryTable
+              name: runSets
+        panel_type: Vega2
+cuda:
+  desc: null
+  value: false
+device:
+  desc: null
+  value: cpu
+exp_name:
+  desc: null
+  value: search_and_rescue_simple_train
+gamma:
+  desc: null
+  value: 0.9
+lr_phi:
+  desc: null
+  value: 0.0001
+lr_q:
+  desc: null
+  value: 0.0001
+prior_initialization:
+  desc: null
+  value: true
+seed:
+  desc: null
+  value: 1
+torch_deterministic:
+  desc: null
+  value: true
+track:
+  desc: null
+  value: true
+wandb_entity:
+  desc: null
+  value: rl-world
+wandb_project_name:
+  desc: null
+  value: cleanRL
