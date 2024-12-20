@@ -1,0 +1,31 @@
+{
+  "os":  "Linux-6.6.58-x86_64-with-glibc2.40",
+  "python":  "3.12.7",
+  "startedAt":  "2024-12-19T22:11:06.895053Z",
+  "program":  "/home/hl-valdemar/Dev/Projects/University/BSc/code/src/main.py",
+  "codePath":  "code/src/main.py",
+  "git":  {
+    "remote":  "git@github.com:hl-valdemar/BSc-Thesis.git",
+    "commit":  "c539752fe1e3c88f2a6ad3780c0def1f5b71d42f"
+  },
+  "root":  "/home/hl-valdemar/Dev/Projects/University/BSc/code/src",
+  "host":  "nixos",
+  "username":  "hl-valdemar",
+  "executable":  "/home/hl-valdemar/Dev/Projects/University/BSc/code/venv/bin/python",
+  "codePathLocal":  "main.py",
+  "cpu_count":  4,
+  "cpu_count_logical":  8,
+  "disk":  {
+    "/":  {
+      "total":  "493086142464",
+      "used":  "73252282368"
+    }
+  },
+  "memory":  {
+    "total":  "8064790528"
+  },
+  "cpu":  {
+    "count":  4,
+    "countLogical":  8
+  }
+}

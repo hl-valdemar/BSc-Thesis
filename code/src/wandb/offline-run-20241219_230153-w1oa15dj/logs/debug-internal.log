@@ -1,0 +1,15 @@
+{"time":"2024-12-19T23:01:53.56881412+01:00","level":"INFO","msg":"using version","core version":"0.18.5"}
+{"time":"2024-12-19T23:01:53.568952264+01:00","level":"INFO","msg":"created symlink","path":"/home/hl-valdemar/Dev/Projects/University/BSc/code/src/wandb/offline-run-20241219_230153-w1oa15dj/logs/debug-core.log"}
+{"time":"2024-12-19T23:01:53.677426688+01:00","level":"INFO","msg":"created new stream","id":"w1oa15dj"}
+{"time":"2024-12-19T23:01:53.677535062+01:00","level":"INFO","msg":"stream: started","id":"w1oa15dj"}
+{"time":"2024-12-19T23:01:53.67773724+01:00","level":"INFO","msg":"sender: started","stream_id":"w1oa15dj"}
+{"time":"2024-12-19T23:01:53.67764261+01:00","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"w1oa15dj"}}
+{"time":"2024-12-19T23:01:53.677699293+01:00","level":"INFO","msg":"handler: started","stream_id":{"value":"w1oa15dj"}}
+{"time":"2024-12-19T23:01:53.716741689+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-19T23:02:20.963475515+01:00","level":"INFO","msg":"stream: closing","id":"w1oa15dj"}
+{"time":"2024-12-19T23:02:20.963746349+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-19T23:02:20.966368438+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-19T23:02:20.967039199+01:00","level":"INFO","msg":"handler: closed","stream_id":{"value":"w1oa15dj"}}
+{"time":"2024-12-19T23:02:20.967120386+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"w1oa15dj"}}
+{"time":"2024-12-19T23:02:20.967262197+01:00","level":"INFO","msg":"sender: closed","stream_id":"w1oa15dj"}
+{"time":"2024-12-19T23:02:20.967416892+01:00","level":"INFO","msg":"stream: closed","id":"w1oa15dj"}

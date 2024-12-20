@@ -1,0 +1,16 @@
+{"time":"2024-12-20T00:34:21.213477122+01:00","level":"INFO","msg":"using version","core version":"0.18.5"}
+{"time":"2024-12-20T00:34:21.213587667+01:00","level":"INFO","msg":"created symlink","path":"/home/hl-valdemar/Dev/Projects/University/BSc/code/src/wandb/offline-run-20241220_003421-8nuagv4o/logs/debug-core.log"}
+{"time":"2024-12-20T00:34:21.324802673+01:00","level":"INFO","msg":"created new stream","id":"8nuagv4o"}
+{"time":"2024-12-20T00:34:21.324974813+01:00","level":"INFO","msg":"stream: started","id":"8nuagv4o"}
+{"time":"2024-12-20T00:34:21.325074944+01:00","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"8nuagv4o"}}
+{"time":"2024-12-20T00:34:21.325510392+01:00","level":"INFO","msg":"sender: started","stream_id":"8nuagv4o"}
+{"time":"2024-12-20T00:34:21.325613467+01:00","level":"INFO","msg":"handler: started","stream_id":{"value":"8nuagv4o"}}
+{"time":"2024-12-20T00:34:21.37233365+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-20T00:39:12.125378266+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-20T00:39:12.134959595+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-20T00:39:12.145891471+01:00","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2024-12-20T00:39:13.18848532+01:00","level":"INFO","msg":"stream: closing","id":"8nuagv4o"}
+{"time":"2024-12-20T00:39:13.188602337+01:00","level":"INFO","msg":"handler: closed","stream_id":{"value":"8nuagv4o"}}
+{"time":"2024-12-20T00:39:13.188671781+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"8nuagv4o"}}
+{"time":"2024-12-20T00:39:13.188690836+01:00","level":"INFO","msg":"sender: closed","stream_id":"8nuagv4o"}
+{"time":"2024-12-20T00:39:13.189228663+01:00","level":"INFO","msg":"stream: closed","id":"8nuagv4o"}

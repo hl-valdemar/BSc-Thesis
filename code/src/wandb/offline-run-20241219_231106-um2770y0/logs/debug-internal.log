@@ -1,0 +1,15 @@
+{"time":"2024-12-19T23:11:06.924358452+01:00","level":"INFO","msg":"using version","core version":"0.18.5"}
+{"time":"2024-12-19T23:11:06.924441109+01:00","level":"INFO","msg":"created symlink","path":"/home/hl-valdemar/Dev/Projects/University/BSc/code/src/wandb/offline-run-20241219_231106-um2770y0/logs/debug-core.log"}
+{"time":"2024-12-19T23:11:07.031449159+01:00","level":"INFO","msg":"created new stream","id":"um2770y0"}
+{"time":"2024-12-19T23:11:07.03151939+01:00","level":"INFO","msg":"stream: started","id":"um2770y0"}
+{"time":"2024-12-19T23:11:07.031608105+01:00","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"um2770y0"}}
+{"time":"2024-12-19T23:11:07.031784579+01:00","level":"INFO","msg":"sender: started","stream_id":"um2770y0"}
+{"time":"2024-12-19T23:11:07.031745152+01:00","level":"INFO","msg":"handler: started","stream_id":{"value":"um2770y0"}}
+{"time":"2024-12-19T23:11:07.069218618+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-19T23:24:12.361534533+01:00","level":"INFO","msg":"stream: closing","id":"um2770y0"}
+{"time":"2024-12-19T23:24:12.361662407+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-19T23:24:12.363210317+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-19T23:24:12.364052453+01:00","level":"INFO","msg":"handler: closed","stream_id":{"value":"um2770y0"}}
+{"time":"2024-12-19T23:24:12.364151483+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"um2770y0"}}
+{"time":"2024-12-19T23:24:12.364169093+01:00","level":"INFO","msg":"sender: closed","stream_id":"um2770y0"}
+{"time":"2024-12-19T23:24:12.364656934+01:00","level":"INFO","msg":"stream: closed","id":"um2770y0"}

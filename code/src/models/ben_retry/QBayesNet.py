@@ -1,3 +1,6 @@
+from typing import Tuple
+
+import torch
 import torch.nn.init as init
 from torch import nn
 
@@ -35,12 +38,12 @@ class QBayesNetwork(nn.Module):
         # make hidden states on same device as model, and same batch size as input
         return self.fc1.weight.new(1, 64).zero_()
 
-    def forward(self, x, hidden_state):
+    def forward(self, x, hidden_state) -> Tuple[torch.Tensor, torch.Tensor]:
         x1 = self.fc1(x)
         x2 = self.relu1(x1)
         h_in = hidden_state.reshape(-1, 64)
-        h_out = self.rnn(x2, h_in)
+        h_out = self.rnn.forward(x2, h_in)
         x3 = self.fc2(h_out)
         x3 = self.relu2(x3)
-        x3 = self.out(x3)
+        x3 = self.out.forward(x3)
         return x3, h_out

@@ -2,6 +2,7 @@ from argparse import Namespace
 from typing import List
 
 import torch
+from tqdm import tqdm
 
 from environments.nchain import NChainEnv, NChainState
 
@@ -100,9 +101,11 @@ def posterior_update(
 ):
     optimizer_psi = torch.optim.Adam(model.parameters(), lr=args.lr_phi)
     optimizer_q = torch.optim.Adam(q_network.parameters(), lr=args.lr_q)
+
     losses_q = []
     losses_epistemic = []
-    for update_period in range(N_update):
+
+    for update_period in tqdm(range(N_update), desc=f"Updating posterior ({t})"):
         optimizer_q.zero_grad()
 
         reward_init = (
@@ -150,6 +153,7 @@ def posterior_update(
                     b_val = reward + args.gamma * v_val_est
                 except:
                     hh = 1
+
             b_val = b_val.detach().view(1, 1, 1, -1)
             q_val_t = q_val_t.detach().view(1, 1, 1, -1)
             loss_epistemic = model.ELBO(b_val, q_val_t, hidden_conditioner, i)
@@ -188,6 +192,7 @@ def posterior_update(
         loss_q.backward()
         optimizer_q.step()
         optimizer_q.zero_grad()
+
     return (
         q_network,
         model,

@@ -1,0 +1,15 @@
+{"time":"2024-12-19T22:32:07.156869651+01:00","level":"INFO","msg":"using version","core version":"0.18.5"}
+{"time":"2024-12-19T22:32:07.156998512+01:00","level":"INFO","msg":"created symlink","path":"/home/hl-valdemar/Dev/Projects/University/BSc/code/src/wandb/offline-run-20241219_223207-gs67jihg/logs/debug-core.log"}
+{"time":"2024-12-19T22:32:07.265826311+01:00","level":"INFO","msg":"created new stream","id":"gs67jihg"}
+{"time":"2024-12-19T22:32:07.265938956+01:00","level":"INFO","msg":"stream: started","id":"gs67jihg"}
+{"time":"2024-12-19T22:32:07.266112439+01:00","level":"INFO","msg":"sender: started","stream_id":"gs67jihg"}
+{"time":"2024-12-19T22:32:07.26603419+01:00","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"gs67jihg"}}
+{"time":"2024-12-19T22:32:07.266061697+01:00","level":"INFO","msg":"handler: started","stream_id":{"value":"gs67jihg"}}
+{"time":"2024-12-19T22:32:07.320942488+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-19T22:32:34.336939271+01:00","level":"INFO","msg":"stream: closing","id":"gs67jihg"}
+{"time":"2024-12-19T22:32:34.337213797+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-19T22:32:34.340002509+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-19T22:32:34.340734541+01:00","level":"INFO","msg":"handler: closed","stream_id":{"value":"gs67jihg"}}
+{"time":"2024-12-19T22:32:34.341184191+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"gs67jihg"}}
+{"time":"2024-12-19T22:32:34.341478875+01:00","level":"INFO","msg":"sender: closed","stream_id":"gs67jihg"}
+{"time":"2024-12-19T22:32:34.342740798+01:00","level":"INFO","msg":"stream: closed","id":"gs67jihg"}
