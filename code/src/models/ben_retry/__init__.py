@@ -2,4 +2,4 @@ from .training import train
 
 
 def main():
-    train()
+    train(chain_length=50)

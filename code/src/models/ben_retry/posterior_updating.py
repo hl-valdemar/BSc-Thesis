@@ -187,8 +187,10 @@ def posterior_update(
             device=args.device,
         )
         loss_q = msbbe(b1, b2, q_reshaped)
+
         if update_period % 2 == 0:
             losses_q.append(loss_q.item())
+
         loss_q.backward()
         optimizer_q.step()
         optimizer_q.zero_grad()

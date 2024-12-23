@@ -19,12 +19,12 @@ class NChainState:
     Attributes:
         position: Integer position in the chain [0, n-1]
         n: Length of each branch
-        branch: Which branch we're on (-1=pre-split, 0=left, 1=right)
+        branch: Which branch we're on (-1=pre-split, 0=branch_0, 1=branch_1, ...)
     """
 
     position: int
     n: int  # Length of each branch (total length = n + split_point)
-    branch: int  # -1 = pre-split, 0 = left branch, 1 = right branch
+    branch: int  # -1 = pre-split, 0 = branch 0, 1 = branch 1, ...
 
     def __post_init__(self):
         assert (
@@ -117,8 +117,10 @@ class NChainEnv:
     def __init__(
         self,
         n: int = 5,  # Length of each branch
-        rewards: List[float] = [5.0, 10.0, 15.0],
+        rewards: List[float] = [50.0, 250.0, 1250.0],
     ):
+        assert len(rewards) == 3, "Reward count should match branch count (3)"
+
         self.n = n
         self.rewards = rewards
         self.split_point = n // 2  # Split occurs at n // 2 (the middle)
