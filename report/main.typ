@@ -399,10 +399,10 @@ This history belongs to a state-action-reward product space $cal(H)_t$ and follo
 The agent's goal in a CMDP is to find a policy that optimizes the expected discounted return $ J^pi (phi) = EE_(tau_infinity ~ P^pi_infinity (phi))[sum_(t=0)^infinity gamma^t r_t]. $
 
 An optimal policy $pi^*(dot, phi)$ belongs to the set $Pi^*_Phi (phi) := op("arg max", limits: #true)_(pi in Pi_Phi) J^pi (phi)$.
-With this, we define the optimal $Q$-function $Q^* (h_t, a_t, phi)$.
+With this, we define the optimal Q-function $Q^* (h_t, a_t, phi)$.
 
 #attention("Optimal Q-Function")[
-For an optimal policy $pi^*$, _the optimal $Q$-function_ $Q^* : cal(S) times cal(A) times Phi -> RR$ satisfies the Bellman equation $ cal(B)^* [Q^*] (s_t, a_t, phi) = Q^*(s_t, a_t, phi), $ where $cal(B)^*$ is the optimal Bellman operator defined as $ cal(B)^* [Q^*] (s_t, a_t, phi) := EE_(r_t, s_(t+1) ~ P_(R, S) (s_t, a_t, phi)) [r_t + max_(a' in cal(A)) Q^* (s_(t+1), a', phi)]. $
+For an optimal policy $pi^*$, _the optimal Q-function_ $Q^* : cal(S) times cal(A) times Phi -> RR$ satisfies the Bellman equation $ cal(B)^* [Q^*] (s_t, a_t, phi) = Q^*(s_t, a_t, phi), $ where $cal(B)^*$ is the optimal Bellman operator defined as $ cal(B)^* [Q^*] (s_t, a_t, phi) := EE_(r_t, s_(t+1) ~ P_(R, S) (s_t, a_t, phi)) [r_t + max_(a' in cal(A)) Q^* (s_(t+1), a', phi)]. $
 ]
 
 === The Learning Challenge
@@ -479,138 +479,209 @@ A Bayes-optimal policy achieves perfect balance between exploration and exploita
 
 === The Optimal Bayesian Q-Function
 
-For a Bayes-optimal policy $pi^*$, we can define the optimal Bayesian $Q$-function as $Q^* (h_t, a_t) := Q^(pi^*_"Bayes") (h_t, a_t)$.
-This $Q$-function satisfies the optimal Bayesian Bellman equation $ Q^* (h_t, a_t) = cal(B)^* [Q^*] (h_t, a_t), $ where $cal(B)^* [Q^*]$ is the optimal Bayesian Bellman operator $ cal(B^*) [Q^*] (h_t, a_t) := EE_(h_(t + 1) ~ P_cal(H) (h_t, a_t)) [r_t + gamma max_a' Q^* (h_(t + 1), a')]. $
+For a Bayes-optimal policy $pi^*$, we can define the optimal Bayesian Q-function as $Q^* (h_t, a_t) := Q^(pi^*_"Bayes") (h_t, a_t)$.
+This Q-function satisfies the optimal Bayesian Bellman equation $ Q^* (h_t, a_t) = cal(B)^* [Q^*] (h_t, a_t), $ where $cal(B)^* [Q^*]$ is the optimal Bayesian Bellman operator $ cal(B^*) [Q^*] (h_t, a_t) := EE_(h_(t + 1) ~ P_cal(H) (h_t, a_t)) [r_t + gamma max_a' Q^* (h_(t + 1), a')]. $
 
 == Bayesian Exploration Networks
 
-#todo[Probably explain model-free reinforcement learning vs model-based approaches.]
+Model-free reinforcement learning takes a different approach to learning optimal behaviors compared to model-based methods.
+Rather than explicitly modeling the environment's dynamics, model-free approaches attempt to learn optimal policies from experience.
+Bayesian Exploration Networks (BENs) extend this idea into the Bayesian realm by characterizing uncertainty in the Bellman operator itself, instead of in the environment's transition dynamics.
 
-#note[
-    - In model-free BRL, the goal is to characterise uncertainty in the optimal Bayesian Bellman operator instead of the reward-state transition distribution
-    - Given samples from the true reward-state distribution $r_t, s_(t + 1) ~ P^*_(R, S) (s_t, a_t)$ we use _bootstrapping_ to estimate the optimal Bayesian Bellman operator $ b_t = beta_omega (h_(t+1)) := r_t + gamma max_a' Q_omega (h_(t+1), a') $
-        - We refer to $beta_omega (h_(t + 1))$ as the bootstrap function
-        - Interprete bootstrapping as making a change of variables under the mapping $beta_omega(dot, h_t, a_t) : RR times cal(S) -> RR$
-    - Bootstrapped samples $b_t$ have distribution $P^*_B (h_t, a_t; omega)$ which is the _pushforward_ distribution over next period's possible updated Q-values satisfying $ EE_(b_t ~ P^*_B (h_t, a_t; omega)) [f(b_t)] = EE_(r_t, s_(t+1) ~ P^*_(R, S) (s_t, a_t)) [f(r_t + gamma max_a' Q_omega (h_(t+ 1), a'))] $ (for any measurable function $f : RR -> RR$)
-        - Refer to $P^*_B (h_t, a_t; omega)$ as the Bellman distribution
-    - When predicting $b_t$ given an observation $h_t, a$:
-        - Two sources of uncertainty:
-            - Firstly, even if $P^*_B (h_t, a_t; omega)$ is known, there's natural stochasticity due to the environment's reward-state transition dynamics that prevents $b_t$ from being determined (_aleatoric uncertainty_)
-                - Aleatoric uncertainty _cannot_ be reduced with more data
-            - Secondly, in a learning problem, the Bellman distribution $P^*_B (h_t, a_t; omega)$ cannot be determined a priori and must be inferred from observations of $b_t$ (_epistemic uncertainty_)
-                - Epistemic uncertainty _can_ be reduced with more data as the agent explores
-    - We introduce a model of the process $b_t ~ P^*_B (h_t, a_t; omega)$ which characterises the aleatoric uncertainty in the optimal Bellman operator
-    - @fellows2024bayesianexplorationnetworks choose a parametric model $P_B (h_t, a_t, phi; omega)$
-        - density $p(b_t|h_t, a_t, phi; omega)$
-        - parametrised by $phi in Phi$
-    - The space of models $P_B (h_t, a_t, phi; omega)$ can be interpreted as a hypothesis space over the true Bellman distribution $P^*_B (h_t, a_t; omega)$, with each hypothesis indexed by a parameter $phi in Phi$
-    - $cal(D) (h_t) := {(b_i, h_i, a_i)}_(i = 0)^(t-1)$ denotes the dataset of bootstrapped samples
-        - the agent updates its belief in $phi$ by inferring a posterior $P_Phi (cal(D)_omega (h_t))$ when it has observed $cal(D)_omega (h_t)$
-        - This posterior ($P_Phi (cal(D)_omega (h_t))$) characterises the epistemic uncertainty over the hypothesis space, which is used to obtain the predictive optimal Bellman distribution: $ P_B (h_t, a_t; omega) = EE_(phi ~ P_Phi (cal(D)_omega (h_t))) [P_B (h_t, a_t, phi; omega)] $
-        - Taking expectations over the variable $b_t$ using $P_B (h_t, a_t; omega)$, the predictive optimal Bellman operator is derived: $ B^+ [Q_omega] (h_t, a_t) := EE_(b_t ~ P_B (h_t, a_t; omega)) [b_t], $ which integrates both the aleatoric epistemic uncertainty in $b_t$ to make a Bayesian prediction of the optimal Bellman operator at each timestep $t$
+#attention("Model-Free vs Model-Based")[
+    While model-based approaches maintain explicit probabilistic models of the environment's dynamics, model-free methods like BEN directly learn mappings from states to values or actions.
+    This can be more computationally efficient but requires careful handling of uncertainty.
 ]
 
-Bayesian Exploration Networks (BENs) represent an approach to model-free Bayesian RL that addresses the challenge of efficient exploration under uncertainty by incorporating both aleatoric and epistemic uncertainty in the model.
-The innovation of BENs lies in their three-component architecture that separates different types of uncertainty:
+=== The Bootstrapping Perspective
 
-+ A _recurrent Q-network_ that approximates Q-values while maintaining a history of past interactions;
-+ An _aleatoric network_ that models inherent randomness in the environment;
-+ An _epistemic network_ that captures uncertainty in our knowledge of the environment.
+Instead of modeling the full complexity of state transitions, we can use bootstrapping to estimate the optimal Bayesian Bellman operator directly.
+Given samples from the true reward-state distribution $r_t, s_(t+1) ~ P^*_(R,S) (s_t, a_t)$, we estimate $b_t = beta_omega (h_(t+1)) := r_t + gamma max_a' Q_omega (h_(t+1), a').$
 
-This three-component architecture allows BEN to:
-+ Maintain a history-dependent view of the environment;
-+ Model both inherent randomness and knowledge uncertainty separately;
-+ Learn Bayes-optimal policies through principled exploration.
+This bootstrapping process can be viewed as a transformation of variables --- mapping from the space of rewards and next states to a single scalar value.
+This significantly reduces the dimensionality of the problem while preserving the essential information needed for learning optimal policies @fellows2024bayesianexplorationnetworks.
 
-#maybe[We will examine each component in detail].
-
-=== Recurrent Q-Network
-
-#todo[
-    - If mentioning QBRL, explain what it is.
+#attention("Bootstrapped Distribution")[
+    The samples $b_t$ follow what we call the Bellman distribution $P^*_B (h_t, a_t; omega)$, which captures the distribution of possible Q-value updates.
+    This distribution encapsulates both the environment's inherent randomness and our uncertainty about its true nature.
 ]
 
-At its core, BEN uses a recurrent neural network (RNN) to approximate the optimal Bayesian $Q$-function.
-Unlike approaches based on #maybe[QBRL] that only consider the current state (and a context variable) @fellows2024bayesianexplorationnetworks, BEN's Q-network processes the entire history of interactions.
-We denote the output at timestep $t$ as $q_t = Q_omega (h_t, a_t) = Q_omega (hat(h)_(t-1), o_t)$, where $h_t$ represents the history up to time $t$, $a_t$ is the action, $hat(h)_(t-1)$ is the recurrent encoding of previous history, and $o_t$ contains the current observation tuple ${r_(t-1), s_t, a_t}$.
+=== Sources of Uncertainty
 
-By conditioning on history rather than just current state, BEN can capture how uncertainty evolves over time, making it capable of learning Bayes-optimal policies.
+When predicting future Q-values, BEN distinguishes between two types of uncertainty:
 
++ *Aleatoric Uncertainty*: The inherent randomness in the environment's dynamics that persists even with perfect knowledge.
 
-=== Aleatoric Network
+    _Example: Rolling a fair die --- this uncertainty cannot be reduced with more data._
 
-The aleatoric network models inherent randomness in the environment's behavior --- what we might call "known uncertainty."
-It uses normalizing flows to transform a simple base distribution (such as a standard Gaussian) into a more complex distribution $P_B (h_t, a_t, phi; omega)$, over possible next-state Q-values by applying the transformation $b_t = B(z_"al", q_t, phi)$, where $z_"al" in RR ~ P_"al"$ is a base variable with a zero-mean, unit variance Gaussian $P_"al"$, $q_t$ is the Q-value from the recurrent network, and $phi$ and $omega$ represent the network parameters.
++ *Epistemic Uncertainty*: Our uncertainty about the true Bellman distribution itself.
+    This represents our lack of knowledge about the environment and can be reduced through exploration and learning.
 
-#attention("Aleatoric Uncertainty")[
-    The unpredictability inherent in the environment, even with perfect knowledge of its dynamics.
-    Like rolling a fair die --- we know the probabilities perfectly, but can't predict individual outcomes.
-]
+    _Example: Determining whether a die is fair --- this uncertainty is can be reduced with more data._
 
-=== Epistemic Network
+This separation of uncertainties allows BEN to distinguish between what is fundamentally unpredictable (aleatoric) and what can be learned through exploration (epistemic), leading to more efficient learning strategies.
 
-#todo[
-    - Explain variational inference?
-]
+=== Network Architecture
 
-The epistemic network captures our uncertainty about the environment itself --- what we might call "unknown uncertainty."
-This layer uses normalizing flows for variational inference to learn a tractable approximation $P_psi$ of the potentially complex target distribution $P_B (h_t, a_t, phi; omega)$ parametrised by $psi in Psi$.
-We learn $psi$ by minimizing the KL-divergence between the two distributions $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$, which is equivalent to minimising the tractable evidence lower bound $"ELBO"(psi; h, omega)$ @fellows2024bayesianexplorationnetworks.
-This flow $P_psi$, representing the epistemic uncertainty, characterises the uncertainty in $phi$.
+BEN implements this uncertainty handling through three neural networks:
++ *Recurrent Q-Network*:
 
-#attention("Epistemic Uncertainty")[
-    Uncertainty about the true nature of the environment, which can be reduced through observation and learning.
-    Like uncertainty about whether a die is fair --- this can be resolved through repeated observations.
-]
+    At its core, BEN uses a recurrent neural network (RNN) to approximate the optimal Bayesian Q-function.
+    The Q-network processes the entire history of interactions.
+    We denote the output at timestep $t$ as $q_t = Q_omega (h_t, a_t) = Q_omega (hat(h)_(t-1), o_t)$, where $h_t$ represents the history up to time $t$, $a_t$ is the action, $hat(h)_(t-1)$ is the recurrent encoding of previous history, and $o_t$ contains the current observation tuple ${r_(t-1), s_t, a_t}$.
+    By conditioning on history rather than just current state, BENs can capture how uncertainty evolves over time, making it capable of learning Bayes-optimal policies.
 
-=== Learning Process
++ *Aleatoric Network*:
 
-The network is trained by minimizing two objectives:
+    The aleatoric network models the inherent randomness in the environment.
+    It uses normalizing flows to transform a simple base distribution (such as a standard Gaussian) into a more complex distribution $P_B (h_t, a_t, phi; omega)$ over possible next-state Q-values, representing the aleatoric uncertainty in the Bellman operator, by applying the transformation $b_t = B(z_"al", q_t, phi)$, where $z_"al" in RR ~ P_"al"$ is a base variable with a zero-mean, unit variance Gaussian $P_"al"$, $q_t$ is the Q-value from the recurrent network, and $phi$ and $omega$ represent the network parameters.
 
-- The Mean Squared Bayesian Bellman Error (MSBBE) for the Q-network and the aleatoric network;
-- The Evidence Lower Bound (ELBO) for the epistemic network.
++ *Epistemic Network*:
 
-This dual optimization process ensures that the network learns both optimal value estimation and appropriate uncertainty quantification.
+    The epistemic network captures our uncertainty about the environment itself.
+    This layer uses normalizing flows for variational inference to learn a tractable approximation $P_psi$ of the potentially complex target distribution $P_B (h_t, a_t, phi; omega)$ parametrised by $psi in Psi$.
+    We learn $psi$ by minimizing the KL-divergence between the two distributions $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$, where $cal(D)_omega (h_t) := {(b_i, h_i, a_i)}_(i=0)^(t-1)$ denotes the datasat of bootstrapped samples, and $P_Phi (cal(D)_omega (h_t))$ is a posterior representing an agent's beliefs corresponding to a dataset boostrapped samples at time $t$.
+    This is equivalent to minimising the tractable evidence lower bound $"ELBO"(psi; h, omega)$ @fellows2024bayesianexplorationnetworks.
+    This flow $P_psi$, representing the epistemic uncertainty, characterises the uncertainty in $phi$.
 
-=== MSBBE as an Objective
+=== Training Process
 
-#todo[
-    We use the predictive optimal Bellman operator, but we don't define it
-    - This would fit into a preliminary section on model-free BRL
-]
+The network is trained through a dual optimization process:
 
-The MSBBE is computed as the difference between the predictive optimal Bellman operator $B^+ [Q_omega]$ and $Q_omega$: $ "MSBBE"(omega; h_t, psi) := || B^+ [Q_omega] (h_t, a_t) - Q_omega (h_t, a_t) ||^2_rho, $ which is minimized to learn the parametrisation $omega^*$, satisfying the optimal Bayesian Bellman equation for our $Q$-function approximator, with $rho$ being an arbitrary sampling distribution with support over $cal(A)$.
++ *MSBBE Optimization:* The MSBBE is computed as the difference between the predictive optimal Bellman operator $B^+ [Q_omega]$ and $Q_omega$: $ "MSBBE"(omega; h_t, psi) := || B^+ [Q_omega] (h_t, a_t) - Q_omega (h_t, a_t) ||^2_rho, $ which is minimized to learn the parametrisation $omega^*$, satisfying the optimal Bayesian Bellman equation for our Q-function approximator, with $rho$ being an arbitrary sampling distribution with support over $cal(A)$.
+    
+    The predictive optimal Bellman operator can be obtained by taking expectations over variable $b_t$ using $P_B (h_t, a_t; omega)$ with $ B^+ [Q_omega] (h_t, a_t) := EE_(b_t ~ P_B (h_t, a_t; omega)) [b_t]$, where $P_B (h_t, a_t; omega) = EE_(phi ~ P_Phi (cal(D)_omega (h_t))) [P_B (h_t, a_t, phi; omega)]$ is the predictive optimal Bellman distribution.
 
-This gives rise to a nested optimisation problem, as is common in model-free RL @fellows2024bayesianexplorationnetworks, which can be solved using two-timescale stochastic approximation.
-In this case, we update the epistemic network parameters $psi$ using gradient descent on an asymptotically faster timescale than the function approximator parameters $omega$ to ensure convergence to a fixed point @fellows2024bayesianexplorationnetworks.
+    This gives rise to a nested optimisation problem, as is common in model-free RL @fellows2024bayesianexplorationnetworks, which can be solved using two-timescale stochastic approximation.
+    In this case, we update the epistemic network parameters $psi$ using gradient descent on an asymptotically faster timescale than the function approximator parameters $omega$ to ensure convergence to a fixed point @fellows2024bayesianexplorationnetworks.
 
-
-=== ELBO as an Objective
-
-The Evidence Lower Bound (ELBO) serves as the optimization objective for training BEN's epistemic network.
-While minimizing the KL-divergence $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$ directly would give us the most accurate approximation of the true posterior, computing this divergence is typically intractable.
-Instead, we can derive and optimize the ELBO, which provides a tractable lower bound on the model evidence.
-
-Starting with the definition of the KL-divergence and applying Bayes' rule, @fellows2024bayesianexplorationnetworks derives $ "ELBO"&(psi; h_t, omega) \ &:= EE_(z_"ep" ~ P_"ep") [ sum_(i=0)^(t-1) ( B^(-1)(b_i, q_i, phi)^2 - log bar.v partial_b B^(-1)(b_i, q_i, phi) bar.v ) - log p_Phi (phi) ], $ where $phi = t_psi (z_"ep")$ and:
-
-- $z_"ep"$ is drawn from the base distribution $P_"ep"$ (a standard Gaussian $cal(N)(0, I^d)$);
-- $B^(-1)$ is the inverse of the aleatoric network's transformation;
-- $partial_b B^(-1)$ is the Jacobian of this inverse transformation;
-- $t_psi$ represents the epistemic network's transformation.
-
-#attention("Jacobian Term")[
-    The term $partial_b B^(-1)$ accounts for how the epistemic network's transformation changes the volume of probability space.
-    This is important for maintaining proper probability distributions when using normalizing flows.
-]
-
-The ELBO objective breaks down into three key components:
-
-+ A reconstruction term $B^(-1)(b_i, q_i, phi)^2$ that measures how well our model can explain the observed Q-values;
-+ A volume correction term $log|partial_b B^(-1)(b_i, q_i, phi)|$ that accounts for the change in probability space;
-+ A prior regularization term $log p_Phi (phi)$ that encourages the approximated posterior to stay close to our prior beliefs.
-
-By minimizing the ELBO, we obtain an approximate posterior that balances accuracy with computational tractability, allowing BEN to maintain and update its uncertainty estimates efficiently during learning.
-
+//#todo[Probably explain model-free reinforcement learning vs model-based approaches.]
+//
+//#note[
+//    - In model-free BRL, the goal is to characterise uncertainty in the optimal Bayesian Bellman operator instead of the reward-state transition distribution
+//    - Given samples from the true reward-state distribution $r_t, s_(t + 1) ~ P^*_(R, S) (s_t, a_t)$ we use _bootstrapping_ to estimate the optimal Bayesian Bellman operator $ b_t = beta_omega (h_(t+1)) := r_t + gamma max_a' Q_omega (h_(t+1), a') $
+//        - We refer to $beta_omega (h_(t + 1))$ as the bootstrap function
+//        - Interprete bootstrapping as making a change of variables under the mapping $beta_omega(dot, h_t, a_t) : RR times cal(S) -> RR$
+//    - Bootstrapped samples $b_t$ have distribution $P^*_B (h_t, a_t; omega)$ which is the _pushforward_ distribution over next period's possible updated Q-values satisfying $ EE_(b_t ~ P^*_B (h_t, a_t; omega)) [f(b_t)] = EE_(r_t, s_(t+1) ~ P^*_(R, S) (s_t, a_t)) [f(r_t + gamma max_a' Q_omega (h_(t+ 1), a'))] $ (for any measurable function $f : RR -> RR$)
+//        - Refer to $P^*_B (h_t, a_t; omega)$ as the Bellman distribution
+//    - When predicting $b_t$ given an observation $h_t, a$:
+//        - Two sources of uncertainty:
+//            - Firstly, even if $P^*_B (h_t, a_t; omega)$ is known, there's natural stochasticity due to the environment's reward-state transition dynamics that prevents $b_t$ from being determined (_aleatoric uncertainty_)
+//                - Aleatoric uncertainty _cannot_ be reduced with more data
+//            - Secondly, in a learning problem, the Bellman distribution $P^*_B (h_t, a_t; omega)$ cannot be determined a priori and must be inferred from observations of $b_t$ (_epistemic uncertainty_)
+//                - Epistemic uncertainty _can_ be reduced with more data as the agent explores
+//    - We introduce a model of the process $b_t ~ P^*_B (h_t, a_t; omega)$ which characterises the aleatoric uncertainty in the optimal Bellman operator
+//    - @fellows2024bayesianexplorationnetworks choose a parametric model $P_B (h_t, a_t, phi; omega)$
+//        - density $p(b_t|h_t, a_t, phi; omega)$
+//        - parametrised by $phi in Phi$
+//    - The space of models $P_B (h_t, a_t, phi; omega)$ can be interpreted as a hypothesis space over the true Bellman distribution $P^*_B (h_t, a_t; omega)$, with each hypothesis indexed by a parameter $phi in Phi$
+//    - $cal(D) (h_t) := {(b_i, h_i, a_i)}_(i = 0)^(t-1)$ denotes the dataset of bootstrapped samples
+//        - the agent updates its belief in $phi$ by inferring a posterior $P_Phi (cal(D)_omega (h_t))$ when it has observed $cal(D)_omega (h_t)$
+//        - This posterior ($P_Phi (cal(D)_omega (h_t))$) characterises the epistemic uncertainty over the hypothesis space, which is used to obtain the predictive optimal Bellman distribution: $ P_B (h_t, a_t; omega) = EE_(phi ~ P_Phi (cal(D)_omega (h_t))) [P_B (h_t, a_t, phi; omega)] $
+//        - Taking expectations over the variable $b_t$ using $P_B (h_t, a_t; omega)$, the predictive optimal Bellman operator is derived: $ B^+ [Q_omega] (h_t, a_t) := EE_(b_t ~ P_B (h_t, a_t; omega)) [b_t], $ which integrates both the aleatoric epistemic uncertainty in $b_t$ to make a Bayesian prediction of the optimal Bellman operator at each timestep $t$
+//]
+//
+//Bayesian Exploration Networks (BENs) represent an approach to model-free Bayesian RL that addresses the challenge of efficient exploration under uncertainty by incorporating both aleatoric and epistemic uncertainty in the model.
+//The innovation of BENs lies in their three-component architecture that separates different types of uncertainty:
+//
+//+ A _recurrent Q-network_ that approximates Q-values while maintaining a history of past interactions;
+//+ An _aleatoric network_ that models inherent randomness in the environment;
+//+ An _epistemic network_ that captures uncertainty in our knowledge of the environment.
+//
+//This three-component architecture allows BEN to:
+//+ Maintain a history-dependent view of the environment;
+//+ Model both inherent randomness and knowledge uncertainty separately;
+//+ Learn Bayes-optimal policies through principled exploration.
+//
+//#maybe[We will examine each component in detail].
+//
+//=== Recurrent Q-Network
+//
+//#todo[
+//    - If mentioning QBRL, explain what it is.
+//]
+//
+//At its core, BEN uses a recurrent neural network (RNN) to approximate the optimal Bayesian $Q$-function.
+//Unlike approaches based on #maybe[QBRL] that only consider the current state (and a context variable) @fellows2024bayesianexplorationnetworks, BEN's Q-network processes the entire history of interactions.
+//We denote the output at timestep $t$ as $q_t = Q_omega (h_t, a_t) = Q_omega (hat(h)_(t-1), o_t)$, where $h_t$ represents the history up to time $t$, $a_t$ is the action, $hat(h)_(t-1)$ is the recurrent encoding of previous history, and $o_t$ contains the current observation tuple ${r_(t-1), s_t, a_t}$.
+//
+//By conditioning on history rather than just current state, BEN can capture how uncertainty evolves over time, making it capable of learning Bayes-optimal policies.
+//
+//
+//=== Aleatoric Network
+//
+//The aleatoric network models inherent randomness in the environment's behavior --- what we might call "known uncertainty."
+//It uses normalizing flows to transform a simple base distribution (such as a standard Gaussian) into a more complex distribution $P_B (h_t, a_t, phi; omega)$, over possible next-state Q-values by applying the transformation $b_t = B(z_"al", q_t, phi)$, where $z_"al" in RR ~ P_"al"$ is a base variable with a zero-mean, unit variance Gaussian $P_"al"$, $q_t$ is the Q-value from the recurrent network, and $phi$ and $omega$ represent the network parameters.
+//
+//#attention("Aleatoric Uncertainty")[
+//    The unpredictability inherent in the environment, even with perfect knowledge of its dynamics.
+//    Like rolling a fair die --- we know the probabilities perfectly, but can't predict individual outcomes.
+//]
+//
+//=== Epistemic Network
+//
+//#todo[
+//    - Explain variational inference?
+//]
+//
+//The epistemic network captures our uncertainty about the environment itself --- what we might call "unknown uncertainty."
+//This layer uses normalizing flows for variational inference to learn a tractable approximation $P_psi$ of the potentially complex target distribution $P_B (h_t, a_t, phi; omega)$ parametrised by $psi in Psi$.
+//We learn $psi$ by minimizing the KL-divergence between the two distributions $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$, which is equivalent to minimising the tractable evidence lower bound $"ELBO"(psi; h, omega)$ @fellows2024bayesianexplorationnetworks.
+//This flow $P_psi$, representing the epistemic uncertainty, characterises the uncertainty in $phi$.
+//
+//#attention("Epistemic Uncertainty")[
+//    Uncertainty about the true nature of the environment, which can be reduced through observation and learning.
+//    Like uncertainty about whether a die is fair --- this can be resolved through repeated observations.
+//]
+//
+//=== Learning Process
+//
+//The network is trained by minimizing two objectives:
+//
+//- The Mean Squared Bayesian Bellman Error (MSBBE) for the Q-network and the aleatoric network;
+//- The Evidence Lower Bound (ELBO) for the epistemic network.
+//
+//This dual optimization process ensures that the network learns both optimal value estimation and appropriate uncertainty quantification.
+//
+//=== MSBBE as an Objective
+//
+//#todo[
+//    We use the predictive optimal Bellman operator, but we don't define it
+//    - This would fit into a preliminary section on model-free BRL
+//]
+//
+//The MSBBE is computed as the difference between the predictive optimal Bellman operator $B^+ [Q_omega]$ and $Q_omega$: $ "MSBBE"(omega; h_t, psi) := || B^+ [Q_omega] (h_t, a_t) - Q_omega (h_t, a_t) ||^2_rho, $ which is minimized to learn the parametrisation $omega^*$, satisfying the optimal Bayesian Bellman equation for our $Q$-function approximator, with $rho$ being an arbitrary sampling distribution with support over $cal(A)$.
+//
+//This gives rise to a nested optimisation problem, as is common in model-free RL @fellows2024bayesianexplorationnetworks, which can be solved using two-timescale stochastic approximation.
+//In this case, we update the epistemic network parameters $psi$ using gradient descent on an asymptotically faster timescale than the function approximator parameters $omega$ to ensure convergence to a fixed point @fellows2024bayesianexplorationnetworks.
+//
+//
+//=== ELBO as an Objective
+//
+//The Evidence Lower Bound (ELBO) serves as the optimization objective for training BEN's epistemic network.
+//While minimizing the KL-divergence $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$ directly would give us the most accurate approximation of the true posterior, computing this divergence is typically intractable.
+//Instead, we can derive and optimize the ELBO, which provides a tractable lower bound on the model evidence.
+//
+//Starting with the definition of the KL-divergence and applying Bayes' rule, @fellows2024bayesianexplorationnetworks derives $ "ELBO"&(psi; h_t, omega) \ &:= EE_(z_"ep" ~ P_"ep") [ sum_(i=0)^(t-1) ( B^(-1)(b_i, q_i, phi)^2 - log bar.v partial_b B^(-1)(b_i, q_i, phi) bar.v ) - log p_Phi (phi) ], $ where $phi = t_psi (z_"ep")$ and:
+//
+//- $z_"ep"$ is drawn from the base distribution $P_"ep"$ (a standard Gaussian $cal(N)(0, I^d)$);
+//- $B^(-1)$ is the inverse of the aleatoric network's transformation;
+//- $partial_b B^(-1)$ is the Jacobian of this inverse transformation;
+//- $t_psi$ represents the epistemic network's transformation.
+//
+//#attention("Jacobian Term")[
+//    The term $partial_b B^(-1)$ accounts for how the epistemic network's transformation changes the volume of probability space.
+//    This is important for maintaining proper probability distributions when using normalizing flows.
+//]
+//
+//The ELBO objective breaks down into three key components:
+//
+//+ A reconstruction term $B^(-1)(b_i, q_i, phi)^2$ that measures how well our model can explain the observed Q-values;
+//+ A volume correction term $log|partial_b B^(-1)(b_i, q_i, phi)|$ that accounts for the change in probability space;
+//+ A prior regularization term $log p_Phi (phi)$ that encourages the approximated posterior to stay close to our prior beliefs.
+//
+//By minimizing the ELBO, we obtain an approximate posterior that balances accuracy with computational tractability, allowing BEN to maintain and update its uncertainty estimates efficiently during learning.
+//
 
 = Theoretical Framework <theoretical_framework>
 
