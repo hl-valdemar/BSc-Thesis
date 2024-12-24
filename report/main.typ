@@ -230,7 +230,6 @@ We examine how each algorithm handles the exploration-exploitation trade-off and
 
 #note[
 - Fundamentals of reinforcement learning
-    - Markov Decision Processes
     - Q-learning and temporal difference methods
 - Sparse reward challenges
 - Survey of existing approaches
@@ -338,7 +337,7 @@ Trajectory balance focuses on ensuring consistency across entire trajectories, i
 ]
 
 Consider a Markovian flow $F$ that induces a distribution $P$ over trajectories according to $P(tau) = 1/Z F(tau)$.
-The forward policy $P_F$ and backward policy $P_B$ must satisfy the following _trajectory balance constraint_ @malkin2023trajectorybalanceimprovedcredit $ Z product_(t = 1)^n P_F (s_t|s_(t - 1)) = F(x) product_(t = 1)^n P_B (s_(t - 1)|s_t) . $
+The forward policy $P_F$ and backward policy $P_B$ must satisfy the following _trajectory balance constraint_ @malkin2023trajectorybalanceimprovedcredit $ Z product_(t = 1)^n P_F (s_t|s_(t - 1)) = F(x) product_(t = 1)^n P_B (s_(t - 1)|s_t). $
 
 That is to say, the probability of constructing a trajectory forward should match the probability of reconstructing it backward, scaled by the appropriate rewards.
 
@@ -362,9 +361,33 @@ In such cases, the backward policy becomes deterministic ($P_B = 1$), reducing t
 
 The model is trained by sampling trajectories from a training policy $pi_theta$ --- typically a tempered version of $P_F (-|-; theta)$ to encourage exploration --- and updating parameters using stochastic gradient descent: $theta <- theta - alpha EE_(tau ~ pi_theta) nabla_theta cal(L)_"TB" (tau).$
 
+== Markov Decision Processes
+
+The concept of the Markov Decision Process (MDP) @martin1994markovdecisionprocesses is fundamental in reinforcement learning and provides a model for sequential decision-making under uncertainty.
+
+#attention("Markov Decision Process")[
+A tuple $cal(M) := angle.l cal(S), cal(A), P_0, P_S, P_R, gamma angle.r$ where:
+
+- $cal(S)$ is the set of states;
+- $cal(A)$ is the set of actions;
+- $P_0 in cal(P)(cal(S))$ is the initial state distribution;
+- $P_S : cal(S) times cal(A) -> cal(P)(cal(S))$ is the state transition distribution;
+- $P_R : cal(S) times cal(A) -> cal(P)(RR)$ is the reward distribution;
+- $gamma in [0, 1]$ is the discount factor.
+]
+
+At each timestep $t$, an agent observes its current state $s_t in cal(S)$ and selects an action $a_t in cal(A)$ according to some policy $pi: cal(S) -> cal(P)(cal(A))$.
+The environment then transitions to a new state $s_(t+1)$ according to the transition distribution $P_S (s_t, a_t)$ and provides a reward $r_t$ sampled from $P_R (s_t, a_t)$.
+The agent's objective is to find a policy $pi$ that maximizes the expected sum of discounted future rewards $ J^pi := EE_(tau ~ P^pi)[sum_(t=0)^infinity gamma^t r_t], $ where $tau = (s_0, a_0, r_0, s_1, ...)$ represents a trajectory through the environment and $P^pi$ is the distribution over trajectories induced by following policy $pi$.
+An optimal policy $pi^* in Pi^* := op("arg max", limits: #true)_(pi) J^pi$ can be found through the optimal value function $V^*: cal(S) -> RR$ or the optimal action-value function $Q^*: cal(S) times cal(A) -> RR$, which satisfy the Bellman optimality equations
+$ V^* (s) = max_(a in cal(A)) Q^* (s, a), $
+$ Q^* (s, a) = EE_(r, s' ~ P_(R,S)(s,a))[r + gamma max_(a' in cal(A)) Q^* (s', a')]. $
+
+This framework serves as the building block for more sophisticated models like Contextual MDPs and Bayesian approaches to reinforcement learning, as described in the following sections.
+
 == Contextual Reinforcement Learning
 
-#todo[Define a regular MDP]
+In contextual RL, we use the concept of a Contextual MDP.
 
 #attention("Contextual MDP")[
     A Markov Decision Process augmented with a context variable that determines the specific dynamics of the environment.
@@ -468,15 +491,6 @@ A Bayes-optimal policy achieves perfect balance between exploration and exploita
 + It considers how this uncertainty will evolve in the future;
 + It weights future information gain by the discount factor $gamma$.
 
-#maybe[
-    #attention("Conditionality Principle")[
-    Bayesian decisions only condition on observed data, never on unknown quantities.
-    This principle automatically prevents the pathological exploration-exploitation trade-offs that plague frequentist approaches.
-    ]
-]
-
-#note[Describing the conditionality principle would probably require describing frequentist reinforcement learning.]
-
 === The Optimal Bayesian Q-Function
 
 For a Bayes-optimal policy $pi^*$, we can define the optimal Bayesian Q-function as $Q^* (h_t, a_t) := Q^(pi^*_"Bayes") (h_t, a_t)$.
@@ -534,154 +548,77 @@ BEN implements this uncertainty handling through three neural networks:
 + *Aleatoric Network*:
 
     The aleatoric network models the inherent randomness in the environment.
-    It uses normalizing flows to transform a simple base distribution (such as a standard Gaussian) into a more complex distribution $P_B (h_t, a_t, phi; omega)$ over possible next-state Q-values, representing the aleatoric uncertainty in the Bellman operator, by applying the transformation $b_t = B(z_"al", q_t, phi)$, where $z_"al" in RR ~ P_"al"$ is a base variable with a zero-mean, unit variance Gaussian $P_"al"$, $q_t$ is the Q-value from the recurrent network, and $phi$ and $omega$ represent the network parameters.
+    It uses normalizing flows to transform a simple base distribution (such as a standard Gaussian) into a more complex distribution $P_B (h_t, a_t, phi; omega)$ over possible next-state Q-values, representing the aleatoric uncertainty in the Bellman operator, by applying the transformation $b_t = B(z_"al", q_t, phi)$, where 
+
+    - $z_"al" in RR ~ P_"al"$ is a base variable with a zero-mean, unit variance Gaussian $P_"al"$;
+    - $q_t$ is the Q-value from the recurrent network;
+    - and $phi$ and $omega$ represent the network parameters.
+
+    We optimize the parameters $omega$ of the recurrent Q-network and the aleatoric network using the Mean Squared Bayesian Bellman Error (MSBBE), which satisfies the optimal Bayesian Bellman equation for our Q-function approximator.
 
 + *Epistemic Network*:
 
     The epistemic network captures our uncertainty about the environment itself.
-    This layer uses normalizing flows for variational inference to learn a tractable approximation $P_psi$ of the potentially complex target distribution $P_B (h_t, a_t, phi; omega)$ parametrised by $psi in Psi$.
-    We learn $psi$ by minimizing the KL-divergence between the two distributions $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$, where $cal(D)_omega (h_t) := {(b_i, h_i, a_i)}_(i=0)^(t-1)$ denotes the datasat of bootstrapped samples, and $P_Phi (cal(D)_omega (h_t))$ is a posterior representing an agent's beliefs corresponding to a dataset boostrapped samples at time $t$.
-    This is equivalent to minimising the tractable evidence lower bound $"ELBO"(psi; h, omega)$ @fellows2024bayesianexplorationnetworks.
-    This flow $P_psi$, representing the epistemic uncertainty, characterises the uncertainty in $phi$.
+    The network maintains a dataset of bootstrapped samples $cal(D)_omega (h_t) := {(b_i, h_i, a_i)}_(i=0)^(t-1)$ collected from interactions with the environment.
+    Each tuple in this dataset consists of
+
+    - a bootstrapped value estimate $b_i$;
+    - the history at that timestep $h_i$;
+    - the action taken $a_i$.
+
+    Given this dataset, we would ideally compute the posterior distribution $P_Phi (cal(D)_omega (h_t))$ representing our refined beliefs about the environment after observing these samples.
+    However, computing this posterior directly is typically intractable for complex environments @fellows2024bayesianexplorationnetworks.
+    Instead, BEN employs normalizing flows for variational inference.
+
+    The epistemic network learns a tractable approximation $P_psi$ parametrized by $psi in Psi$ that aims to capture the essential characteristics of the true posterior.
+    We optimize this approximation by minimizing the KL-divergence between our approximation and the true posterior: $ "KL"(P_psi || P_Phi (cal(D)_omega (h_t))). $
+    
+    This optimization is performed indirectly by maximizing the Evidence Lower Bound (ELBO) $"ELBO"(psi; h, omega)$, which is equivalent @fellows2024bayesianexplorationnetworks.
+
+#note[We use the concept of variational inference without defining it]
 
 === Training Process
 
 The network is trained through a dual optimization process:
 
-+ *MSBBE Optimization:* The MSBBE is computed as the difference between the predictive optimal Bellman operator $B^+ [Q_omega]$ and $Q_omega$: $ "MSBBE"(omega; h_t, psi) := || B^+ [Q_omega] (h_t, a_t) - Q_omega (h_t, a_t) ||^2_rho, $ which is minimized to learn the parametrisation $omega^*$, satisfying the optimal Bayesian Bellman equation for our Q-function approximator, with $rho$ being an arbitrary sampling distribution with support over $cal(A)$.
++ *MSBBE Optimization:* The Mean Squared Bayesian Bellman Error (MSBBE) is computed as the difference between the predictive optimal Bellman operator $B^+ [Q_omega]$ and $Q_omega$: $ "MSBBE"(omega; h_t, psi) := norm(B^+ [Q_omega] (h_t, a_t) - Q_omega (h_t, a_t))^2_rho, $ which is minimized to learn the parametrisation $omega^*$, satisfying the optimal Bayesian Bellman equation for our Q-function approximator, with $rho$ being an arbitrary sampling distribution with support over $cal(A)$.
     
-    The predictive optimal Bellman operator can be obtained by taking expectations over variable $b_t$ using $P_B (h_t, a_t; omega)$ with $ B^+ [Q_omega] (h_t, a_t) := EE_(b_t ~ P_B (h_t, a_t; omega)) [b_t]$, where $P_B (h_t, a_t; omega) = EE_(phi ~ P_Phi (cal(D)_omega (h_t))) [P_B (h_t, a_t, phi; omega)]$ is the predictive optimal Bellman distribution.
+    The predictive optimal Bellman operator can be obtained by taking expectations over variable $b_t$ using the predictive optimal Bellman distribution $P_B (h_t, a_t; omega)$: $ B^+ [Q_omega] (h_t, a_t) := EE_(b_t ~ P_B (h_t, a_t; omega)) [b_t], $ where $P_B (h_t, a_t; omega) = EE_(phi ~ P_Phi (cal(D)_omega (h_t))) [P_B (h_t, a_t, phi; omega)]$.
 
     This gives rise to a nested optimisation problem, as is common in model-free RL @fellows2024bayesianexplorationnetworks, which can be solved using two-timescale stochastic approximation.
     In this case, we update the epistemic network parameters $psi$ using gradient descent on an asymptotically faster timescale than the function approximator parameters $omega$ to ensure convergence to a fixed point @fellows2024bayesianexplorationnetworks.
 
-//#todo[Probably explain model-free reinforcement learning vs model-based approaches.]
-//
-//#note[
-//    - In model-free BRL, the goal is to characterise uncertainty in the optimal Bayesian Bellman operator instead of the reward-state transition distribution
-//    - Given samples from the true reward-state distribution $r_t, s_(t + 1) ~ P^*_(R, S) (s_t, a_t)$ we use _bootstrapping_ to estimate the optimal Bayesian Bellman operator $ b_t = beta_omega (h_(t+1)) := r_t + gamma max_a' Q_omega (h_(t+1), a') $
-//        - We refer to $beta_omega (h_(t + 1))$ as the bootstrap function
-//        - Interprete bootstrapping as making a change of variables under the mapping $beta_omega(dot, h_t, a_t) : RR times cal(S) -> RR$
-//    - Bootstrapped samples $b_t$ have distribution $P^*_B (h_t, a_t; omega)$ which is the _pushforward_ distribution over next period's possible updated Q-values satisfying $ EE_(b_t ~ P^*_B (h_t, a_t; omega)) [f(b_t)] = EE_(r_t, s_(t+1) ~ P^*_(R, S) (s_t, a_t)) [f(r_t + gamma max_a' Q_omega (h_(t+ 1), a'))] $ (for any measurable function $f : RR -> RR$)
-//        - Refer to $P^*_B (h_t, a_t; omega)$ as the Bellman distribution
-//    - When predicting $b_t$ given an observation $h_t, a$:
-//        - Two sources of uncertainty:
-//            - Firstly, even if $P^*_B (h_t, a_t; omega)$ is known, there's natural stochasticity due to the environment's reward-state transition dynamics that prevents $b_t$ from being determined (_aleatoric uncertainty_)
-//                - Aleatoric uncertainty _cannot_ be reduced with more data
-//            - Secondly, in a learning problem, the Bellman distribution $P^*_B (h_t, a_t; omega)$ cannot be determined a priori and must be inferred from observations of $b_t$ (_epistemic uncertainty_)
-//                - Epistemic uncertainty _can_ be reduced with more data as the agent explores
-//    - We introduce a model of the process $b_t ~ P^*_B (h_t, a_t; omega)$ which characterises the aleatoric uncertainty in the optimal Bellman operator
-//    - @fellows2024bayesianexplorationnetworks choose a parametric model $P_B (h_t, a_t, phi; omega)$
-//        - density $p(b_t|h_t, a_t, phi; omega)$
-//        - parametrised by $phi in Phi$
-//    - The space of models $P_B (h_t, a_t, phi; omega)$ can be interpreted as a hypothesis space over the true Bellman distribution $P^*_B (h_t, a_t; omega)$, with each hypothesis indexed by a parameter $phi in Phi$
-//    - $cal(D) (h_t) := {(b_i, h_i, a_i)}_(i = 0)^(t-1)$ denotes the dataset of bootstrapped samples
-//        - the agent updates its belief in $phi$ by inferring a posterior $P_Phi (cal(D)_omega (h_t))$ when it has observed $cal(D)_omega (h_t)$
-//        - This posterior ($P_Phi (cal(D)_omega (h_t))$) characterises the epistemic uncertainty over the hypothesis space, which is used to obtain the predictive optimal Bellman distribution: $ P_B (h_t, a_t; omega) = EE_(phi ~ P_Phi (cal(D)_omega (h_t))) [P_B (h_t, a_t, phi; omega)] $
-//        - Taking expectations over the variable $b_t$ using $P_B (h_t, a_t; omega)$, the predictive optimal Bellman operator is derived: $ B^+ [Q_omega] (h_t, a_t) := EE_(b_t ~ P_B (h_t, a_t; omega)) [b_t], $ which integrates both the aleatoric epistemic uncertainty in $b_t$ to make a Bayesian prediction of the optimal Bellman operator at each timestep $t$
-//]
-//
-//Bayesian Exploration Networks (BENs) represent an approach to model-free Bayesian RL that addresses the challenge of efficient exploration under uncertainty by incorporating both aleatoric and epistemic uncertainty in the model.
-//The innovation of BENs lies in their three-component architecture that separates different types of uncertainty:
-//
-//+ A _recurrent Q-network_ that approximates Q-values while maintaining a history of past interactions;
-//+ An _aleatoric network_ that models inherent randomness in the environment;
-//+ An _epistemic network_ that captures uncertainty in our knowledge of the environment.
-//
-//This three-component architecture allows BEN to:
-//+ Maintain a history-dependent view of the environment;
-//+ Model both inherent randomness and knowledge uncertainty separately;
-//+ Learn Bayes-optimal policies through principled exploration.
-//
-//#maybe[We will examine each component in detail].
-//
-//=== Recurrent Q-Network
-//
-//#todo[
-//    - If mentioning QBRL, explain what it is.
-//]
-//
-//At its core, BEN uses a recurrent neural network (RNN) to approximate the optimal Bayesian $Q$-function.
-//Unlike approaches based on #maybe[QBRL] that only consider the current state (and a context variable) @fellows2024bayesianexplorationnetworks, BEN's Q-network processes the entire history of interactions.
-//We denote the output at timestep $t$ as $q_t = Q_omega (h_t, a_t) = Q_omega (hat(h)_(t-1), o_t)$, where $h_t$ represents the history up to time $t$, $a_t$ is the action, $hat(h)_(t-1)$ is the recurrent encoding of previous history, and $o_t$ contains the current observation tuple ${r_(t-1), s_t, a_t}$.
-//
-//By conditioning on history rather than just current state, BEN can capture how uncertainty evolves over time, making it capable of learning Bayes-optimal policies.
-//
-//
-//=== Aleatoric Network
-//
-//The aleatoric network models inherent randomness in the environment's behavior --- what we might call "known uncertainty."
-//It uses normalizing flows to transform a simple base distribution (such as a standard Gaussian) into a more complex distribution $P_B (h_t, a_t, phi; omega)$, over possible next-state Q-values by applying the transformation $b_t = B(z_"al", q_t, phi)$, where $z_"al" in RR ~ P_"al"$ is a base variable with a zero-mean, unit variance Gaussian $P_"al"$, $q_t$ is the Q-value from the recurrent network, and $phi$ and $omega$ represent the network parameters.
-//
-//#attention("Aleatoric Uncertainty")[
-//    The unpredictability inherent in the environment, even with perfect knowledge of its dynamics.
-//    Like rolling a fair die --- we know the probabilities perfectly, but can't predict individual outcomes.
-//]
-//
-//=== Epistemic Network
-//
-//#todo[
-//    - Explain variational inference?
-//]
-//
-//The epistemic network captures our uncertainty about the environment itself --- what we might call "unknown uncertainty."
-//This layer uses normalizing flows for variational inference to learn a tractable approximation $P_psi$ of the potentially complex target distribution $P_B (h_t, a_t, phi; omega)$ parametrised by $psi in Psi$.
-//We learn $psi$ by minimizing the KL-divergence between the two distributions $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$, which is equivalent to minimising the tractable evidence lower bound $"ELBO"(psi; h, omega)$ @fellows2024bayesianexplorationnetworks.
-//This flow $P_psi$, representing the epistemic uncertainty, characterises the uncertainty in $phi$.
-//
-//#attention("Epistemic Uncertainty")[
-//    Uncertainty about the true nature of the environment, which can be reduced through observation and learning.
-//    Like uncertainty about whether a die is fair --- this can be resolved through repeated observations.
-//]
-//
-//=== Learning Process
-//
-//The network is trained by minimizing two objectives:
-//
-//- The Mean Squared Bayesian Bellman Error (MSBBE) for the Q-network and the aleatoric network;
-//- The Evidence Lower Bound (ELBO) for the epistemic network.
-//
-//This dual optimization process ensures that the network learns both optimal value estimation and appropriate uncertainty quantification.
-//
-//=== MSBBE as an Objective
-//
-//#todo[
-//    We use the predictive optimal Bellman operator, but we don't define it
-//    - This would fit into a preliminary section on model-free BRL
-//]
-//
-//The MSBBE is computed as the difference between the predictive optimal Bellman operator $B^+ [Q_omega]$ and $Q_omega$: $ "MSBBE"(omega; h_t, psi) := || B^+ [Q_omega] (h_t, a_t) - Q_omega (h_t, a_t) ||^2_rho, $ which is minimized to learn the parametrisation $omega^*$, satisfying the optimal Bayesian Bellman equation for our $Q$-function approximator, with $rho$ being an arbitrary sampling distribution with support over $cal(A)$.
-//
-//This gives rise to a nested optimisation problem, as is common in model-free RL @fellows2024bayesianexplorationnetworks, which can be solved using two-timescale stochastic approximation.
-//In this case, we update the epistemic network parameters $psi$ using gradient descent on an asymptotically faster timescale than the function approximator parameters $omega$ to ensure convergence to a fixed point @fellows2024bayesianexplorationnetworks.
-//
-//
-//=== ELBO as an Objective
-//
-//The Evidence Lower Bound (ELBO) serves as the optimization objective for training BEN's epistemic network.
-//While minimizing the KL-divergence $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$ directly would give us the most accurate approximation of the true posterior, computing this divergence is typically intractable.
-//Instead, we can derive and optimize the ELBO, which provides a tractable lower bound on the model evidence.
-//
-//Starting with the definition of the KL-divergence and applying Bayes' rule, @fellows2024bayesianexplorationnetworks derives $ "ELBO"&(psi; h_t, omega) \ &:= EE_(z_"ep" ~ P_"ep") [ sum_(i=0)^(t-1) ( B^(-1)(b_i, q_i, phi)^2 - log bar.v partial_b B^(-1)(b_i, q_i, phi) bar.v ) - log p_Phi (phi) ], $ where $phi = t_psi (z_"ep")$ and:
-//
-//- $z_"ep"$ is drawn from the base distribution $P_"ep"$ (a standard Gaussian $cal(N)(0, I^d)$);
-//- $B^(-1)$ is the inverse of the aleatoric network's transformation;
-//- $partial_b B^(-1)$ is the Jacobian of this inverse transformation;
-//- $t_psi$ represents the epistemic network's transformation.
-//
-//#attention("Jacobian Term")[
-//    The term $partial_b B^(-1)$ accounts for how the epistemic network's transformation changes the volume of probability space.
-//    This is important for maintaining proper probability distributions when using normalizing flows.
-//]
-//
-//The ELBO objective breaks down into three key components:
-//
-//+ A reconstruction term $B^(-1)(b_i, q_i, phi)^2$ that measures how well our model can explain the observed Q-values;
-//+ A volume correction term $log|partial_b B^(-1)(b_i, q_i, phi)|$ that accounts for the change in probability space;
-//+ A prior regularization term $log p_Phi (phi)$ that encourages the approximated posterior to stay close to our prior beliefs.
-//
-//By minimizing the ELBO, we obtain an approximate posterior that balances accuracy with computational tractability, allowing BEN to maintain and update its uncertainty estimates efficiently during learning.
-//
++ *ELBO Optimization:* The Evidence Lower BOund (ELBO) serves as the optimization objective for training BEN's epistemic network.
+    While minimizing the KL-divergence $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$ directly would give us the most accurate approximation of the true posterior, computing this divergence is typically intractable.
+    Instead, we can derive and optimize the ELBO, which provides a tractable lower bound on the model evidence.
+    
+    Starting with the definition of the KL-divergence and applying Bayes' rule, @fellows2024bayesianexplorationnetworks derives $ "ELBO"&(psi; h_t, omega) \ &:= EE_(z_"ep" ~ P_"ep") [ sum_(i=0)^(t-1) ( B^(-1)(b_i, q_i, phi)^2 - log bar.v partial_b B^(-1)(b_i, q_i, phi) bar.v ) - log p_Phi (phi) ], $ where $phi = t_psi (z_"ep")$ and:
+    
+    - $z_"ep"$ is drawn from the base distribution $P_"ep"$ (a standard Gaussian $cal(N)(0, I^d)$);
+    - $B^(-1)$ is the inverse of the aleatoric network's transformation;
+    - $partial_b B^(-1)$ is the Jacobian of this inverse transformation;
+    - $t_psi$ represents the epistemic network's transformation.
+    
+    #attention("Jacobian Term")[
+        The term $partial_b B^(-1)$ accounts for how the epistemic network's transformation changes the volume of probability space.
+        This is important for maintaining proper probability distributions when using normalizing flows.
+    ]
+    
+    The ELBO objective breaks down into three key components:
+    
+    + A reconstruction term $B^(-1)(b_i, q_i, phi)^2$ that measures how well our model can explain the observed Q-values;
+    + A volume correction term $log|partial_b B^(-1)(b_i, q_i, phi)|$ that accounts for the change in probability space;
+    + A prior regularization term $log p_Phi (phi)$ that encourages the approximated posterior to stay close to our prior beliefs.
+    
+    By minimizing the ELBO, we obtain an approximate posterior that balances accuracy with computational tractability, allowing BEN to maintain and update its uncertainty estimates efficiently during learning.
+
+#attention("Training Dynamics")[
+    The two optimization processes occur at different timescales, with epistemic updates happening more frequently than the Q-network updates.
+    This separation ensures stable convergence while maintaining the ability to adapt to new information.
+]
+
+With this architecture, BEN can learn truly Bayes-optimal policies while maintaining the computational efficiency of model-free methods.
+This makes it particularly well-suited for environments with sparse, delayed rewards where efficient exploration is important.
 
 = Theoretical Framework <theoretical_framework>
 
@@ -693,6 +630,121 @@ The network is trained through a dual optimization process:
 - Proposed solution approach
 ]
 
+In this section, we develop a theoretical framework for comparing GFlowNets and Bayesian Exploration Networks (BENs) in environments with delayed and sparse rewards.
+Our goal is to establish precise criteria for evaluating these different approaches to exploration and uncertainty handling.
+
+== Problem Formulation
+
+Consider an environment with delayed rewards characterized by
+
+- *Reward Delay:* The temporal gap $T_"reward"$ between an action and its corresponding reward signal
+    . We formally define this as $ T_"reward" := min{t | s_t in cal(X), r_t != 0}. $
+    In our n-chain environment, $T_"reward"$ corresponds to the chain length.
+
+- *Reward Sparsity:* The proportion $rho$ of state-action pairs that yield non-zero rewards: $ rho := abs({(s, a) in cal(S) times cal(A) : EE[R(s, a)] != 0}) / abs(cal(S) times cal(A)), $ where $R(dot)$ is some reward distribution.
+
+These characteristics create distinct challenges, as discussed, for reinforcement learning algorithms.
+
++ The _temporal credit assignment problem_ becomes more severe with increasing $T_"reward"$.
++ The _exploration efficiency_ becomes critical as $rho$ decreases.
++ The _signal-to-noise ratio_ in value estimation deteriorates with both $T_"reward"$ and $rho$.
+
+=== Value Propagation Mechanisms
+
+The algorithms differ in how they handle value propagation. GFlowNet value propagation maintains consistency between forward and backward flows through the trajectory balance constraint $Z product_(t = 1)^n P_F (s_t|s_(t - 1)) = F(x) product_(t = 1)^n P_B (s_(t - 1)|s_t).$
+
+BEN value propagation directly models the distribution of bootstrapped values through the estimated Bellman operator $b_t = r_t + gamma max_a' Q_omega (h_(t+1), a').$
+
+=== Uncertainty Representation
+
+Both approaches maintain uncertainty estimates but through different mechanisms:
+
+- GFlowNets implicitly capture uncertainty through the learned flow distribution;
+- BENs explicitly separate aleatoric and epistemic uncertainty.
+
+This leads to our central hypothesis.
+
+#attention("Hypothesis")[
+In environments with highly delayed rewards (large $T_"reward"$), BEN's explicit uncertainty decomposition leads to more efficient learning compared to GFlowNets, particularly in early training stages.
+]
+
+However, this advantage diminishes as $T_"reward"$ decreases.
+This hypothesis is supported by the following three observations.
+
++ BEN's direct modeling of the Bellman operator allows for faster value propagation.
++ The explicit separation of uncertainty types enables more targeted exploration.
++ GFlowNets must learn complete trajectories before gaining signal about reward structure.
+
+=== Analytical Framework
+
+To evaluate our hypothesis about the relative performance of GFlowNets and BENs in delayed reward environments, we establish three metrics that capture different aspects of learning and exploration efficiency.
+
++ *Sample Efficiency:* Measures how quickly each algorithm converges to optimal behavior through their respective loss functions.
+
+    For GFlowNets, we track the trajectory balance loss $cal(L)_"TB" (tau) = (log Z_theta + log sum_(t = 1)^n P_F (s_t|s_(t - 1); theta) - log R(x) - log sum_(t = 1)^n P_B (s_(t - 1)|s_t; theta))^2$.
+
+    While for BEN, we monitor the Mean Squared Bayesian Bellman Error $"MSBBE"(omega; h_t, psi) = norm(B^+ [Q_omega] (h_t, a_t) - Q_omega (h_t, a_t))^2_rho$.
+
+    These metrics allow us to quantify learning progress and compare convergence rates between algorithms as a function of reward delay $T_"reward"$.
+
++ *Distribution Matching:* Evaluates how well the learned policy matches the true underlying reward structure.
+
+    In our n-chain environment, where terminal states are guaranteed to be reached, we measure the KL divergence between the true terminal state distribution $P$ (determined by rewards) and the empirical distribution $Q$ generated by each algorithm $"KL"(P || Q)$.
+    This metric is particularly relevant for GFlowNets, as they explicitly aim to learn a sampling distribution proportional to the reward function.
+
++ *Exploration Efficiency:* Captures how effectively each algorithm explores the state space before converging to optimal behavior.
+
+    We introduce two complementary metrics.
+
+    - *State Coverage Ratio:* Measures the proportion of the state space explored over time as $ E(t) := abs(S_("visited")(t)) / abs(S), $ where $S_("visited")(t)$ represents the set of unique states visited up to time $t$.
+
+    - *Time-to-First-Success:* Quantifies initial exploration effectiveness as $ T_("success") := min{t | s_t in cal(X), r_t > 0}. $
+
+    This metric becomes increasingly important as reward delay $T_"reward"$ grows, as it indicates how quickly each algorithm can discover successful trajectories in sparse reward settings.
+
+Combining these metrics, we construct a evaluation framework that addresses three important aspects of performance:
+
++ Learning efficiency through loss convergence analysis;
++ Policy quality through distribution matching;
++ Exploration effectiveness through coverage and discovery time.
+
+This framework allows us to investigate how the advantage of BEN's explicit uncertainty decomposition versus GFlowNet's flow-based approach vary with reward delay $T_"reward"$ and sparsity $rho$.
+In particular, we can test our hypothesis that BEN's advantages become more pronounced as $T_"reward"$ increases by examining the correlation between reward delay and relative performance across the mentioned metrics.
+
+
+
+//== Hypothesis
+//
+//Our hypothesis is that BEN's Bayesian exploration strategy leads to more efficient learning compared to GFlowNets in environments with highly delayed rewards, particularly during the early stages of training.
+//We formalize this hypothesis through two claims:
+//
+//+ In environments with reward delay $d$, BEN requires $cal(O)(f(d))$ samples to achieve near-optimal performance, while GFlowNets require $cal(O)(g(d))$ samples, where $f(d)$ grows asymptotically slower than $g(d)$.
+//
+//+ This efficiency advantage diminishes as the delay between actions and rewards decreases, which would suggests that the benefits of explicit uncertainty modelling becomes less critical in environments with more immediate feedback.
+//
+//== Delay and Sparsity Formalization
+//
+//We define a reward function $R$ as $(d, s)$-delayed-sparse, where
+//
+//- $d in NN$ represents the minimum number of actions required before any non-zero reward;
+//- $s in [0, 1]$ represents the sparsity ratio: the proportion of trajectories that yield non-zero rewards.
+//
+//For our n-chain environment with length $n$ and branching factor $b$, we have $d = n$, and $s = b / (|cal(A)|^n)$.
+//That is, the delay equals the chain length, and the sparsity ratio depends on branching factor and action space size.
+//
+//== Information Processing Rate
+//
+//To compare the learning efficiency of both approaches, we introduce the concept of Random Deviation Index (RDI): $ "RDI"(t) = "KL"(pi_t || pi_"random"), $ where $pi_t$ is the policy at time $t$, $pi_"random"$ is a uniform random policy. //@kullback1951oninformationandsufficiency.
+//This metric captures how quickly each method moves away from random exploration toward informed decision-making.
+//
+//== Uncertainty Representation
+//
+//We analyze how each method represents uncertainty.
+//
+//+ GFlowNets implicitly handle uncertainty through flow matching: $F(x) = R(x)$ for terminal states $x in cal(X)$.
+//
+//+ BEN explicitly models both aleatoric uncertainty through the Bellman distribution $P_B (h_t, a_t, phi; omega)$, and epistemic uncertainty through the approximation $P_psi$ of the posterior $P_Phi (cal(D)_omega (h_t))$ by minimization of $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$.
+//
 = Experimental Design <experimental_design>
 
 #note[
