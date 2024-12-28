@@ -30,7 +30,7 @@
 #set par(
   //first-line-indent: 1em,
   //spacing: 1em,
-  //justify: true,
+  justify: true,
 )
 
 #let show_notes = true
@@ -42,7 +42,7 @@
           fill: fill,
           inset: 12pt,
           breakable: true,
-          [_NOTE:_\ \ #body],
+          [#smallcaps[note] #v(0pt) #body],
         )
     }
 }
@@ -54,7 +54,10 @@
             fill: fill,
             inset: 12pt,
             breakable: true,
-            [_TODO:_\ \ #body],
+            [
+                #set align(left)
+                #smallcaps[todo] #v(0pt) #body
+            ],
         )
     }
 }
@@ -116,23 +119,20 @@
     ]
 }
 
-#note[
-- Use consistent mathematical notation throughout
-- Include clear figures and diagrams
-- Provide code snippets for key implementations
-- Reference related work appropriately
-- Writing style: maintain an academic tone while ensuring readability. Use precise technical language but explain complex concepts clearly. Include examples and visualizations to aid understanding.
-]
-
-#note[
-    Maybe there is not enough natural stochasticiy in the environment's reward-state transition dynamics to make this interesting.
-    Maybe this could remidied by:
-    - Making the chain length random between episodes?
-    - Making the reward for reaching a terminal state random following a pre-determined distribution (by sampling the rewards from pre-determined distributions corresponding to each terminal state, we can still make assumptions about the desired behavior --- bigger mean rewards $=>$ higher desired sample rates for trained model).
-]
-
-#todo[Add title page.]
-#todo[Add an abstract.]
+//#note[
+//- Use consistent mathematical notation throughout
+//- Include clear figures and diagrams
+//- Provide code snippets for key implementations
+//- Reference related work appropriately
+//- Writing style: maintain an academic tone while ensuring readability. Use precise technical language but explain complex concepts clearly. Include examples and visualizations to aid understanding.
+//]
+//
+//#note[
+//    Maybe there is not enough natural stochasticiy in the environment's reward-state transition dynamics to make this interesting.
+//    Maybe this could remidied by:
+//    - Making the chain length random between episodes?
+//    - Making the reward for reaching a terminal state random following a pre-determined distribution (by sampling the rewards from pre-determined distributions corresponding to each terminal state, we can still make assumptions about the desired behavior --- bigger mean rewards $=>$ higher desired sample rates for trained model).
+//]
 
 #let title = "BSc Thesis"
 #let authors = (
@@ -144,14 +144,14 @@
 
 #make_title(title, authors, supervisors)
 #v(1cm)
-#make_abstract[Abstract goes here.]
+#make_abstract[#todo[Write the abstract]]
 
 //#set page(columns: 2)
 
 #pagebreak()
 #counter(page).update(1)
 
-#outline()
+//#outline()
 
 = Introduction <introduction>
 
@@ -220,8 +220,6 @@ This chapter establishes the mathematical framework and notation used throughout
 
 *@results_and_analysis: Results and Analysis* presents our findings, including both quantitative performance metrics #maybe[and qualitative analysis of learning behaviors].
 We examine how each algorithm handles the exploration-exploitation trade-off and adapts to varying levels of reward sparsity.
-
-*@future_research: Future Research* #maybe[...]
 
 *@conclusion: Conclusion* summarizes our findings, discusses their implications for the field, and suggests directions for future research.
 
@@ -622,14 +620,6 @@ This makes it particularly well-suited for environments with sparse, delayed rew
 
 = Theoretical Framework <theoretical_framework>
 
-#note[
-- Hypothesis development
-- Problem formulation
-    - Mathematical notation and definitions
-    - Assumptions and constraints
-- Proposed solution approach
-]
-
 In this section, we develop a theoretical framework for comparing GFlowNets and Bayesian Exploration Networks (BENs) in environments with delayed and sparse rewards.
 Our goal is to establish precise criteria for evaluating these different approaches to exploration and uncertainty handling.
 
@@ -675,7 +665,7 @@ This hypothesis is supported by the following three observations.
 + The explicit separation of uncertainty types enables more targeted exploration.
 + GFlowNets must learn complete trajectories before gaining signal about reward structure.
 
-=== Analytical Framework
+=== Analytical Framework <analytical_framework>
 
 To evaluate our hypothesis about the relative performance of GFlowNets and BENs in delayed reward environments, we establish three metrics that capture different aspects of learning and exploration efficiency.
 
@@ -711,87 +701,77 @@ Combining these metrics, we construct a evaluation framework that addresses thre
 This framework allows us to investigate how the advantage of BEN's explicit uncertainty decomposition versus GFlowNet's flow-based approach vary with reward delay $T_"reward"$ and sparsity $rho$.
 In particular, we can test our hypothesis that BEN's advantages become more pronounced as $T_"reward"$ increases by examining the correlation between reward delay and relative performance across the mentioned metrics.
 
-
-
-//== Hypothesis
-//
-//Our hypothesis is that BEN's Bayesian exploration strategy leads to more efficient learning compared to GFlowNets in environments with highly delayed rewards, particularly during the early stages of training.
-//We formalize this hypothesis through two claims:
-//
-//+ In environments with reward delay $d$, BEN requires $cal(O)(f(d))$ samples to achieve near-optimal performance, while GFlowNets require $cal(O)(g(d))$ samples, where $f(d)$ grows asymptotically slower than $g(d)$.
-//
-//+ This efficiency advantage diminishes as the delay between actions and rewards decreases, which would suggests that the benefits of explicit uncertainty modelling becomes less critical in environments with more immediate feedback.
-//
-//== Delay and Sparsity Formalization
-//
-//We define a reward function $R$ as $(d, s)$-delayed-sparse, where
-//
-//- $d in NN$ represents the minimum number of actions required before any non-zero reward;
-//- $s in [0, 1]$ represents the sparsity ratio: the proportion of trajectories that yield non-zero rewards.
-//
-//For our n-chain environment with length $n$ and branching factor $b$, we have $d = n$, and $s = b / (|cal(A)|^n)$.
-//That is, the delay equals the chain length, and the sparsity ratio depends on branching factor and action space size.
-//
-//== Information Processing Rate
-//
-//To compare the learning efficiency of both approaches, we introduce the concept of Random Deviation Index (RDI): $ "RDI"(t) = "KL"(pi_t || pi_"random"), $ where $pi_t$ is the policy at time $t$, $pi_"random"$ is a uniform random policy. //@kullback1951oninformationandsufficiency.
-//This metric captures how quickly each method moves away from random exploration toward informed decision-making.
-//
-//== Uncertainty Representation
-//
-//We analyze how each method represents uncertainty.
-//
-//+ GFlowNets implicitly handle uncertainty through flow matching: $F(x) = R(x)$ for terminal states $x in cal(X)$.
-//
-//+ BEN explicitly models both aleatoric uncertainty through the Bellman distribution $P_B (h_t, a_t, phi; omega)$, and epistemic uncertainty through the approximation $P_psi$ of the posterior $P_Phi (cal(D)_omega (h_t))$ by minimization of $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$.
-//
 = Experimental Design <experimental_design>
 
+We implement a modified n-chain environment that serves as a testbed for studying delayed rewards.
+This environment presents properties that make it particularly suitable for our analysis.
+
+#attention("N-Chain Environment")[
+    A sequential decision-making environment with a branching structure, where rewards are only received at terminal states.
+]
+
+Parameters of the n-chain environment include a chain length $n$, controlling reward delay $T_"reward"$, a branching factor $b$, affecting exploration complexity, and terminal state rewards, determining optimal distributions.
+Adjusting the chain length $n$ and branching factor $b$ also allow us to control the reward sparsity $rho$ by proxy, as a longer chain involves more states, increasing sparsity.
+Similarly, increasing the branching factor $b$ introduces more branches, again inreasing the number of states and, thus, the sparsity $rho$ as well.
+
+The environment consists of three main components:
+
++ *State Space:* A chain of length $n$ with a branching point at the middle ($floor(n/2)$), creating multiple possible trajectories.
+    This results in a total of $floor(n / 2) + b (n - floor(n / 2))$ possible states, and exactly $b$ terminal states.
+
++ *Action Space:* At each state, an agent can move forward with the $"FORWARD"$ action, or stay in terminal states with the $"TERMINAL_STAY"$ action.
+    At the split point, the agent must choose a branch using the $"BRANCH"_i$ action, where $i in {1, ..., b}$.
+    This results in a total of $2 + b$ actions.
+
++ *Reward Structure:* Generally, a reward function $R: cal(X) -> RR$ is defined over terminal states $x in cal(X)$, creating a natural target distribution for sampling and clear optimal policies.
+    For GFlowNets, the reward function is further constrained to the domain $RR_(>0)$, yielding a reward function $R: cal(X) -> RR_(>0)$.
+
+This design creates a sparse reward landscape --- agents must execute sequences of $floor(n/2) - 1$ actions before reaching the branch point, where the chosen branch determines the final reward, followed by another $floor(n/2)$ actions to reach any terminal state.
+This structure allows us to precisely control both reward delay $T_"reward"$ and sparsity $rho$.
+
+
+== Evaluation Protocol
+
+#todo[
+    - Delay Variation Study:
+        - Chain length 3
+        - Chain length 5
+        - Chain length 7
+        - Chain length 9
+        - Chain length 11
+]
+
+We evaluate each algorithm through a sequence of experiments with increasing complexity.
+
++ *Base Configuration:*
+    - Fixed chain length ($n = 5$);
+    - Three terminal states with fixed rewards ${0, 10, 90}$;
+    - BEN: Discount factor $gamma = 0.9$;
+    - GFlowNet: Exploration factor $epsilon = 0.1$.
+
++ *Delay Variation Studies:*
+    - Chain lengths $n in {3, 5, 7, 9, 11}$;
+    - Keeping terminal rewards fixed;
+    - Measuring performance vs. delay $T_"reward"$.
+
++ *Stochastic Analysis:*
+    - Introducing random rewards drawn from distributions;
+    - Terminal states $x in cal(X)$ rewards: $R_x ~ cal(N)(mu_x, sigma^2)$;
+    - Testing robustness to uncertainty.
+
+For each configuration, we conduct 50 independent trials with different random seeds to ensure statistical significance.
+We then apply the framework discussed in @analytical_framework on the results of these three configurations for analysis.
+
+
+== Implementation Details
+
 #note[
-- Test environments
-    - N-Chain implementation
-- Evaluation metrics
-    - Sample efficiency (steps needed to reach optimal policy) - measure by objective loss over training?
-    - Final performance (average success/reward rate) - measure by difference between sample distribution and true distributions? Otherwise, this probably doesn't make sense for the semi-deterministic n-chain environment, as we know we'll succeed in n steps.
-    - Exploration behavior (state coverage over time) - maybe not so interesting for the simple n-chain environment, but not entirely uninteresting either.
 - Implementation details
     - Network architectures
     - Training procedures
         - For GFlowNets, mention tempered exploration during training (off-policy training)
     - Hyperparameter selection
 ]
-
-== Test Environment
-
-#todo[
-    - Describe the n-chain environment:
-        - a chain of length $n$
-        - the chain has a branch point from which two branches emerge
-        - last state is always a terminal state
-        - terminal states have a disignated reward
-
-    - Describe the action space:
-        - actions include a _forward_ action;
-        - a _left branch_ or _right branch_ choice at branch point.
-
-    - #note[The _terminal stay_ action is probably inconsequensial.]
-]
-
-== Evaluation Metrics
-
-#todo[
-    - Describe how the sample efficiency is measured.
-        - Maybe the objective loss over training (how many steps to convergence)
-    - Describe the final performance:
-        - In my n-chain implementation, a terminal state will always be reached, so average success rate wouldn't make sense as a metric (as success will always be 100%).
-        - Instead, for GFlowNets, this should probably be evaluated as the difference from the true distribution (the expected distribution).
-        - I.e., with rewards 10 and 5 for two terminal states, the true distribution would be $1/3$ samples with reward 5 and $2/3$ samples with reward 10.
-    - Describe exploration behavior:
-        - State coverage over time.
-        - This will probably require a higher number of branches for any interesting metrics.
-]
-
-== Implementation Details
 
 #todo[
     - Network architectures
@@ -813,6 +793,8 @@ In particular, we can test our hypothesis that BEN's advantages become more pron
     - Hyperparameter selection
 ]
 
+#maybe[We employ curriculum learning for both algorithms, starting with shorter chain lengths and gradually increasing $n$ as performance improves, while tracking convergence throughout.]
+
 = Results and Analysis <results_and_analysis>
 
 #note[
@@ -825,10 +807,6 @@ In particular, we can test our hypothesis that BEN's advantages become more pron
 - Discussion of findings
 ]
 
-= Future Research <future_research>
-
-#note[Everything I think I could have done better essentially.]
-
 = Conclusion <conclusion>
 
 #note[
@@ -837,4 +815,15 @@ In particular, we can test our hypothesis that BEN's advantages become more pron
 - Future work directions
 ]
 
+== Future Research
+
+#note[Everything I think I could have done better essentially.]
+
+
 #bibliography("refs.bib")
+
+#set heading(numbering: "A.1.1", supplement: [Appendix])
+#counter(heading).update(0)
+#text(size: 2em)[Appendix]
+
+= #maybe[Hello]
