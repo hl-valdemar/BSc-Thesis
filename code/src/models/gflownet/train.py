@@ -1,6 +1,6 @@
 import random
 from collections import deque
-from typing import Deque, Dict, List, Tuple
+from typing import Deque, Dict, List, Set, Tuple
 
 import numpy as np
 import torch
@@ -37,6 +37,9 @@ class GFlowNetTrainer:
         self.buffer_size = buffer_size
         self.replay_buffer: Deque[NChainTrajectory] = deque(maxlen=buffer_size)
         self.metrics = MetricsTracker(window_size=metrics_window)
+
+        # Set of visited states represented by a tuple unique: (position, branch)
+        self.states_visited: Set[Tuple[int, int]] = set()
 
     def get_tempered_forward_policy(
         self,
@@ -104,7 +107,7 @@ class GFlowNetTrainer:
 
     def collect_trajectory_with_metrics(
         self,
-    ) -> Tuple[NChainTrajectory, Dict[str, float]]:
+    ) -> Tuple[NChainTrajectory, GFlowNetMetrics]:
         """Collect trajectory and compute relevant metrics."""
         state = self.env.reset()
         done = False
@@ -146,6 +149,7 @@ class GFlowNetTrainer:
             # Sample action and step environment
             action = torch.multinomial(forward_policy, 1).item()
             next_state, reward, done = self.env.step(NChainAction(action))
+            self.states_visited.add((next_state.position, next_state.branch))
 
             states.append(next_state)
             actions.append(action)
@@ -168,6 +172,8 @@ class GFlowNetTrainer:
             backward_masks=backward_masks,
         )
 
+        exploration_ratio = len(list(self.states_visited)) / self.env.num_states
+
         # Compute episode metrics
         metrics = GFlowNetMetrics(
             trajectory_balance_loss=0.0,  # Will be updated during training
@@ -178,6 +184,7 @@ class GFlowNetTrainer:
             branch_chosen=states[-1].branch,
             forward_entropy=np.mean(forward_entropies),
             backward_entropy=np.mean(backward_entropies),
+            exploration_ratio=exploration_ratio,
         )
 
         return trajectory, metrics
@@ -264,6 +271,7 @@ class GFlowNetTrainer:
         return {
             "loss": loss.item(),
             "terminal_reward": metrics.terminal_reward,
+            "exploration_ratio": metrics.exploration_ratio,
             "log_Z": metrics.log_Z,
         }
 
@@ -276,7 +284,7 @@ class GFlowNetTrainer:
                 summary = self.metrics.get_summary_stats()
                 print(f"\nStep {step+1}/{num_steps}")
                 print(f"Average Loss: {summary['avg_loss']:.4f}")
-                print(f"Success Rate: {summary['success_rate']:.2%}")
+                print(f"Exploration ratio: {summary['avg_exploration_ratio']:.2%}")
                 print(
                     "Branch Distribution:",
                     {k: f"{v:.2%}" for k, v in summary["branch_dist"].items()},
@@ -334,10 +342,18 @@ class GFlowNetTrainer:
         branch_counts = {b: branches.count(b) for b in set(branches)}
         branch_freqs = {b: c / num_trajectories for b, c in branch_counts.items()}
 
+        reward_set = set(rewards)
+        target_dist_err = 0
+        for r in reward_set:
+            actual_freq = reward_freqs[r]
+            expected_freq = r / np.sum(list(reward_set))
+            target_dist_err += np.abs(actual_freq - expected_freq)
+
         return {
             "reward_counts": reward_counts,
             "reward_frequencies": reward_freqs,
             "branch_counts": branch_counts,
             "branch_frequencies": branch_freqs,
             "average_trajectory_length": np.mean(trajectory_lengths),
+            "target_dist_error": target_dist_err,
         }

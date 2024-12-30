@@ -1,6 +1,6 @@
 import argparse
 import os
-from typing import List
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -106,40 +106,51 @@ class QMyopicNetwork(nn.Module):
         self.out.reset_parameters()
 
 
-obs_prob = 0.85
-horizon = 11
-learning_rate = 0.02
-memory = 10
-N_episodes = 100
-N_pretrain = 100
-n_msbbe_steps = 10
+def train(
+    timestamp: str,
+    descriptor: str,
+    chain_length: int = 5,
+    gamma: float = 0.9,
+    N_episodes: int = 10,
+    max_steps_per_episode: int = 10,
+) -> Tuple[BayesModel, QBayesNetwork, NChainEnv, Dict[str, Any]]:
+    obs_prob = 0.85
+    horizon = 11
+    learning_rate = 0.02
+    memory = 10
+    N_pretrain = 10
+    n_msbbe_steps = 5
 
-# Collect metrics during training
-all_q_losses: List[float] = []
-all_epistemic_losses: List[float] = []
-all_rewards: List[int] = []
-all_branches: List[int] = []
-cumulative_returns: List[int] = []
+    # Collect metrics during training
+    all_q_losses: List[float] = []
+    all_epistemic_losses: List[float] = []
+    all_rewards: List[int] = []
+    all_branches: List[int] = []
+    cumulative_returns: List[int] = []
+    states_visited: Set[Tuple[int, int]] = set()
 
-
-def train(chain_length: int = 5, max_steps_per_episode: int = 10):
     max_steps_per_episode = max(max_steps_per_episode, chain_length * 2)
 
     args = parse_args()
-    gamma = args.gamma
+    # gamma = args.gamma
 
     cumulative_return = 0
 
     # Additional config params
     # args.device = th.device("cuda" if th.cuda.is_available() else "cpu")
     # Initialise Env
-    env = NChainEnv(n=chain_length, rewards=[-200, 10, 100])
+    env = NChainEnv(n=chain_length, rewards=[-500, 10, 200])
     env.reset()
     (aleatoric_flow, num_params_aleatoric, base_dist_al) = construct_aleatoric_flow(
-        6, 2, device=args.device
+        6,
+        2,
+        device=args.device,
     )
     epistemic_flow, prior_ep = construct_epsitemic_flow(
-        num_params_aleatoric, 2, aleatoric_flow, device=args.device
+        num_params_aleatoric,
+        2,
+        aleatoric_flow,
+        device=args.device,
     )
     q_net = QBayesNetwork(
         input_size=np.prod(env.current_state.to_tensor().shape) + 2,
@@ -213,7 +224,7 @@ def train(chain_length: int = 5, max_steps_per_episode: int = 10):
             model=model,
             hist_length=hidden_size,
             N_pretrain=N_pretrain,
-            gamma=args.gamma,
+            gamma=gamma,
             device=args.device,
             args=args,
         )
@@ -261,6 +272,7 @@ def train(chain_length: int = 5, max_steps_per_episode: int = 10):
                 action_init=action_init,
                 reward_init=reward_init,
                 args=args,
+                gamma=gamma,
                 env=env,
                 state_init=o,
                 N_update=n_msbbe_steps,
@@ -278,7 +290,7 @@ def train(chain_length: int = 5, max_steps_per_episode: int = 10):
             # print(f"  position: {o.position}")
             # print(f"  action: {a}")
             next_state, reward, done = env.step(a)
-            assert reward is not None and a is not None
+            states_visited.add((next_state.position, next_state.branch))
 
             inputs = torch.cat(
                 (
@@ -339,12 +351,76 @@ def train(chain_length: int = 5, max_steps_per_episode: int = 10):
                 # Break out when done
                 break
 
+    print_summary(
+        env=env,
+        losses_q=all_q_losses,
+        losses_epistemic=all_epistemic_losses,
+        rewards=all_rewards,
+        branches=all_branches,
+        states_visited=states_visited,
+        cumulative_returns=cumulative_returns,
+    )
+
     plot_ben_metrics(
         losses_q=all_q_losses,
         losses_epistemic=all_epistemic_losses,
         rewards=all_rewards,
         branches=all_branches,
         cumulative_returns=cumulative_returns,
+        save_plot=True,
+        transparent=False,
+        file_name=f"ben_training_plot_{descriptor}_{timestamp}.png",
+    )
+
+    return (
+        model,
+        q_net,
+        env,
+        {
+            "losses_q": all_q_losses,
+            "losses_epistemic": all_epistemic_losses,
+            "rewards": all_rewards,
+            "branches": all_branches,
+            "states_visited": list(states_visited),
+            "cumulative_returns": cumulative_returns,
+        },
+    )
+
+
+def print_summary(
+    env: NChainEnv,
+    losses_q: List[float],
+    losses_epistemic: List[float],
+    rewards: List[float],
+    branches: List[int],
+    cumulative_returns: List[int],
+    states_visited: Set[Tuple[int, int]],
+    window_size: int = 50,
+) -> None:
+    window_size = min(window_size, min(len(losses_q), len(losses_epistemic)))
+
+    losses_q_recent = losses_q[-window_size:]
+    losses_epistemic_recent = losses_epistemic[-window_size:]
+
+    reward_counts = {r: rewards.count(r) for r in set(rewards)}
+    reward_freqs = {r: c / len(rewards) for r, c in reward_counts.items()}
+
+    branch_counts = {b: branches.count(b) for b in set(branches)}
+    branch_freqs = {b: c / len(rewards) for b, c in branch_counts.items()}
+
+    exploration_ratio = len(list(states_visited)) / env.num_states
+
+    print("\nBEN training summary:")
+    print(f"  Avg recent MSBBE loss: {np.mean(losses_q_recent):.4f}")
+    print(f"  Avg recent ELBO loss: {np.mean(losses_epistemic_recent):.4f}")
+    print(f"  Exploration raito: {exploration_ratio:.2%}")
+    print(
+        "  Reward frequencies:",
+        {k: f"{v:.2%}" for k, v in reward_freqs.items()},
+    )
+    print(
+        "  Branch Distribution:",
+        {k: f"{v:.2%}" for k, v in branch_freqs.items()},
     )
 
 
@@ -355,7 +431,10 @@ def plot_ben_metrics(
     branches: List[int],
     cumulative_returns: List[int],
     window_size: int = 50,
-):
+    save_plot: bool = False,
+    file_name: Optional[str] = None,
+    transparent: bool = False,
+) -> None:
     """
     Plot key metrics from BEN training including MSBBE loss, ELBO loss,
     rewards, and branch choices.
@@ -457,4 +536,7 @@ def plot_ben_metrics(
 
     # Adjust layout and display
     plt.tight_layout()
-    plt.show()
+    if save_plot:
+        plt.savefig(file_name, transparent=transparent)
+    else:
+        plt.show()

@@ -114,10 +114,10 @@ class BayesNormalizingFlow(nf.flows.Flow):
         """Transforms latent variable z to the flow variable x
 
         Args:
-                                                                        z: Batch in the latent space
+            z: Batch in the latent space
 
         Returns:
-                                                                        Batch in the space of the target distribution
+            Batch in the space of the target distribution
         """
         for flow in self.flows:
             z, _ = flow(z)
@@ -353,15 +353,9 @@ class AleatoricFlow(BayesNormalizingFlow):
         """Transforms latent variable z_al to the flow variable x
 
         Args:
-                                        z_al: Batch in the latent space
+            z_al: Batch in the latent space
 
-        Returns: [
-                                                                                                                                                                        params.numel()
-                                                                                                                                                                        for flow in flows_aleatoric
-                                                                                                                                                                        for params in flow.parameters()
-                                                                                                                                                                        if params.requires_grad
-                                                                                                                                        ]
-                                        Batch in the space of the target distribution
+        Returns: [ params.numel() for flow in flows_aleatoric for params in flow.parameters() if params.requires_grad ] Batch in the space of the target distribution
         """
         b = z_al
         for flow in self.flows:
@@ -371,7 +365,12 @@ class AleatoricFlow(BayesNormalizingFlow):
                 and not isinstance(flow, nf.flows.Reverse)
             ):
                 b, _ = flow(
-                    b, phi, conditioner_network, q_network, inputs, hidden_state
+                    b,
+                    phi,
+                    conditioner_network,
+                    q_network,
+                    inputs,
+                    hidden_state,
                 )
             else:
                 b, _ = flow(b)

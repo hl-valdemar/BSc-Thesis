@@ -39,7 +39,10 @@ def construct_epsitemic_flow(
             )
         )
     flow_epistemic = BayesNormalizingFlow(
-        base_epistemic_dist, flows_epistemic, prior_phi, target_dist=flow_aleatoric
+        base_epistemic_dist,
+        flows_epistemic,
+        prior_phi,
+        target_dist=flow_aleatoric,
     ).to(device)
     # +1 for q_val size
     conditioner_MLP = ConditionerMLP(

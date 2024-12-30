@@ -1,0 +1,24 @@
+{
+  "reward_counts": {
+    "10": 141,
+    "20": 218,
+    "70": 641
+  },
+  "reward_frequencies": {
+    "10": 0.141,
+    "20": 0.218,
+    "70": 0.641
+  },
+  "branch_counts": {
+    "0": 141,
+    "1": 218,
+    "2": 641
+  },
+  "branch_frequencies": {
+    "0": 0.141,
+    "1": 0.218,
+    "2": 0.641
+  },
+  "average_trajectory_length": 8.0,
+  "target_dist_error": 0.11799999999999991
+}

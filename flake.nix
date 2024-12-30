@@ -26,6 +26,8 @@
             seaborn
             distutils
             wandb
+            pandas
+            glob2
           ]))
       ];
 

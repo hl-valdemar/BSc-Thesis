@@ -107,7 +107,12 @@ class AbsFlow(nf.flows.Flow):
         else:
             param = conditioner_net(phi)
         conditioner_input, _ = torch.split(
-            param, [2 * (z.shape[-1]), param[0, 0, :].numel() - 2 * z.shape[-1]], dim=-1
+            param,
+            [
+                2 * (z.shape[-1]),
+                param[0, 0, :].numel() - 2 * z.shape[-1],
+            ],
+            dim=-1,
         )
         "Doesn't return log dets as this direction will only be used for sampling"
         zi = z

@@ -111,7 +111,12 @@ class BayesModel(nn.Module):
         """
         phi, log_p = self.sample_params(num_samples)
         q_val = self.target_distribution.forward(
-            hidden_state, current_state, action, rewards, q_network, envs
+            hidden_state,
+            current_state,
+            action,
+            rewards,
+            q_network,
+            envs,
         )
         q_val = q_val.unsqueeze(0).view(-1, 1, 1, 1).repeat(num_samples, 1, 1, 1)
         phi = torch.cat([phi, q_val], dim=-1)
@@ -216,7 +221,7 @@ class BayesModel(nn.Module):
         # log_q += log_q_
 
         # z_al, log_det = self.aleatoric_flows.set_params(params).sample(
-        #    num_samples_per_param
+        #     num_samples_per_param
         # )
         b_vals, q_values = self.target_distribution(
             hidden_state, next_state, action, rewards, q_network

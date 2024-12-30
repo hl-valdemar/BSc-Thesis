@@ -93,6 +93,7 @@ def posterior_update(
     action_init: torch.Tensor,
     reward_init: torch.Tensor,
     args: Namespace,
+    gamma: float,
     env: NChainEnv,
     state_init: NChainState,
     N_update: int = 5,
@@ -150,7 +151,7 @@ def posterior_update(
                 q_vals_off_path, _ = q_network(next_q_obs, hidden_conditioner)
                 v_val_est, _ = q_vals_off_path.max(1)
                 try:
-                    b_val = reward + args.gamma * v_val_est
+                    b_val = reward + gamma * v_val_est
                 except:
                     hh = 1
 

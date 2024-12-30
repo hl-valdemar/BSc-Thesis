@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from environments.nchain import NChainEnv
+from environments.nchain import NChainEnv, NChainState
 
 from .QBayesNet import QBayesNetwork
 
@@ -117,7 +117,8 @@ class EmpiricalTarget(nn.Module):
             )
             next_q, next_next_hidden = q_network(inputs, next_hidden_state)
 
-            envs.set_attr("state", current_state)
+            # envs.set_attr("state", current_state)
+            envs.current_state = NChainState.from_tensor(current_state)
             q_network.load_state_dict(states)
 
             with torch.no_grad():
@@ -160,7 +161,8 @@ class EmpiricalTarget(nn.Module):
             next_q, next_next_hidden = q_network(inputs, next_hidden_state)
             with torch.no_grad():
                 b = torch.tensor(reward) + self.gamma * next_q.max()
-            envs.set_attr("state", current_state)
+            # envs.set_attr("state", current_state)
+            envs.current_state = NChainState.from_tensor(current_state)
             q_network.load_state_dict(states)
             b_vals.append(b)
         return torch.cat(b_vals, dim=0).mean()

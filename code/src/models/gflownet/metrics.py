@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,6 +18,7 @@ class GFlowNetMetrics:
         branch_chosen: Which branch was taken (-1 if none)
         forward_entropy: Average entropy of forward policy
         backward_entropy: Average entropy of backward policy
+        exploration_ratio: Ratio of states visited vs not visited
     """
 
     trajectory_balance_loss: float
@@ -28,6 +29,7 @@ class GFlowNetMetrics:
     branch_chosen: int
     forward_entropy: float
     backward_entropy: float
+    exploration_ratio: float
 
 
 class MetricsTracker:
@@ -66,6 +68,7 @@ class MetricsTracker:
                     "branch_chosen": metric.branch_chosen,
                     "forward_entropy": metric.forward_entropy,
                     "backward_entropy": metric.backward_entropy,
+                    "exploration_ratio": metric.exploration_ratio,
                 }
             )
 
@@ -120,6 +123,7 @@ class MetricsTracker:
         # Policy behavior metrics
         avg_forward_entropy = np.mean([m.forward_entropy for m in recent])
         avg_backward_entropy = np.mean([m.backward_entropy for m in recent])
+        avg_exploration_ratio = np.mean([m.exploration_ratio for m in recent])
 
         return {
             "avg_loss": avg_loss,
@@ -129,9 +133,15 @@ class MetricsTracker:
             "branch_dist": branch_dist,
             "avg_forward_entropy": avg_forward_entropy,
             "avg_backward_entropy": avg_backward_entropy,
+            "avg_exploration_ratio": avg_exploration_ratio,
         }
 
-    def plot_training_curves(self):
+    def plot_training_curves(
+        self,
+        save_plot: bool = False,
+        transparent: bool = False,
+        file_name: Optional[str] = None,
+    ):
         """Visualize key training metrics over time."""
         if not self.metrics_history:
             return
@@ -172,4 +182,7 @@ class MetricsTracker:
         axes[1, 1].legend()
 
         plt.tight_layout()
-        plt.show()
+        if save_plot:
+            plt.savefig(file_name, transparent=transparent)
+        else:
+            plt.show()

@@ -2,14 +2,14 @@
 
 #set page(
     header: context {
-      if counter(page).get().first() > 1 [
-        #grid(
+      if counter(page).get().first() > 1 {
+        grid(
           columns: (1fr, 1fr, 1fr),
           box(width: 100%, align(left)[Valdemar H. Lorenzen]),
           box(width: 100%, align(center)[BSc Thesis]),
           box(width: 100%, align(right)[IMADA, SDU]),
         )
-      ]
+      }
     },
     footer: context {
         if here().page() != 1 {
@@ -26,12 +26,14 @@
 
 #set heading(numbering: "1.1")
 #set math.equation(numbering: "(1)")
-#set text(size: 11pt)
+//#set text(size: 11pt)
 #set par(
   //first-line-indent: 1em,
   //spacing: 1em,
   justify: true,
 )
+
+#show heading: set block(above: 1.75em, below: 1em)
 
 #let show_notes = true
 
@@ -89,6 +91,7 @@
 
 #let make_title(title, authors, supervisors) = {
     align(center)[#text(size: 18pt, weight: 900)[#title]]
+    v(0.5em)
     align(center)[
         #for (i, name) in authors.enumerate() {
             name
@@ -109,6 +112,8 @@
             }
         }
     ]
+    v(1.5em)
+    align(center)[IMADA, SDU]
 }
 
 #let make_abstract(content) = {
@@ -155,10 +160,10 @@
 
 = Introduction <introduction>
 
-Many real-world applications present a fundamental challenge that current reinforcement learning (RL) methods struggle to address effectively: the problem of delayed and sparse rewards.
+Many real-world applications present an inherent challenge that current reinforcement learning (RL) methods struggle to address effectively: the problem of delayed and sparse rewards @sutton2018reinforcementlearninganintroduction @houthooft2017vimevariationalinformationmaximizing.
 
 #attention([Delayed and Sparse Rewards])[
-    Learning scenarios where meaningful feedback signals (rewards) are provided only far after a long sequence of actions, and where most actions yeild no immediate feedback.
+    Learning scenarios where meaningful feedback signals (rewards) are provided only far after a long sequence of actions, and where most actions yield no immediate feedback.
 
     _Example: In drug discovery, the effectiveness of a designed molecule can only be evaluated after its complete synthesis, with no intermediate feedback during the design process._
 ]
@@ -169,20 +174,20 @@ Similarly, in robotics tasks like assembly or navigation, success often depends 
 
 Traditional reinforcement learning algorithms face two critical limitations in such environments:
 
-+ *Credit Assignment:* When rewards are delayed, the algorithm struggles to correctly attribute success or failure to specific actions in a long sequence.
++ *Credit Assignment:* When rewards are delayed, the algorithm struggles to correctly attribute success or failure to specific actions in a long sequence @harutyunyan2019hindsightcreditassignment.
     This is analogous to trying to improve a chess strategy when only knowing the game's outcome, without understanding which moves were actually decisive.
 
-+ *Exploration Efficiency:* With sparse rewards, random exploration becomes highly inefficient.
++ *Exploration Efficiency:* With sparse rewards, random exploration becomes highly inefficient @osband2016deepexplorationbootstrappeddqn @pathak2017curiositydrivenexplorationselfsupervisedprediction.
     An agent might need to execute precisely the right sequence of actions to receive any feedback at all, making random exploration about as effective as searching for a needle in a haystack.
 
-This thesis investigates a novel approach to addressing these challenges through the comparison of two promising methodologies: *Generative Flow Networks* (GFlowNets) @bengio2021flownetworkbasedgenerative and *Bayesian Exploration Networks* (BEN) @fellows2024bayesianexplorationnetworks.
-These approaches represent fundamentally different perspectives on handling uncertainty and exploration in reinforcement learning:
+This thesis investigates a novel approach to addressing these challenges through the comparison of two promising methodologies: *Generative Flow Networks* (GFlowNets) as proposed by @bengio2021flownetworkbasedgenerative, and *Bayesian Exploration Networks* (BEN) as proposed by @fellows2024bayesianexplorationnetworks.
+These approaches represent different perspectives on handling uncertainty and exploration in reinforcement learning.
 
-+ GFlowNets frame the learning process as a flow network, potentially offering more robust learning in situations with multiple viable solutions.
++ _GFlowNets_ frame the learning process as a flow network, potentially offering more robust learning in situations with multiple viable solutions.
 
-+ BENs leverages Bayesian uncertainty estimation to guide exploration more efficiently, potentially making better use of limited feedback.
++ _BENs_ leverages Bayesian uncertainty estimation to guide exploration more efficiently, potentially making better use of limited feedback.
 
-By comparing these approaches, we aim to understand their relative strengths and limitations in environments with delayed and sparse rewards, #maybe[ultimately contributing to the development of more efficient and practical reinforcement learning algorithms].
+By comparing these approaches, we aim to understand their relative strengths and limitations in environments with delayed and sparse rewards.
 Our investigation focuses specifically on examining these methods in carefully designed environments that capture the essential characteristics of delayed and sparse reward scenarios while remaining tractable for systematic analysis.
 
 == Research Objectives and Contributions
@@ -207,18 +212,15 @@ The contributions of this work include:
 
 The remainder of this thesis is structured as follows:
 
-#note[Check that these titles correctly correspond to their reference.]
-
 *@preliminaries: Preliminaries* provides the theoretical foundations of reinforcement learning and explores existing approaches to handling sparse rewards.
 This chapter establishes the mathematical framework and notation used throughout the thesis.
 
 *@theoretical_framework: Theoretical Framework* presents our hypothesis and analytical approach.
-#maybe[We develop the mathematical foundations for comparing GFlowNets and BEN, with particular attention to their theoretical guarantees and limitations.]
+We develop the mathematical foundations for comparing GFlowNets and BEN.
 
 *@experimental_design: Experimental Design* details our testing methodology, including environment specifications, evaluation metrics, and implementation details.
-#maybe[This chapter ensures reproducibility and clarity in our experimental approach.]
 
-*@results_and_analysis: Results and Analysis* presents our findings, including both quantitative performance metrics #maybe[and qualitative analysis of learning behaviors].
+*@results_and_analysis: Results and Analysis* presents our findings, including both quantitative performance metrics and qualitative analysis of learning behaviors.
 We examine how each algorithm handles the exploration-exploitation trade-off and adapts to varying levels of reward sparsity.
 
 *@conclusion: Conclusion* summarizes our findings, discusses their implications for the field, and suggests directions for future research.
@@ -226,22 +228,12 @@ We examine how each algorithm handles the exploration-exploitation trade-off and
 
 = Preliminaries <preliminaries>
 
-#note[
-- Fundamentals of reinforcement learning
-    - Q-learning and temporal difference methods
-- Sparse reward challenges
-- Survey of existing approaches
-    - GFlowNets
-    - Deep exploration networks (BEN)
-    - Comparison of methodologies
-]
-
 == Flow Networks
 
-GFlowNets @bengio2021flownetworkbasedgenerative rely on the concept of flow networks. A flow network is represented as a directed acyclic graph $G = (cal(S), cal(A))$, where $cal(S)$ represents the state space and $cal(A)$ represents the action space.
+GFlowNets rely on the concept of flow networks. The flow network is represented as a directed acyclic graph $G = (cal(S), cal(A))$, where $cal(S)$ represents the state space and $cal(A)$ represents the action space.
 
 #attention([Flow Network])[
-    A directed acyclic graph with a single source node (initial state) and one or more sink nodes (terminal states), where flow is conserved at each intermediate node.
+    A directed acyclic graph with a single source node (initial state) and one or more sink nodes (terminal states), where flow is conserved at each intermediate node @bengio2021flownetworkbasedgenerative @malkin2023trajectorybalanceimprovedcredit.
 
     _Example: In molecular design, states represent partial molecules and actions represent adding molecular fragments._
 ]
@@ -259,7 +251,7 @@ Formally, we write a trajectory as an ordered sequence $tau = (s_0 -> s_1 -> ...
 
 === Flow Function and Conservation
 
-The _trajectory flow function_ $F: cal(T) -> RR_(>= 0)$ assigns a non-negative value to each possible trajectory.
+The _trajectory flow function_ $F: cal(T) -> RR_(>= 0)$ assigns a non-negative value to each possible trajectory @malkin2023trajectorybalanceimprovedcredit.
 From this flow function, two important quantities are derived:
 
 + *State flow*: For any state $s$, its flow is the sum of flows through all trajectories passing through it: $ F(s) = sum_(s in tau) F(tau). $
@@ -275,26 +267,26 @@ These flows must satisfy a conservation principle known as the _flow matching co
 === Markovian Flow
 
 The flow function induces a probability distribution over trajectories.
-Given a flow function $F$, we define $P(tau) = 1 / Z F(tau)$, where $Z = F(s_0) = sum_(tau in cal(T)) F(tau)$ is the _partition function_ @malkin2023trajectorybalanceimprovedcredit --- i.e., the total flow through the network.
+Given a flow function $F$, we define $P(tau) = 1 / Z F(tau)$ @malkin2023trajectorybalanceimprovedcredit, where $Z = F(s_0) = sum_(tau in cal(T)) F(tau)$ is the _partition function_ --- i.e., the total flow through the network.
 
 #attention([Markovian Flow])[
     A flow is _Markovian_ when it can be factored into local decisions at each state.
-    This occurs when the following exist @malkin2023trajectorybalanceimprovedcredit:
+    This occurs when the following criteria are met @malkin2023trajectorybalanceimprovedcredit:
 
     + Forward policies $P_F (-|s)$ over children of each non-terminal state s.t. $ & P(tau = (s_0 -> ... -> s_n)) & = product_(t = 1)^n P_F (s_t|s_(t - 1)). $
 
     + Backward policies $P_B (-|s)$ over parents of each non-initial state s.t. $ & P(tau = (s_0 -> ... -> s_n)|s_n = x) & = product_(t = 1)^n P_B (s_(t - 1)|s_(t)). $
 ]
 
-The Markovian property allows us to decompose complex trajectory distributions into simple local decisions, making learning tractable while maintaining the global flow constraints #citation_needed().
-
+The Markovian property allows us to decompose complex trajectory distributions into simple local decisions, making learning tractable while maintaining the global flow constraints.
 
 == GFlowNets
 
-GFlowNets @bengio2021flownetworkbasedgenerative are an approach to learning policies that sample from desired probability distributions.
+GFlowNets are an approach to learning policies that sample from desired probability distributions @bengio2021flownetworkbasedgenerative.
 They frame the learning process as discovering a flow function that makes the probability of generating any particular object proportional to its reward.
 
 Given a reward function $R: cal(X) -> RR_(>= 0)$ defined over the set of terminal states $cal(X)$, GFlowNets aim to approximate a Markovian flow $F$ on the graph $G$ s.t. $F(x) = R(x)$ for all $x in cal(X)$.
+We will make use of the following definition of a GFlowNet.
 
 #attention([GFlowNet])[
     @malkin2023trajectorybalanceimprovedcredit defines a GFlowNet as any learning algorithm that discovers flow functions matching terminal state rewards, consisting of: 
@@ -302,20 +294,21 @@ Given a reward function $R: cal(X) -> RR_(>= 0)$ defined over the set of termina
     + A model that outputs:
         - Initial state flow $Z = F(s_0)$;
         - Forward action distributions $P_F (-|s)$ for non-terminal states.
+
     + An objective function that, when globally minimized, guarantees $F(x) = R(x)$ for all terminal states.
 
     _Example: In molecular design, this ensures that high-reward molecules are genered more frequently, while maintaining diversity through exploration of multiple pathways._
 ]
 
-The power of GFlowNets lies in their ability to handle situations where multiple action sequences can lead to the same terminal state --- a common scenario in real-world applications like molecular design #maybe[or image synthesis]. 
-Unlike traditional RL methods that focus on finding a single optimal path, GFlowNets learn a distribution over all possible paths proportional to their rewards.
+The power of GFlowNets lies in their ability to handle situations where multiple action sequences can lead to the same terminal state --- a common scenario in real-world applications like molecular design or image synthesis.
+Unlike traditional RL methods that focus on finding a single optimal path, GFlowNets learn a distribution over all possible paths directly proportional to their rewards.
 
 === Learning Process
 
 The learning process of GFlowNets involves iteratively improving both flow estimates and the policies.
 The forward policy of a GFlowNet can sample trajectories from the learned Markovian flow $F$ by sequentially selecting actions according to $P_F (-|s)$.
 When the training converges to a global minimum of the objective function, this sampling process guarantees that $P(x) prop R(x)$.
-#maybe[That is, the probability of generating any terminal state $x$ is proportional to its reward $R(x)$.]
+That is, the probability of generating any terminal state $x$ is proportional to its reward $R(x)$.
 This property makes GFlowNets particularly well-suited for:
 
 + *Diverse Candidate Generation:* Rather than converging to a single solution, GFlowNets maintain a distribution over solutions weighted by their rewards.
@@ -363,7 +356,7 @@ The model is trained by sampling trajectories from a training policy $pi_theta$ 
 
 The concept of the Markov Decision Process (MDP) @martin1994markovdecisionprocesses is fundamental in reinforcement learning and provides a model for sequential decision-making under uncertainty.
 
-#attention("Markov Decision Process")[
+#attention([Markov Decision Process @martin1994markovdecisionprocesses])[
 A tuple $cal(M) := angle.l cal(S), cal(A), P_0, P_S, P_R, gamma angle.r$ where:
 
 - $cal(S)$ is the set of states;
@@ -377,7 +370,7 @@ A tuple $cal(M) := angle.l cal(S), cal(A), P_0, P_S, P_R, gamma angle.r$ where:
 At each timestep $t$, an agent observes its current state $s_t in cal(S)$ and selects an action $a_t in cal(A)$ according to some policy $pi: cal(S) -> cal(P)(cal(A))$.
 The environment then transitions to a new state $s_(t+1)$ according to the transition distribution $P_S (s_t, a_t)$ and provides a reward $r_t$ sampled from $P_R (s_t, a_t)$.
 The agent's objective is to find a policy $pi$ that maximizes the expected sum of discounted future rewards $ J^pi := EE_(tau ~ P^pi)[sum_(t=0)^infinity gamma^t r_t], $ where $tau = (s_0, a_0, r_0, s_1, ...)$ represents a trajectory through the environment and $P^pi$ is the distribution over trajectories induced by following policy $pi$.
-An optimal policy $pi^* in Pi^* := op("arg max", limits: #true)_(pi) J^pi$ can be found through the optimal value function $V^*: cal(S) -> RR$ or the optimal action-value function $Q^*: cal(S) times cal(A) -> RR$, which satisfy the Bellman optimality equations
+An optimal policy $pi^* in Pi^* := op("arg max", limits: #true)_(pi) J^pi$ can be found through the optimal value function $V^*: cal(S) -> RR$ or the optimal action-value function $Q^*: cal(S) times cal(A) -> RR$, which satisfy the Bellman optimality equations @bellman1957dynamicprogramming @martin1994markovdecisionprocesses
 $ V^* (s) = max_(a in cal(A)) Q^* (s, a), $
 $ Q^* (s, a) = EE_(r, s' ~ P_(R,S)(s,a))[r + gamma max_(a' in cal(A)) Q^* (s', a')]. $
 
@@ -387,8 +380,8 @@ This framework serves as the building block for more sophisticated models like C
 
 In contextual RL, we use the concept of a Contextual MDP.
 
-#attention("Contextual MDP")[
-    A Markov Decision Process augmented with a context variable that determines the specific dynamics of the environment.
+#attention([Contextual MDP])[
+    A Markov Decision Process augmented with a context variable that determines the specific dynamics of the environment @hallak2015contextualmarkovdecisionprocesses.
     This allows us to model uncertainty about the true environment through uncertainty about the context.
 ]
 
@@ -441,26 +434,26 @@ As we'll see in the next section, Bayesian approaches offer a principled framewo
 
 == Bayesian Reinforcement Learning
 
-In the Bayesian approach to RL, rather than viewing uncertainty as a problem to be eliminated, it becomes an integral part of the decision-making process --- something to be reasoned about systematically.
+In the Bayesian approach to RL, rather than viewing uncertainty as a problem to be eliminated, it becomes an integral part of the decision-making process --- something to be reasoned about systematically @Ghavamzadeh_2015.
 
 #attention("Bayesian Epistemology")[
     A framework that characterizes uncertainty through probability distributions over possible worlds.
-    In reinforcement learning, this means maintaining distributions over possible MDPs, updated as new evidence arrives.
+    In reinforcement learning, this means maintaining distributions over possible MDPs, updated as new evidence arrives @Ghavamzadeh_2015.
 ]
 
 === From Prior to Posterior
 
-The Bayesian learning process begins with a _prior distribution_ $P_Phi$ representing our initial beliefs about the true context $phi^*$ before any observations.
+The Bayesian learning process starts with a _prior distribution_ $P_Phi$ representing our initial beliefs about the true context $phi^*$ before any observations.
 As the agent interacts with the environment, it accumulates a history of experiences $h_t$ and updates these beliefs through Bayesian inference, forming a _posterior distribution_ $P_Phi (h_t)$.
 
 This history-dependent posterior in Bayesian RL differentiates it from traditional RL approaches.
 
 #attention("History-Conditioned Policies")[
-    Unlike traditional RL policies that map states to actions, Bayesian policies operate on entire histories, defining a set of history-conditioned policies $Pi_cal(H) := {pi: cal(H) -> cal(P)(cal(A))}$, where $cal(H) := { cal(H)_t|t >= 0 }$ denotes the set of all histories.
+    Unlike traditional RL policies that map states to actions, Bayesian policies operate on entire histories, defining a set of history-conditioned policies $Pi_cal(H) := {pi: cal(H) -> cal(P)(cal(A))}$, where $cal(H) := { cal(H)_t|t >= 0 }$ denotes the set of all histories @Ghavamzadeh_2015.
 ]
 
 Where the prior $P_Phi$ represents our initial uncertainty (the special case where $h_t = emptyset$), the posterior $P_Phi (h_t)$ captures our refined beliefs after observing interactions with the environment.
-This allows us to reason about future outcomes by _marginalizing_ across all possible MDPs according to our current uncertainty.
+This allows us to reason about future outcomes by marginalizing across all possible MDPs according to our current uncertainty.
 
 === The Bayesian Perspective on Transitions
 
@@ -469,18 +462,13 @@ Instead of committing to a single model of the environment, it maintains a distr
 
 This distribution lets us reason about future trajectories using the _prior predictive distribution_ $P^pi_t$ with density $ p^pi_t (h_t) = p_0 (s_0) product_(i = 0)^t pi (a_i|h_i) p (r_i, s_(i + 1)|h_i, a_i). $
 
-#attention("Belief Transitions")[
-    The evolution of beliefs about the environment can itself be viewed as a transition system.
-    This leads to the concept of a _Bayes-adaptive MDP_ (BAMDP) @duff2002optimallearningcomputationalprocedures.
-]
-
 The belief transition distribution $P_cal(H) (h_t, a_t)$ captures how our beliefs evolve with new observations, with density $ p_cal(H)(h_(t+1)|h_t, a_t) = p(s_(t+1), r_t|h_t, a_t). $
 
-This formulation leads to the definition of the Bayes-adaptive MDP: $ cal(M)_"BAMDP" := angle.l cal(H), cal(A), P_0, P_cal(H)(h,a), gamma angle.r. $
+This formulation leads to the definition of the Bayes-adaptive MDP (BAMDP) @duff2002optimallearningcomputationalprocedures $ cal(M)_"BAMDP" := angle.l cal(H), cal(A), P_0, P_cal(H)(h,a), gamma angle.r. $
 
 === Natural Resolution of the Exploration Dilemma
 
-An interesting aspects of the Bayesian framework is how it naturally resolves the exploration-exploitation dilemma.
+An interesting aspects of the Bayesian framework is how it naturally resolves the exploration-exploitation dilemma @duff2002optimallearningcomputationalprocedures @Ghavamzadeh_2015.
 Rather than treating exploration as a separate mechanism, it emerges naturally from the optimization of expected returns under uncertainty $ J^pi_"Bayes" := EE_(h_infinity ~ P^pi_infinity)[sum_(i=0)^infinity gamma^i r_i]. $
 
 A Bayes-optimal policy achieves perfect balance between exploration and exploitation because:
@@ -498,10 +486,10 @@ This Q-function satisfies the optimal Bayesian Bellman equation $ Q^* (h_t, a_t)
 
 Model-free reinforcement learning takes a different approach to learning optimal behaviors compared to model-based methods.
 Rather than explicitly modeling the environment's dynamics, model-free approaches attempt to learn optimal policies from experience.
-Bayesian Exploration Networks (BENs) extend this idea into the Bayesian realm by characterizing uncertainty in the Bellman operator itself, instead of in the environment's transition dynamics.
+Bayesian Exploration Networks (BENs) extend this idea into the Bayesian realm by characterizing uncertainty in the Bellman operator itself, instead of in the environment's transition dynamics @fellows2024bayesianexplorationnetworks.
 
 #attention("Model-Free vs Model-Based")[
-    While model-based approaches maintain explicit probabilistic models of the environment's dynamics, model-free methods like BEN directly learn mappings from states to values or actions.
+    While model-based approaches maintain explicit probabilistic models of the environment's dynamics, model-free methods like BEN directly learn mappings from states to values or actions @DayanPeter2008RlTG.
     This can be more computationally efficient but requires careful handling of uncertainty.
 ]
 
@@ -514,13 +502,13 @@ This bootstrapping process can be viewed as a transformation of variables --- ma
 This significantly reduces the dimensionality of the problem while preserving the essential information needed for learning optimal policies @fellows2024bayesianexplorationnetworks.
 
 #attention("Bootstrapped Distribution")[
-    The samples $b_t$ follow what we call the Bellman distribution $P^*_B (h_t, a_t; omega)$, which captures the distribution of possible Q-value updates.
+    The samples $b_t$ follow what we call the Bellman distribution $P^*_B (h_t, a_t; omega)$, which captures the distribution of possible Q-value updates @fellows2024bayesianexplorationnetworks.
     This distribution encapsulates both the environment's inherent randomness and our uncertainty about its true nature.
 ]
 
 === Sources of Uncertainty
 
-When predicting future Q-values, BEN distinguishes between two types of uncertainty:
+When predicting future Q-values, BEN distinguishes between two types of uncertainty.
 
 + *Aleatoric Uncertainty*: The inherent randomness in the environment's dynamics that persists even with perfect knowledge.
 
@@ -531,22 +519,22 @@ When predicting future Q-values, BEN distinguishes between two types of uncertai
 
     _Example: Determining whether a die is fair --- this uncertainty is can be reduced with more data._
 
-This separation of uncertainties allows BEN to distinguish between what is fundamentally unpredictable (aleatoric) and what can be learned through exploration (epistemic), leading to more efficient learning strategies.
+This separation of uncertainties allows BEN to distinguish between what is fundamentally unpredictable (aleatoric) and what can be learned through exploration (epistemic), leading to more efficient learning strategies @fellows2024bayesianexplorationnetworks.
 
 === Network Architecture
 
-BEN implements this uncertainty handling through three neural networks:
+BEN implements this uncertainty handling through three neural networks @fellows2024bayesianexplorationnetworks:
 + *Recurrent Q-Network*:
 
     At its core, BEN uses a recurrent neural network (RNN) to approximate the optimal Bayesian Q-function.
     The Q-network processes the entire history of interactions.
     We denote the output at timestep $t$ as $q_t = Q_omega (h_t, a_t) = Q_omega (hat(h)_(t-1), o_t)$, where $h_t$ represents the history up to time $t$, $a_t$ is the action, $hat(h)_(t-1)$ is the recurrent encoding of previous history, and $o_t$ contains the current observation tuple ${r_(t-1), s_t, a_t}$.
-    By conditioning on history rather than just current state, BENs can capture how uncertainty evolves over time, making it capable of learning Bayes-optimal policies.
+    By conditioning on history rather than just current state, BENs can capture how uncertainty evolves over time, making it capable of learning Bayes-optimal policies @fellows2024bayesianexplorationnetworks.
 
 + *Aleatoric Network*:
 
     The aleatoric network models the inherent randomness in the environment.
-    It uses normalizing flows to transform a simple base distribution (such as a standard Gaussian) into a more complex distribution $P_B (h_t, a_t, phi; omega)$ over possible next-state Q-values, representing the aleatoric uncertainty in the Bellman operator, by applying the transformation $b_t = B(z_"al", q_t, phi)$, where 
+    It uses normalizing flows to transform a simple base distribution (such as a standard Gaussian) into a more complex distribution $P_B (h_t, a_t, phi; omega)$ over possible next-state Q-values, representing the aleatoric uncertainty in the Bellman operator, by applying the transformation $b_t = B(z_"al", q_t, phi)$ @fellows2024bayesianexplorationnetworks, where 
 
     - $z_"al" in RR ~ P_"al"$ is a base variable with a zero-mean, unit variance Gaussian $P_"al"$;
     - $q_t$ is the Q-value from the recurrent network;
@@ -571,26 +559,25 @@ BEN implements this uncertainty handling through three neural networks:
     The epistemic network learns a tractable approximation $P_psi$ parametrized by $psi in Psi$ that aims to capture the essential characteristics of the true posterior.
     We optimize this approximation by minimizing the KL-divergence between our approximation and the true posterior: $ "KL"(P_psi || P_Phi (cal(D)_omega (h_t))). $
     
-    This optimization is performed indirectly by maximizing the Evidence Lower Bound (ELBO) $"ELBO"(psi; h, omega)$, which is equivalent @fellows2024bayesianexplorationnetworks.
+    This optimization is performed indirectly by maximizing the Evidence Lower Bound (ELBO) $"ELBO"(psi; h, omega)$, which is equivalent as proved by @fellows2024bayesianexplorationnetworks.
 
-#note[We use the concept of variational inference without defining it]
 
 === Training Process
 
 The network is trained through a dual optimization process:
 
-+ *MSBBE Optimization:* The Mean Squared Bayesian Bellman Error (MSBBE) is computed as the difference between the predictive optimal Bellman operator $B^+ [Q_omega]$ and $Q_omega$: $ "MSBBE"(omega; h_t, psi) := norm(B^+ [Q_omega] (h_t, a_t) - Q_omega (h_t, a_t))^2_rho, $ which is minimized to learn the parametrisation $omega^*$, satisfying the optimal Bayesian Bellman equation for our Q-function approximator, with $rho$ being an arbitrary sampling distribution with support over $cal(A)$.
++ *MSBBE Optimization:* The Mean Squared Bayesian Bellman Error (MSBBE) is computed as the difference between the predictive optimal Bellman operator $B^+ [Q_omega]$ and $Q_omega$ @fellows2024bayesianexplorationnetworks: $ "MSBBE"(omega; h_t, psi) := norm(B^+ [Q_omega] (h_t, a_t) - Q_omega (h_t, a_t))^2_rho, $ which is minimized to learn the parametrisation $omega^*$, satisfying the optimal Bayesian Bellman equation for our Q-function approximator, with $rho$ being an arbitrary sampling distribution with support over $cal(A)$.
     
     The predictive optimal Bellman operator can be obtained by taking expectations over variable $b_t$ using the predictive optimal Bellman distribution $P_B (h_t, a_t; omega)$: $ B^+ [Q_omega] (h_t, a_t) := EE_(b_t ~ P_B (h_t, a_t; omega)) [b_t], $ where $P_B (h_t, a_t; omega) = EE_(phi ~ P_Phi (cal(D)_omega (h_t))) [P_B (h_t, a_t, phi; omega)]$.
 
-    This gives rise to a nested optimisation problem, as is common in model-free RL @fellows2024bayesianexplorationnetworks, which can be solved using two-timescale stochastic approximation.
-    In this case, we update the epistemic network parameters $psi$ using gradient descent on an asymptotically faster timescale than the function approximator parameters $omega$ to ensure convergence to a fixed point @fellows2024bayesianexplorationnetworks.
+    This gives rise to a nested optimisation problem, as is common in model-free RL @fellows2024bayesianexplorationnetworks, which can be solved using two-timescale stochastic approximation  @borkar2008stochasticapproximationadynamicalsystemsviewpoint.
+    In the case of BEN, we update the epistemic network parameters $psi$ using gradient descent on an asymptotically faster timescale than the function approximator parameters $omega$ to ensure convergence to a fixed point, as propposed by @fellows2024bayesianexplorationnetworks.
 
 + *ELBO Optimization:* The Evidence Lower BOund (ELBO) serves as the optimization objective for training BEN's epistemic network.
     While minimizing the KL-divergence $"KL"(P_psi || P_Phi (cal(D)_omega (h_t)))$ directly would give us the most accurate approximation of the true posterior, computing this divergence is typically intractable.
-    Instead, we can derive and optimize the ELBO, which provides a tractable lower bound on the model evidence.
+    Instead, we can derive and optimize the ELBO, which provides a tractable lower bound on the model evidence @fellows2024bayesianexplorationnetworks.
     
-    Starting with the definition of the KL-divergence and applying Bayes' rule, @fellows2024bayesianexplorationnetworks derives $ "ELBO"&(psi; h_t, omega) \ &:= EE_(z_"ep" ~ P_"ep") [ sum_(i=0)^(t-1) ( B^(-1)(b_i, q_i, phi)^2 - log bar.v partial_b B^(-1)(b_i, q_i, phi) bar.v ) - log p_Phi (phi) ], $ where $phi = t_psi (z_"ep")$ and:
+    By applying Baye's rule on this KL-divergence, @fellows2024bayesianexplorationnetworks derives $ "ELBO"&(psi; h_t, omega) \ &:= EE_(z_"ep" ~ P_"ep") [ sum_(i=0)^(t-1) ( B^(-1)(b_i, q_i, phi)^2 - log bar.v partial_b B^(-1)(b_i, q_i, phi) bar.v ) - log p_Phi (phi) ], $ where $phi = t_psi (z_"ep")$ and:
     
     - $z_"ep"$ is drawn from the base distribution $P_"ep"$ (a standard Gaussian $cal(N)(0, I^d)$);
     - $B^(-1)$ is the inverse of the aleatoric network's transformation;
@@ -599,7 +586,7 @@ The network is trained through a dual optimization process:
     
     #attention("Jacobian Term")[
         The term $partial_b B^(-1)$ accounts for how the epistemic network's transformation changes the volume of probability space.
-        This is important for maintaining proper probability distributions when using normalizing flows.
+        This is important for maintaining proper probability distributions when using normalizing flows @pmlr-v37-rezende15.
     ]
     
     The ELBO objective breaks down into three key components:
@@ -608,14 +595,14 @@ The network is trained through a dual optimization process:
     + A volume correction term $log|partial_b B^(-1)(b_i, q_i, phi)|$ that accounts for the change in probability space;
     + A prior regularization term $log p_Phi (phi)$ that encourages the approximated posterior to stay close to our prior beliefs.
     
-    By minimizing the ELBO, we obtain an approximate posterior that balances accuracy with computational tractability, allowing BEN to maintain and update its uncertainty estimates efficiently during learning.
+    By minimizing the ELBO, we obtain an approximate posterior that balances accuracy with computational tractability, allowing BEN to maintain and update its uncertainty estimates efficiently during learning @fellows2024bayesianexplorationnetworks.
 
 #attention("Training Dynamics")[
     The two optimization processes occur at different timescales, with epistemic updates happening more frequently than the Q-network updates.
-    This separation ensures stable convergence while maintaining the ability to adapt to new information.
+    This separation ensures stable convergence while maintaining the ability to adapt to new information @borkar2008stochasticapproximationadynamicalsystemsviewpoint.
 ]
 
-With this architecture, BEN can learn truly Bayes-optimal policies while maintaining the computational efficiency of model-free methods.
+With this architecture, BEN can learn truly Bayes-optimal policies while maintaining the computational efficiency of model-free methods @fellows2024bayesianexplorationnetworks.
 This makes it particularly well-suited for environments with sparse, delayed rewards where efficient exploration is important.
 
 = Theoretical Framework <theoretical_framework>
@@ -679,7 +666,7 @@ To evaluate our hypothesis about the relative performance of GFlowNets and BENs 
 
 + *Distribution Matching:* Evaluates how well the learned policy matches the true underlying reward structure.
 
-    In our n-chain environment, where terminal states are guaranteed to be reached, we measure the KL divergence between the true terminal state distribution $P$ (determined by rewards) and the empirical distribution $Q$ generated by each algorithm $"KL"(P || Q)$.
+    In our n-chain environment, where terminal states are guaranteed to be reached, we measure the KL-divergence between the true terminal state distribution $P$ (determined by rewards) and the empirical distribution $Q$ generated by each algorithm $"KL"(P || Q)$.
     This metric is particularly relevant for GFlowNets, as they explicitly aim to learn a sampling distribution proportional to the reward function.
 
 + *Exploration Efficiency:* Captures how effectively each algorithm explores the state space before converging to optimal behavior.
@@ -732,20 +719,11 @@ This structure allows us to precisely control both reward delay $T_"reward"$ and
 
 == Evaluation Protocol
 
-#todo[
-    - Delay Variation Study:
-        - Chain length 3
-        - Chain length 5
-        - Chain length 7
-        - Chain length 9
-        - Chain length 11
-]
-
 We evaluate each algorithm through a sequence of experiments with increasing complexity.
 
 + *Base Configuration:*
     - Fixed chain length ($n = 5$);
-    - Three terminal states with fixed rewards ${0, 10, 90}$;
+    - Three terminal states with fixed rewards ${10, 20, 70}$;
     - BEN: Discount factor $gamma = 0.9$;
     - GFlowNet: Exploration factor $epsilon = 0.1$.
 
@@ -754,46 +732,113 @@ We evaluate each algorithm through a sequence of experiments with increasing com
     - Keeping terminal rewards fixed;
     - Measuring performance vs. delay $T_"reward"$.
 
+#maybe[
 + *Stochastic Analysis:*
     - Introducing random rewards drawn from distributions;
     - Terminal states $x in cal(X)$ rewards: $R_x ~ cal(N)(mu_x, sigma^2)$;
     - Testing robustness to uncertainty.
+]
 
-For each configuration, we conduct 50 independent trials with different random seeds to ensure statistical significance.
+For each configuration, we conduct 10 independent trials with different random seeds to minimize the impact of statistical variance.
 We then apply the framework discussed in @analytical_framework on the results of these three configurations for analysis.
 
 
 == Implementation Details
 
-#note[
-- Implementation details
-    - Network architectures
-    - Training procedures
-        - For GFlowNets, mention tempered exploration during training (off-policy training)
-    - Hyperparameter selection
-]
+=== Environment Setup
 
-#todo[
-    - Network architectures
-        - GFlowNets:
-            - Multi-layer perceptron for state encoding
-                - Input: State tensor of shape [batch_size, state_dim]
-                - Output: State encoding of  of shape [batch_size, hidden_dim]
-            - Single layer for forward policy
-                - Input: State encoding of shape [batch_size, hidden_dim]
-                - Output: Forward policy [batch_size, num_actions]
-            - Single layer for backward policy
-                - Input: State encoding of shape [batch_size, hidden_dim]
-                - Output: Backward policy [batch_size, num_actions]
-                    - Note: for the n-chain environment, the graph is a directed tree and so each state can have at most one parent, meaning that only one action is possible for each state in the backward policy, as only one action could have lead from the previous state to this state (as actions are represented by edges)
-            - Parameter (scalar) for log Z function approximation
-    - Training procedures
-        - For GFlowNets, mention tempered exploration during training (i.e., off-policy training)
-            - Mention epsilon parameter for temperature control in guided exploration
-    - Hyperparameter selection
-]
+Our implementation of the n-chain environment creates a decision space that enables precise control over reward delay and sparsity.
+The environment is implemented as a deterministic MDP, where each state is encoded as a composite tensor of shape `[n*3 + 4]`, consisting of a one-hot position encoding of length 3n to account for all three branches, as well as a one-hot branch encoding of length 4 (pre-split + 3 possible branches).
 
-#maybe[We employ curriculum learning for both algorithms, starting with shorter chain lengths and gradually increasing $n$ as performance improves, while tracking convergence throughout.]
+The state space is managed through a `NChainState` class that tracks three attributes:
+
++ _Position:_ An integer in [0, n-1] indicating location in the chain;
++ _Branch:_ An integer flag (-1 for pre-split, {0,1,2} for branch selection);
++ _Chain Length:_ The parameter n that determines the delay between actions and rewards.
+
+The action space is managed through a `NChainAction` enum and consists of the following five distinct actions:
+
+- `TERMINAL_STAY`: Available only in terminal states;
+- `FORWARD`: For progression along the chosen path;
+- `BRANCH_0`, `BRANCH_1`, `BRANCH_2`: Available only at the split point.
+
+The environment enforces strict action masking through a get_valid_actions method that returns only legitimate actions for each state.
+This creates three distinct decision phases:
+
++ Pre-split: Only `FORWARD` actions are valid;
++ Split-point: Only `BRANCH_i` actions are valid, for $i in {0, 1, 2}$;
++ Post-split: `FORWARD` until terminal, then `TERMINAL_STAY`.
+
+For interaction with the environment, the implementation provides methods like `step`, `reset`, as well as utility methods like state-to-tensor conversions.
+This approach allows for systematic variation of both reward delay through the chain length $n$, and reward sparsity through the ratio of rewarding states to total states.
+
+=== Network Architectures
+
+The GFlowNet implementation consists of three primary components working in concert to learn flow-matching policies:
+
++ _State Encoder:_ A multi-layer perceptron that processes state tensors of shape `[batch_size, state_dim]` into a learned encoding of shape `[batch_size, hidden_dim]`.
+    This encoding captures the essential features of each state necessary for policy decisions.
+
++ _Forward Policy Network:_ A single dense layer that transforms the state encoding into a forward policy distribution over actions, outputting tensors of shape `[batch_size, num_actions]`.
+    This network determines the probabilities of taking each possible action from the current state.
+
++ _Backward Policy Network:_ For the n-chain environment, this component is simplified due to the tree structure of the state space.
+    Since each non-initial state has exactly one parent, the backward policy becomes deterministic, requiring only a lightweight network layer to maintain architectural symmetry.
+
+Additionally, we maintain a scalar parameter representing $log Z$ (the partition function), which is important for our flow matching approach and is learned alongside the network parameters.
+
+The BEN implementation is heavily based on the implementation provided by @fellows2024bayesianexplorationnetworks, but is adapted for the n-chain environment.
+It comprises three interacting networks:
+
++ _Q-Bayes Network:_ A recurrent neural network that processes observation tuples (state, action, reward) to generate Q-values and maintain a history encoding.
+    The network accepts inputs of shape `[batch_size, state_dim + action_dim + reward_dim]` and outputs both Q-values `[batch_size, num_actions]` and a RNN hidden state `[batch_size, rnn_hidden_dim]` for further processing.
+
++ _Aleatoric Network:_ Implements a normalizing flow to model the inherent randomness in Bellman updates through:
+   - A conditioning network (ConditionerMLP) @fellows2024bayesianexplorationnetworks that generates parameters for the flow based on Q-values and RNN state;
+   - An inverse autoregressive flow that transforms a base distribution into the desired Bellman distribution.
+
++ _Epistemic Network:_ Another normalizing flow that captures uncertainty about the environment itself, transforming a base variable $z_"ep" in RR^d$ into the parameter space that defines our beliefs about the environment.
+
+=== Training Procedures
+
+Training of the GFlowNet follows a tempered exploration strategy where:
+
++ The forward policy is "softened" during training using an $epsilon$-greedy approach with $epsilon = 0.1$, allowing for off-policy exploration while maintaining flow-matching properties:
+    #align(center)[
+        ```python
+        (1 - self.epsilon) * policy + self.epsilon * random_policy.
+        ```
+    ]
+
++ The trajectory balance loss is minimized using stochastic gradient descent with the Adam optimizer @kingma2017adammethodstochasticoptimization:
+    #align(center)[
+        ```python
+        L_TB(tau) = (log_Z + sum_log_pf - log_R - sum_log_pb).pow(2),
+        ```
+    ]
+    where `tau` represents a trajectory, `sum_log_pf` represents the sum of log forward probabilities over `tau`, and `sum_log_pb` similarly represents the sum of log backward probabilities over `tau`.
+
+BEN employs a two-timescale optimization process:
+
++ _Fast Timescale:_ Updates to the epistemic network parameters $psi$ through ELBO minimization:
+    #align(center)[
+        ```python
+        ELBO(psi; h, omega) = -log_p - torch.mean(log_q) - 1 / (time_period + 1) * prior,
+        ```
+    ]
+    where `log_p` represents the base variable $z_"al"$ obtained from $B^(-1) (b_i, q_i, phi)^2$, `torch.mean(log_q)` represents the log Jacobian of this base variable $log |partial_b B^(-1) (b_i, q_i, phi)|$, and `1 / (time_period + 1) * prior` represents the log prior $log p_Phi (phi)$.
+
+2. _Slow Timescale:_ Updates to the Q-network parameters $omega$ through MSBBE minimization:
+    #align(center)[
+        ```python
+        MSBBE(omega; h_t, psi) = torch.abs((b1 - q) * (b2 - q)),
+        ```
+    ]
+    where `b1` and `b2` represent two samples from the predictive Bellman operator $B^+ [Q_omega] (h_t, a_t)$, and `q` represents the Q-value obtained from $Q_omega (h_t, a_t)$.
+    This operation is similar to a simple squared error, with the only difference being the use of two different samples, minimizing statistical variance.
+
+This separation of timescales ensures stable convergence while maintaining the ability to adapt to new information, controlled by the discount factor $gamma$.
+For details about hyperparameter selection, we refer to @hyperparameter_selection.
 
 = Results and Analysis <results_and_analysis>
 
@@ -805,6 +850,50 @@ We then apply the framework discussed in @analytical_framework on the results of
     - Exploration patterns
     - Learning behavior
 - Discussion of findings
+]
+
+== Convergence Analysis
+
+#todo[
+- Loss curves across different chain lengths
+    - Show plot for n=3, n=7, and n=11
+    - Rest in appendix
+- Statistical significance tests
+    - T-tests between early/mid/late stages
+- Convergence time analysis
+    - By what iteration does loss seem to converge?
+]
+
+== Exploration Efficiency
+
+#todo[
+- State visitation heat maps
+- First-success timing metrics
+- Coverage rate comparisons
+]
+
+== Policy Quality Assessment
+
+#todo[
+- KL divergence from optimal policy
+- Terminal state distribution analysis
+- Reward accumulation curves
+]
+
+== Learning Dynamics
+
+#todo[
+- Early exploration strategies
+- Transition points in policy development
+- Adaptation to different reward scales
+]
+
+== Failure Mode Analysis
+
+#todo[
+- Common pitfalls in learning
+- Edge case behaviors
+- Stability considerations
 ]
 
 = Conclusion <conclusion>
@@ -826,4 +915,22 @@ We then apply the framework discussed in @analytical_framework on the results of
 #counter(heading).update(0)
 #text(size: 2em)[Appendix]
 
-= #maybe[Hello]
+= Implementation Details
+
+== Hyperparameter selection <hyperparameter_selection>
+
+_GFlowNet Hyperparameters:_
+
+- Hidden dimension: 64;
+- Learning rate: 1e-4;
+- Exploration $epsilon$: 0.1;
+- Batch size: 32.
+_BEN Hyperparameters:_
+
+- RNN hidden dimension: 64;
+- Learning rate (Q-network): 1e-4;
+- Learning rate (Epistemic network): 1e-4;
+- Base dimension ($z_"ep"$): 8;
+- Discount factor $gamma$: 0.9,
+- Batch size: 32.
+

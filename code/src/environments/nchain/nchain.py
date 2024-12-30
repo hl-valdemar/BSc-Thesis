@@ -126,12 +126,8 @@ class NChainEnv:
         self.split_point = n // 2  # Split occurs at n // 2 (the middle)
         self.current_state = NChainState(position=0, n=self.n, branch=-1)
         self.state_dim = self.current_state.state_dim
-
-        # Actions: forward (pre-split)
-        # At split: choose one of 3 branches [0..2]
-        # Post-split: forward on chosen branch
-        # At terminal: stay
-        self.num_actions = 5
+        self.num_states = self.split_point + (self.split_point + 1) * len(rewards)
+        self.num_actions = len(list(NChainAction))
 
     def reset(self) -> NChainState:
         """Reset environment to initial state (position 0)."""
