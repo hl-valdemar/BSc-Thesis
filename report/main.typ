@@ -12,9 +12,9 @@
       }
     },
     footer: context {
-        if here().page() != 1 {
-            align(center)[#counter(page).get().first()]
-        }
+        //if here().page() != 1 {
+        align(center)[#counter(page).get().first()]
+        //}
     },
     numbering: "1",
     margin: (
@@ -94,34 +94,57 @@
     align(center)[#text(size: 18pt, weight: 900)[#title]]
     v(0.5em)
     align(center)[
-        #for (i, name) in authors.enumerate() {
-            name
+        #authors.first()
+        #h(1em)
+        \*#supervisors.first()
 
-            // Spacing between names (if not last name in list)
-            if i + 1 != authors.len() {
-                h(1em)
-            }
-        }
-    ]
-    align(center)[
-        #for (i, name) in supervisors.enumerate() {
-            [\*#name]
+        //#for (i, name) in authors.enumerate() {
+        //    name
 
-            // Spacing between names (if not last name in list)
-            if i + 1 != supervisors.len() {
-                h(1em)
-            }
-        }
+        //    // Spacing between names (if not last name in list)
+        //    if i + 1 != authors.len() {
+        //        h(1em)
+        //    }
+        //}
+
+        //#for (i, name) in supervisors.enumerate() {
+        //    [\*#name]
+
+        //    // Spacing between names (if not last name in list)
+        //    if i + 1 != supervisors.len() {
+        //        h(1em)
+        //    }
+        //}
     ]
+    //align(center)[
+    //    #for (i, name) in supervisors.enumerate() {
+    //        [\*#name]
+
+    //        // Spacing between names (if not last name in list)
+    //        if i + 1 != supervisors.len() {
+    //            h(1em)
+    //        }
+    //    }
+    //]
     v(1.5em)
     align(center)[IMADA, SDU]
 }
 
 #let make_abstract(content) = {
     align(center)[
-        #text(size: 16pt, weight: 900)[Abstract]
-        \ \
-        #content
+        #box(width: 90%)[
+            #set par(
+              first-line-indent: 1em,
+              //spacing: 1em,
+              justify: true,
+            )
+
+            #set text(size: 10.5pt)
+
+            #text(size: 16pt, weight: 900)[Abstract]
+            \ \
+            #content
+        ]
     ]
 }
 
@@ -140,7 +163,7 @@
 //    - Making the reward for reaching a terminal state random following a pre-determined distribution (by sampling the rewards from pre-determined distributions corresponding to each terminal state, we can still make assumptions about the desired behavior --- bigger mean rewards $=>$ higher desired sample rates for trained model).
 //]
 
-#let title = "BSc Thesis"
+#let title = "Flow Networks versus Bayesian Exploration: A Comparative Study in Delayed-Reward Environments"
 #let authors = (
     "Valdemar H. Lorenzen",
 )
@@ -150,12 +173,22 @@
 
 #make_title(title, authors, supervisors)
 #v(1cm)
-#make_abstract[#todo[Write the abstract]]
+#make_abstract[
+    This thesis presents a comparative analysis of two promising approaches to reinforcement learning in environments with delayed and sparse rewards: Generative Flow Networks (GFlowNets) and Bayesian Exploration Networks (BEN).
+    We hypothesized that BEN's explicit decomposition of uncertainty would lead to more efficient learning compared to GFlowNets, particularly in early training stages.
+    However, our empirical investigation using a modified n-chain environment with varying chain lengths ($n in {3,5,7,9,11}$) revealed contrary findings.
+    GFlowNet demonstrated superior performance across multiple metrics, including learning stability, reward optimization, and scalability.
+    Notably, GFlowNet achieved consistent convergence with near-zero trajectory balance loss ($< 0.003$) across all chain lengths, while BEN showed increasing instability with longer chains, particularly in its epistemic uncertainty estimation.
+    The results suggest that for environments with deterministic dynamics and delayed rewards, GFlowNet's flow-based approach provides a more effective framework than BEN's sophisticated uncertainty decomposition.
+    This challenges the intuition that explicit uncertainty handling necessarily leads to better exploration in delayed reward scenarios.
+    Our findings contribute to the broader understanding of exploration strategies in reinforcement learning and suggest that the choice of algorithm should be guided by the underlying structure of the environment, particularly its deterministic versus stochastic nature.
+    We conclude by proposing extensions to stochastic environments and more complex reward structures as promising directions for future research.
+]
 
 //#set page(columns: 2)
 
-#pagebreak()
-#counter(page).update(1)
+//#pagebreak()
+//#counter(page).update(1)
 
 //#outline()
 
@@ -205,7 +238,7 @@ The contributions of this work include:
 
 - A comprehensive empirical evaluation using the n-chain environment with varying degrees of reward delay.
 
-- #maybe[Insights into the relative strengths and limitations of Bayesian and flow-based approaches to exploration.]
+- Insights into the relative strengths and limitations of Bayesian and flow-based approaches to exploration.
 
 - Implementation and analysis of both algorithms with comparisons.
 
@@ -917,8 +950,6 @@ This also suggests that the state space is too small to pose a serious challenge
 
 === Information Theoretic Measures
 
-#note[Maybe move this to the appendix as we haven't calculated entropies for BEN.]
-
 #figure(
     placement: top,
     image("figures/gflownet/mean_entropy.png", width: 100%),
@@ -938,7 +969,7 @@ The analysis reveals some chain length-dependent effects:
 
 - Longer chains ($n >= 9$) show higher terminal rewards in late stages;
 - Convergence stability (measured by loss variance) remains consistent across chain lengths;
-#maybe[- Information theoretic measures scale proportionally with chain length while maintaining similar convergence patterns.]
+- Information theoretic measures scale proportionally with chain length while maintaining similar convergence patterns.
 
 This suggests that the algorithm's learning dynamics remain robust across different problem scales.
 
@@ -1070,29 +1101,39 @@ This comparative analysis suggests that the choice between these approaches shou
 
 = Conclusion <conclusion>
 
-#note[
-- Summary of contributions
-- Key insights
-- Future work directions
-]
+Contrary to our initial hypothesis, GFlowNet's flow-based approach demonstrated superior performance and stability compared to BEN's explicit uncertainty decomposition, particularly in environments with deterministic dynamics and delayed rewards. This finding manifested across multiple dimensions:
 
-== Future Research
+- _Learning Stability:_ GFlowNets exhibited consistent convergence across all chain lengths, with trajectory balance loss reaching near-zero values ($< 0.003$) in late stages.
+    In contrast, BEN showed increasingly volatile behavior, particularly in its epistemic uncertainty estimation for longer chains.
 
-#note[
-    Everything I think I could have done better essentially.
+- _Reward Optimization:_ GFlowNets achieved monotonic improvement in terminal rewards, with particularly strong performance in longer chains ($n >= 9$).
+    BEN, however, displayed concerning patterns with monotonic decreases in cumulative returns across all chain lengths.
 
-    - Stochastic Analysis:
-        - Introducing random rewards drawn from distributions;
-        - Terminal states $x in cal(X)$ rewards: $R_x ~ cal(N)(mu_x, sigma^2)$;
-        - Testing robustness to uncertainty.
+- _Scalability:_ Perhaps most importantly, GFlowNets maintained consistent performance characteristics across different chain lengths, while BEN's stability degraded significantly with increasing chain length.
 
-    - Experiment with impact of changing:
-        - exploration factor $epsilon$;
-        - discount factor $gamma$.
+Furthermore, the explicit separation of aleatoric and epistemic uncertainty seemingly introduce unnecessary complexity in deterministic environments with delayed rewards.
+In environments with deterministic transitions, simpler flow-matching approaches may be more effective than sophisticated uncertainty decomposition.
+This suggests that the choice of exploration strategy should be influenced by the underlying structure of the environment, particularly its deterministic versus stochastic nature.
 
-    - Mention more compute needed than what was available in these experiments for more interesting results.
-        - This project could be considered a preliminary experiment to more serious experiments requiring more compute and/or time.
-]
+== Limitations and Future Work
+
+While our study served as an interesting preliminary comparison of GFlowNets and BENs, it leaves much to be desired and would benefit from extended stochastic investigations, as our focus was narrowly fixed on the deterministic n-chain environment.
+A natural extension would be to introduce stochastic elements through:
+
+- More variability (of greater magnitude) in chain lengths;
+- Terminal state rewards following normal distributions (e.g., $R_x ~ cal(N)(mu_x, sigma^2)$ for $x in cal(X)$);
+- Including other environments (e.g., grid-world).
+- Transition probability variations;
+- Testing robustness to uncertainty;
+
+Further investigation is needed into the impact of hyperparameter sensitivity, in particular:
+
+- Exploration factor $epsilon$ in GFlowNets;
+- Discount factor $gamma$ in BEN;
+- Branching factor $b$ for the n-chain environment (increasing the number of impactful decision);
+- The interaction between these parameters and chain length.
+
+Lastly, our current difficulties with training suggest the need for more extensive computational resources to explore longer chain lengths, increase the number of training iterations, and investigate more complex branching structures.
 
 #bibliography("refs.bib")
 
