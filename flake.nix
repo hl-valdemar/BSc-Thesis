@@ -28,6 +28,7 @@
             wandb
             pandas
             glob2
+            scipy
           ]))
       ];
 

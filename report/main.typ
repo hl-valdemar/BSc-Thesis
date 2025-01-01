@@ -570,7 +570,7 @@ The network is trained through a dual optimization process:
     
     The predictive optimal Bellman operator can be obtained by taking expectations over variable $b_t$ using the predictive optimal Bellman distribution $P_B (h_t, a_t; omega)$: $ B^+ [Q_omega] (h_t, a_t) := EE_(b_t ~ P_B (h_t, a_t; omega)) [b_t], $ where $P_B (h_t, a_t; omega) = EE_(phi ~ P_Phi (cal(D)_omega (h_t))) [P_B (h_t, a_t, phi; omega)]$.
 
-    This gives rise to a nested optimisation problem, as is common in model-free RL @fellows2024bayesianexplorationnetworks, which can be solved using two-timescale stochastic approximation  @borkar2008stochasticapproximationadynamicalsystemsviewpoint.
+    This gives rise to a nested optimisation problem, as is common in model-free RL @fellows2024bayesianexplorationnetworks, which can be solved using two-timescale stochastic approximation @borkar2008stochasticapproximationadynamicalsystemsviewpoint.
     In the case of BEN, we update the epistemic network parameters $psi$ using gradient descent on an asymptotically faster timescale than the function approximator parameters $omega$ to ensure convergence to a fixed point, as propposed by @fellows2024bayesianexplorationnetworks.
 
 + *ELBO Optimization:* The Evidence Lower BOund (ELBO) serves as the optimization objective for training BEN's epistemic network.
@@ -716,28 +716,23 @@ The environment consists of three main components:
 This design creates a sparse reward landscape --- agents must execute sequences of $floor(n/2) - 1$ actions before reaching the branch point, where the chosen branch determines the final reward, followed by another $floor(n/2)$ actions to reach any terminal state.
 This structure allows us to precisely control both reward delay $T_"reward"$ and sparsity $rho$.
 
-
 == Evaluation Protocol
 
-We evaluate each algorithm through a sequence of experiments with increasing complexity.
+We evaluate each algorithm through the following experiment.
 
-+ *Base Configuration:*
-    - Fixed chain length ($n = 5$);
-    - Three terminal states with fixed rewards ${10, 20, 70}$;
-    - BEN: Discount factor $gamma = 0.9$;
-    - GFlowNet: Exploration factor $epsilon = 0.1$.
+- *Base Configuration:*
+    - Three terminal states with fixed rewards;
+    - GFlowNet: 
+        - Rewards: ${10, 20, 70}$;
+        - Exploration factor $epsilon = 0.1$;
+    - BEN: 
+        - Rewards: ${-500, 10, 200}$;
+        - Discount factor $gamma = 0.9$.
 
-+ *Delay Variation Studies:*
+- *Delay Variation Studies:*
     - Chain lengths $n in {3, 5, 7, 9, 11}$;
     - Keeping terminal rewards fixed;
     - Measuring performance vs. delay $T_"reward"$.
-
-#maybe[
-+ *Stochastic Analysis:*
-    - Introducing random rewards drawn from distributions;
-    - Terminal states $x in cal(X)$ rewards: $R_x ~ cal(N)(mu_x, sigma^2)$;
-    - Testing robustness to uncertainty.
-]
 
 For each configuration, we conduct 10 independent trials with different random seeds to minimize the impact of statistical variance.
 We then apply the framework discussed in @analytical_framework on the results of these three configurations for analysis.
@@ -852,7 +847,13 @@ For details about hyperparameter selection, we refer to @hyperparameter_selectio
 - Discussion of findings
 ]
 
-== Convergence Analysis
+== GFlowNet
+
+#todo[
+    FACT CHECK!
+        - Run the statistical significance tests and calculate difference in $mu$'s of terminal rewards
+    - Find out what Cohen's d is (effect sizes)
+]
 
 #todo[
 - Loss curves across different chain lengths
@@ -864,37 +865,217 @@ For details about hyperparameter selection, we refer to @hyperparameter_selectio
     - By what iteration does loss seem to converge?
 ]
 
-== Exploration Efficiency
+===  Training Stability and Loss Dynamics
 
-#todo[
-- State visitation heat maps
-- First-success timing metrics
-- Coverage rate comparisons
-]
+#figure(
+    placement: top,
+    image("figures/gflownet/mean_trajectory_balance_loss.png", width: 120%),
+    caption: [Mean GFlowNet trajectory balance loss across chain lengths.],
+) <mean_trajectory_balance_loss_plot>
 
-== Policy Quality Assessment
+The trajectory balance loss follows a consistent pattern of reduction across all chain lengths, with three distinct phases:
 
-#todo[
-- KL divergence from optimal policy
-- Terminal state distribution analysis
-- Reward accumulation curves
-]
+- _Early Stage:_ High loss values ($mu approx$ 6.8-7.4) with substantial variance;
+- _Mid Stage:_ Significant reduction ($mu approx$ 1.2-1.7) with moderate variance;
+- _Late Stage:_ Near-zero loss ($mu <$ 0.003) with minimal variance.
 
-== Learning Dynamics
+This progression is statistically significant across all transitions ($p < 0.001$), with particularly large effect sizes (Cohen's $d > 2.0$) between early and late stages, indicating robust convergence regardless of chain length, as seen in @mean_trajectory_balance_loss_plot.
 
-#todo[
-- Early exploration strategies
-- Transition points in policy development
-- Adaptation to different reward scales
-]
+=== Solution Quality Evolution
 
-== Failure Mode Analysis
+#figure(
+    placement: top,
+    image("figures/gflownet/mean_terminal_reward.png", width: 100%),
+    caption: [Mean GFlowNet terminal rewards across chain lengths with a moving average (window size: 50).],
+) <mean_terminal_rewards_plot>
 
-#todo[
-- Common pitfalls in learning
-- Edge case behaviors
-- Stability considerations
-]
+Terminal rewards show a monotonic improvement pattern, as seen in @mean_terminal_rewards_plot.
+The improvement in terminal rewards shows a consistent "two-step" enhancement, with moderate-to-large effect sizes (0.75-1.0) between consecutive stages and large effect sizes (1.4-1.9) between early and late stages.
+
+Notably, longer chains ($n >= 9$) demonstrate larger improvements in terminal rewards, with $n = 9$ showing the most substantial gain ($Delta mu approx 16$ between early and late stages). This suggests that the algorithm becomes especially effective at optimizing longer sequences as training progresses.
+
+The time-to-first-success is trivial for the n-chain environment: since the agent must always move forward, it is simply the chain length $n$.
+
+==== Policy Quality Assessment
+
+As GFlowNets aim to learn policies proportional to their reward distributions, we use the KL-divergence between the true reward distribution $R_i$ and the learned policy $P_i$ to assess the quality of the learned policy for $i in {3, 5, 7, 9, 11}$ corresponding to the different chain lengths.
+The KL-divergence measurements look as follows:
+
+- _Chain length 3:_ $"KL"(P_3 | R_3) = 0.00401$;
+- _Chain length 5:_ $"KL"(P_5 | R_5) = 0.02062$;
+- _Chain length 7:_ $"KL"(P_7 | R_7) = 0.01696$;
+- _Chain length 9:_ $"KL"(P_9 | R_9) = 0.00385$;
+- _Chain length 11:_ $"KL"(P_11 | R_11) = 0.00701$;
+- _Mean chain length:_ $overline("KL"(P | R)) = 0.01049$.
+
+Looking at these measurements, the relationship between chain length and distributional accuracy does not seem follow a simple monotonic pattern.
+We conjecture that this is a consequence of the small sample size of 10 training runs per chain length, and as such, the KL values should converge given enough runs.
+
+Looking at the average KL-divergence across all chain lengths, we conclude that the learned policy is very close to the true reward distribution.
+
+=== Exploration-Exploitation Balance
+
+#figure(
+    placement: top,
+    image("figures/gflownet/mean_exploration_ratio.png", width: 100%),
+    caption: [Mean GFlowNet forward and backward entrody across chain lengths.],
+) <mean_exploration_ratio_plot>
+
+The state coverage ratio exhibits rapid convergence to optimal exploration ($1.0$) by mid-stage of only 15 iterations, as seen in @mean_exploration_ratio_plot, as well as:
+
+- Statistically significant transition ($p < 0.005$) from early to mid stage;
+- Perfect maintenance of exploration in late stage ($sigma = 0$).
+
+This indicates that GFlowNet quickly learns to fully explore the solution space and maintains this behavior throughout training.
+This also suggests that the state space is too small to pose a serious challenge for the model, which could be accomodated by increasing the number of critical decision points (by increasing the number branches in the environment).
+
+=== Information Theoretic Measures
+
+#note[Maybe move this to the appendix as we haven't calculated entropies for BEN.]
+
+#figure(
+    placement: top,
+    image("figures/gflownet/mean_entropy.png", width: 100%),
+    caption: [Mean GFlowNet forward and backward entropy across chain lengths.],
+) <mean_entropy_plot>
+
+Both forward and backward entropy demonstrate reduction across training, as seen in @mean_entropy_plot.
+
+- _Forward Entropy:_ Shows consistent, statistically significant decreases ($p < 10^(-82)$) across all stages, with effect sizes growing with chain length;
+- _Backward Entropy:_ Exhibits the most dramatic reductions among all metrics, with effect sizes ranging from 8.5 to 16.3 between early and late stages.
+
+The relative magnitude of entropy reduction remains notably consistent across chain lengths, suggesting a scale-invariant learning process.
+
+=== Chain Length Sensitivity
+
+The analysis reveals some chain length-dependent effects:
+
+- Longer chains ($n >= 9$) show higher terminal rewards in late stages;
+- Convergence stability (measured by loss variance) remains consistent across chain lengths;
+#maybe[- Information theoretic measures scale proportionally with chain length while maintaining similar convergence patterns.]
+
+This suggests that the algorithm's learning dynamics remain robust across different problem scales.
+
+In short, the statistical analysis reveals structured convergence patterns that combine rapid initial improvement with stable late-stage optimization.
+The consistent statistical significance ($p < 0.001$) across multiple metrics and stages suggests that GFlowNet's learning process is both reliable and scalable across different chain lengths.
+
+== BEN
+
+=== Training Stability and Loss Dynamics
+
+#figure(
+    placement: top,
+    image("figures/ben/q_loss.png", width: 100%),
+    caption: [Mean BEN Q-learning (MSBBE) loss across chain lengths.],
+) <mean_q_loss_plot_ben>
+
+- *Q-Learning Loss*: The Q-Learning loss demonstrates a consistent and statistically significant reduction across all chain lengths, as seen in @mean_q_loss_plot_ben, with three notable characteristics.
+
+    - _Early Stage Volatility:_ High variance in early training ($sigma$ ranging from 610 to 2948);
+    - _Mid Stage Stabilization:_ Sharp reduction in both mean and variance;
+    - _Late Stage Refinement:_ Convergence to stable, low values.
+
+    Particularly noteworthy is the scale-dependent convergence rate --- longer chains ($n >= 7$) show more gradual convergence, while shorter chains achieve stability more quickly.
+
+    The magnitude of improvement (effect size) between early and late stages increases with chain length, suggesting that longer chains require more substantial transformations in the learning process.
+
+#figure(
+    placement: top,
+    image("figures/ben/epistemic_loss.png", width: 100%),
+    caption: [Mean BEN epistemic (ELBO) loss across chain lengths.],
+) <mean_epistemic_loss_plot_ben>
+
+- *Epistemic Loss*: The epistemic uncertainty shows a more complex pattern than the Q-learning loss, as seen in @mean_epistemic_loss_plot_ben.
+
+    - For $n=3$: Monotonic decrease (-2257.74 mean difference, $p < 0.001$);
+    - For $n=5$: Sharp initial drop followed by gradual decline;
+    - For $n in {7, 9, 11}$: Non-monotonic behavior with occasional increases.
+
+This suggests that uncertainty management becomes more challenging with longer chains, possibly due to the expanded state space.
+
+=== Reward Dynamics
+
+#figure(
+    placement: top,
+    image("figures/ben/rewards.png", width: 100%),
+    caption: [Mean BEN terminal rewards across chain lengths.],
+) <mean_terminal_rewards_plot_ben>
+
+The reward patterns exhibit rather unpromising behavior as seen in @mean_terminal_rewards_plot_ben. The statistical tests yield the following results:
+
+- _Short Chains ($n in {3,5}$):_ No statistically significant changes between stages;
+- _Medium Chains ($n in {7, 9}$):_ Temporary dip in mid-stage performance;
+- _Long Chains ($n = 11$):_ Significant improvement in late stage ($p < 0.05$).
+
+The statistical significance of stage-wise improvements increases with chain length, suggesting that longer chains benefit more from extended training.
+These statistical results, however, do not seem to capture the apparent "trend"of the rewards (which is seemingly random) --- the analysis would benefit from further investigation on this part.
+
+=== Cumulative Returns
+
+#figure(
+    placement: top,
+    image("figures/ben/cumulative_returns.png", width: 100%),
+    caption: [Mean BEN cumulative returns across chain lengths.],
+) <mean_cumulative_returns_plot_ben>
+
+The cumulative returns, probably the most definitive metric with regards to the quality of the learned policy, can be seen in @mean_cumulative_returns_plot_ben. They show:
+
+- Monotonic decrease across all chain lengths;
+- Larger effect sizes (-7.13 to -8.59) for longer chains;
+- _Statistical Significance:_ $p < 10^(-10)$ for all chain lengths.
+
+The relative magnitude of stage-wise change remains consistent across chain lengths.
+_This is critical as it indicates that the model is not learning optimal policies._
+
+=== Exploration-Exploitation Balance
+
+#todo[]
+
+BEN's exploration strategies across different chain lengths look as follows:
+
+- _Short Chains_ ($n = {3,5}$): The exploration patterns here show remarkable consistency, with no statistically significant differences between stages ($p > 0.05$).
+    This suggests that BEN quickly establishes a stable exploration strategy for smaller state spaces.
+    The mean ratios hover around:
+    - _Early:_ ~1.0
+    - _Mid:_ ~0.95
+    - _Late:_ ~1.0
+
+Medium Chains (n=7,9)
+We begin to see more nuanced behavior:
+
+Less consistent exploration ratios
+Wider variance in mid-stage exploration (σ ≈ 0.24)
+No statistically significant stage-wise changes, but more volatile patterns
+
+Long Chains (n=11)
+Here's where things get particularly interesting:
+
+Early-Mid Transition: Significant decrease (p < 0.05)
+Mid-Late Transition: Significant increase (p < 0.02)
+Effect Size: Moderate to large (0.74-0.90)
+
+
+== Comparison Between GFlowNet and BEN
+
+=== Learning Stability and Convergence
+
+GFlowNet demonstrates stable convergence properties across all chain lengths, with its trajectory balance loss consistently decreasing through well defined phases.
+In contrast, BEN's learning trajectory shows more volatile behavior, especially in its epistemic loss patterns.
+This difference becomes more pronounced with increasing chain length, indicating that GFlowNet maintains consistent learning dynamics across problem scales, while BEN's stability deteriorates with increasing chain length.
+The most striking difference appears in their convergence behaviors.
+
+- GFlowNet achieves near-zero loss values ($< 0.003$) in its late stages across all chain lengths;
+- BEN's Q-learning loss shows persistent fluctuations, particularly in longer chains;
+- BEN's epistemic loss exhibits non-monotonic behavior for $n >= 7$, indicating challenges in uncertainty estimation at larger scales.
+
+=== Reward Optimization
+
+The contrast in reward optimization capabilities is particularly noteworthy:
+
+- GFlowNet shows consistent improvement in terminal rewards, with larger gains in longer chains ($n >= 9$);
+- BEN displays concerning patterns in both terminal rewards and cumulative returns, with monotonic decreases across all chain lengths.
+
+The statistical significance of these differences ($p < 10^(-10)$ for BEN's declining returns) strongly suggests that GFlowNet's flow-based approach is better suited to this environment's reward structure.
 
 = Conclusion <conclusion>
 
@@ -906,8 +1087,18 @@ For details about hyperparameter selection, we refer to @hyperparameter_selectio
 
 == Future Research
 
-#note[Everything I think I could have done better essentially.]
+#note[
+    Everything I think I could have done better essentially.
 
+    - Stochastic Analysis:
+        - Introducing random rewards drawn from distributions;
+        - Terminal states $x in cal(X)$ rewards: $R_x ~ cal(N)(mu_x, sigma^2)$;
+        - Testing robustness to uncertainty.
+
+    - Experiment with impact of changing:
+        - exploration factor $epsilon$;
+        - discount factor $gamma$.
+]
 
 #bibliography("refs.bib")
 
@@ -915,9 +1106,7 @@ For details about hyperparameter selection, we refer to @hyperparameter_selectio
 #counter(heading).update(0)
 #text(size: 2em)[Appendix]
 
-= Implementation Details
-
-== Hyperparameter selection <hyperparameter_selection>
+= Hyperparameter selection <hyperparameter_selection>
 
 _GFlowNet Hyperparameters:_
 
@@ -931,6 +1120,95 @@ _BEN Hyperparameters:_
 - Learning rate (Q-network): 1e-4;
 - Learning rate (Epistemic network): 1e-4;
 - Base dimension ($z_"ep"$): 8;
-- Discount factor $gamma$: 0.9,
+- Discount factor $gamma$: 0.9;
 - Batch size: 32.
 
+= Policy Quality Assessment Results
+
+== GFlowNet
+
+#figure(
+    ```
+    Chain length 3, KL divergence: 0.00401
+    Chain length 5, KL divergence: 0.02062
+    Chain length 7, KL divergence: 0.01696
+    Chain length 9, KL divergence: 0.00385
+    Chain length 11, KL divergence: 0.00701
+    Mean KL divergence across all files: 0.01049
+    ```,
+    caption: [Quality assessment by KL divergence between true and observed reward distributions.]
+)
+
+= Statistical Significance Tests
+
+#show figure: set block(breakable: true)
+
+== GFlowNet
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-3.typ"),
+    caption: [GFlowNet, Chain Length $n = 3$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-5.typ"),
+    caption: [GFlowNet, Chain Length $n = 5$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-7.typ"),
+    caption: [GFlowNet, Chain Length $n = 7$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-9.typ"),
+    caption: [GFlowNet, Chain Length $n = 9$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-11.typ"),
+    caption: [GFlowNet, Chain Length $n = 11$.]
+)
+
+== BEN
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-3.typ"),
+    caption: [BEN, Chain Length $n = 3$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-5.typ"),
+    caption: [BEN, Chain Length $n = 5$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-7.typ"),
+    caption: [BEN, Chain Length $n = 7$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-9.typ"),
+    caption: [BEN, Chain Length $n = 9$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-11.typ"),
+    caption: [BEN, Chain Length $n = 11$.]
+)
