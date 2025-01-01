@@ -1166,76 +1166,76 @@ Lastly, our current difficulties with training suggest the need for more extensi
     caption: [Quality assessment by KL divergence between true and observed reward distributions.]
 )
 
-//= Statistical Significance Tests
-//
-//#show figure: set block(breakable: true)
-//
-//== GFlowNet
-//
-//#figure(
-//    include("listings/gflownet/significance_test_gflownet_chain-3.typ"),
-//    caption: [GFlowNet, Chain Length $n = 3$.]
-//)
-//
-//#v(1em)
-//
-//#figure(
-//    include("listings/gflownet/significance_test_gflownet_chain-5.typ"),
-//    caption: [GFlowNet, Chain Length $n = 5$.]
-//)
-//
-//#v(1em)
-//
-//#figure(
-//    include("listings/gflownet/significance_test_gflownet_chain-7.typ"),
-//    caption: [GFlowNet, Chain Length $n = 7$.]
-//)
-//
-//#v(1em)
-//
-//#figure(
-//    include("listings/gflownet/significance_test_gflownet_chain-9.typ"),
-//    caption: [GFlowNet, Chain Length $n = 9$.]
-//)
-//
-//#v(1em)
-//
-//#figure(
-//    include("listings/gflownet/significance_test_gflownet_chain-11.typ"),
-//    caption: [GFlowNet, Chain Length $n = 11$.]
-//)
-//
-//== BEN
-//
-//#figure(
-//    include("listings/ben/significance_test_ben_chain-3.typ"),
-//    caption: [BEN, Chain Length $n = 3$.]
-//)
-//
-//#v(1em)
-//
-//#figure(
-//    include("listings/ben/significance_test_ben_chain-5.typ"),
-//    caption: [BEN, Chain Length $n = 5$.]
-//)
-//
-//#v(1em)
-//
-//#figure(
-//    include("listings/ben/significance_test_ben_chain-7.typ"),
-//    caption: [BEN, Chain Length $n = 7$.]
-//)
-//
-//#v(1em)
-//
-//#figure(
-//    include("listings/ben/significance_test_ben_chain-9.typ"),
-//    caption: [BEN, Chain Length $n = 9$.]
-//)
-//
-//#v(1em)
-//
-//#figure(
-//    include("listings/ben/significance_test_ben_chain-11.typ"),
-//    caption: [BEN, Chain Length $n = 11$.]
-//)
+= Statistical Significance Tests
+
+#show figure: set block(breakable: true)
+
+== GFlowNet
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-3.typ"),
+    caption: [GFlowNet, Chain Length $n = 3$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-5.typ"),
+    caption: [GFlowNet, Chain Length $n = 5$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-7.typ"),
+    caption: [GFlowNet, Chain Length $n = 7$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-9.typ"),
+    caption: [GFlowNet, Chain Length $n = 9$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/gflownet/significance_test_gflownet_chain-11.typ"),
+    caption: [GFlowNet, Chain Length $n = 11$.]
+)
+
+== BEN
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-3.typ"),
+    caption: [BEN, Chain Length $n = 3$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-5.typ"),
+    caption: [BEN, Chain Length $n = 5$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-7.typ"),
+    caption: [BEN, Chain Length $n = 7$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-9.typ"),
+    caption: [BEN, Chain Length $n = 9$.]
+)
+
+#v(1em)
+
+#figure(
+    include("listings/ben/significance_test_ben_chain-11.typ"),
+    caption: [BEN, Chain Length $n = 11$.]
+)
