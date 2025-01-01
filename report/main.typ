@@ -34,6 +34,7 @@
 )
 
 #show heading: set block(above: 1.75em, below: 1em)
+#show heading.where(level: 4): it => text(it.body, style: "italic")
 
 #let show_notes = true
 
@@ -837,32 +838,12 @@ For details about hyperparameter selection, we refer to @hyperparameter_selectio
 
 = Results and Analysis <results_and_analysis>
 
-#note[
-- Quantitative results
-    - Performance comparisons
-    - Statistical analysis
-- Qualitative analysis
-    - Exploration patterns
-    - Learning behavior
-- Discussion of findings
-]
-
 == GFlowNet
 
 #todo[
     FACT CHECK!
         - Run the statistical significance tests and calculate difference in $mu$'s of terminal rewards
     - Find out what Cohen's d is (effect sizes)
-]
-
-#todo[
-- Loss curves across different chain lengths
-    - Show plot for n=3, n=7, and n=11
-    - Rest in appendix
-- Statistical significance tests
-    - T-tests between early/mid/late stages
-- Convergence time analysis
-    - By what iteration does loss seem to converge?
 ]
 
 ===  Training Stability and Loss Dynamics
@@ -902,10 +883,15 @@ As GFlowNets aim to learn policies proportional to their reward distributions, w
 The KL-divergence measurements look as follows:
 
 - _Chain length 3:_ $"KL"(P_3 | R_3) = 0.00401$;
+
 - _Chain length 5:_ $"KL"(P_5 | R_5) = 0.02062$;
+
 - _Chain length 7:_ $"KL"(P_7 | R_7) = 0.01696$;
+
 - _Chain length 9:_ $"KL"(P_9 | R_9) = 0.00385$;
+
 - _Chain length 11:_ $"KL"(P_11 | R_11) = 0.00701$;
+
 - _Mean chain length:_ $overline("KL"(P | R)) = 0.01049$.
 
 Looking at these measurements, the relationship between chain length and distributional accuracy does not seem follow a simple monotonic pattern.
@@ -1029,31 +1015,9 @@ _This is critical as it indicates that the model is not learning optimal policie
 
 === Exploration-Exploitation Balance
 
-#todo[]
-
-BEN's exploration strategies across different chain lengths look as follows:
-
-- _Short Chains_ ($n = {3,5}$): The exploration patterns here show remarkable consistency, with no statistically significant differences between stages ($p > 0.05$).
-    This suggests that BEN quickly establishes a stable exploration strategy for smaller state spaces.
-    The mean ratios hover around:
-    - _Early:_ ~1.0
-    - _Mid:_ ~0.95
-    - _Late:_ ~1.0
-
-Medium Chains (n=7,9)
-We begin to see more nuanced behavior:
-
-Less consistent exploration ratios
-Wider variance in mid-stage exploration (σ ≈ 0.24)
-No statistically significant stage-wise changes, but more volatile patterns
-
-Long Chains (n=11)
-Here's where things get particularly interesting:
-
-Early-Mid Transition: Significant decrease (p < 0.05)
-Mid-Late Transition: Significant increase (p < 0.02)
-Effect Size: Moderate to large (0.74-0.90)
-
+Due to unfortunate events and time constraints, we only have access to the final state coverage ratio across all chain lengths for BEN.
+For all chain lengths, these final state coverage ratios were all 1, by which we can only conclude that BEN has effectively explored the entire state space.
+Increasing the state space beyond what the models (both GFlowNet and BEN) are capable of exploring to completion before finishing their training would be more interesting, as this would better showcase the exploration-exploitation capabilities of the models and the trade-offs they have to make.
 
 == Comparison Between GFlowNet and BEN
 
@@ -1070,12 +1034,39 @@ The most striking difference appears in their convergence behaviors.
 
 === Reward Optimization
 
-The contrast in reward optimization capabilities is particularly noteworthy:
+The contrast in reward optimization capabilities is noteworthy:
 
 - GFlowNet shows consistent improvement in terminal rewards, with larger gains in longer chains ($n >= 9$);
 - BEN displays concerning patterns in both terminal rewards and cumulative returns, with monotonic decreases across all chain lengths.
 
 The statistical significance of these differences ($p < 10^(-10)$ for BEN's declining returns) strongly suggests that GFlowNet's flow-based approach is better suited to this environment's reward structure.
+
+=== Exploration Efficiency
+
+Due to the unfortunately missing exploration data for BEN, a fair comparison between the two cannot be made, except for the fact they both managed to completely explore the state space.
+
+=== Scale Sensitivity
+
+The algorithms show markedly different responses to increasing chain length.
+GFlowNet maintains consistent convergence patterns, shows improved reward optimization with longer chains, and exhibits stable entropy reduction across scales.
+BEN shows degrading stability with longer chains, demonstrates increasingly volatile epistemic uncertainty, and experiences more severe performance degradation at larger scales.
+
+== Hypothesis Evaluation
+
+Revisiting our original hypothesis that "BEN's explicit uncertainty decomposition leads to more efficient learning compared to GFlowNets, particularly in early training stages," our results suggest we must reject this hypothesis for the n-chain environment.
+The data instead supports a contrary conclusion:
+
+#attention("Our Finding")[
+    GFlowNet's flow-based approach appears fundamentally better suited to environments with deterministic dynamics and delayed rewards, while BEN's explicit uncertainty decomposition may be introducing unnecessary complexity for this particular class of problems.
+]
+
+This finding hints on an interesting nuance: while BEN's sophisticated uncertainty handling might be valuable in stochastic environments, it may be disadvantageous in deterministic scenarios where simpler flow-matching approaches suffice.
+
+=== Architectural Implications
+
+GFlowNet's success suggests that for environments with deterministic transitions and delayed rewards, explicitly modeling flow distributions might be more effective than maintaining separate aleatoric and epistemic uncertainty estimates.
+This insight could inform algorithm design, especially for scenarios where reward delay is a primary challenge.
+This comparative analysis suggests that the choice between these approaches should be guided by the specific characteristics of the target environment, with GFlowNet showing clear advantages in deterministic, delayed-reward scenarios.
 
 = Conclusion <conclusion>
 
@@ -1098,6 +1089,9 @@ The statistical significance of these differences ($p < 10^(-10)$ for BEN's decl
     - Experiment with impact of changing:
         - exploration factor $epsilon$;
         - discount factor $gamma$.
+
+    - Mention more compute needed than what was available in these experiments for more interesting results.
+        - This project could be considered a preliminary experiment to more serious experiments requiring more compute and/or time.
 ]
 
 #bibliography("refs.bib")
