@@ -91,7 +91,7 @@
 }
 
 #let make_title(title, authors, supervisors) = {
-    align(center)[#text(size: 18pt, weight: 900)[#title]]
+    align(center)[#text(size: 16pt, weight: 900)[#title]]
     v(0.5em)
     align(center)[
         #authors.first()
@@ -133,16 +133,15 @@
 #let make_abstract(content) = {
     align(center)[
         #box(width: 90%)[
+            #set text(size: 10.5pt)
             #set par(
               first-line-indent: 1em,
               //spacing: 1em,
               justify: true,
             )
 
-            #set text(size: 10.5pt)
-
-            #text(size: 16pt, weight: 900)[Abstract]
-            \ \
+            #text(size: 12pt, weight: 900)[Abstract]
+            #v(0em)
             #content
         ]
     ]
@@ -194,7 +193,7 @@
 
 = Introduction <introduction>
 
-Many real-world applications present an inherent challenge that current reinforcement learning (RL) methods struggle to address effectively: the problem of delayed and sparse rewards @sutton2018reinforcementlearninganintroduction @houthooft2017vimevariationalinformationmaximizing.
+Many real-world applications present an inherent challenge that current reinforcement learning (RL) methods struggle to address effectively: the problem of delayed and sparse rewards @sutton2018reinforcementlearninganintroduction.// @houthooft2017vimevariationalinformationmaximizing.
 
 #attention([Delayed and Sparse Rewards])[
     Learning scenarios where meaningful feedback signals (rewards) are provided only far after a long sequence of actions, and where most actions yield no immediate feedback.
@@ -873,12 +872,6 @@ For details about hyperparameter selection, we refer to @hyperparameter_selectio
 
 == GFlowNet
 
-#todo[
-    FACT CHECK!
-        - Run the statistical significance tests and calculate difference in $mu$'s of terminal rewards
-    - Find out what Cohen's d is (effect sizes)
-]
-
 ===  Training Stability and Loss Dynamics
 
 #figure(
@@ -1143,24 +1136,23 @@ Lastly, our current difficulties with training suggest the need for more extensi
 
 = Hyperparameter selection <hyperparameter_selection>
 
-_GFlowNet Hyperparameters:_
-
-- Hidden dimension: 64;
-- Learning rate: 1e-4;
-- Exploration $epsilon$: 0.1;
-- Batch size: 32.
-_BEN Hyperparameters:_
-
-- RNN hidden dimension: 64;
-- Learning rate (Q-network): 1e-4;
-- Learning rate (Epistemic network): 1e-4;
-- Base dimension ($z_"ep"$): 8;
-- Discount factor $gamma$: 0.9;
-- Batch size: 32.
-
-= Policy Quality Assessment Results
-
 == GFlowNet
+
+- Hidden dimension: 64
+- Learning rate: 1e-4
+- Exploration $epsilon$: 0.1
+- Batch size: 32
+
+== BEN
+
+- RNN hidden dimension: 64
+- Learning rate (Q-network): 1e-4
+- Learning rate (Epistemic network): 1e-4
+- Base dimension ($z_"ep"$): 8
+- Discount factor $gamma$: 0.9
+- Batch size: 32
+
+= Policy Quality Assessment Results for GFlowNet
 
 #figure(
     ```
@@ -1174,76 +1166,76 @@ _BEN Hyperparameters:_
     caption: [Quality assessment by KL divergence between true and observed reward distributions.]
 )
 
-= Statistical Significance Tests
-
-#show figure: set block(breakable: true)
-
-== GFlowNet
-
-#figure(
-    include("listings/gflownet/significance_test_gflownet_chain-3.typ"),
-    caption: [GFlowNet, Chain Length $n = 3$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/gflownet/significance_test_gflownet_chain-5.typ"),
-    caption: [GFlowNet, Chain Length $n = 5$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/gflownet/significance_test_gflownet_chain-7.typ"),
-    caption: [GFlowNet, Chain Length $n = 7$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/gflownet/significance_test_gflownet_chain-9.typ"),
-    caption: [GFlowNet, Chain Length $n = 9$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/gflownet/significance_test_gflownet_chain-11.typ"),
-    caption: [GFlowNet, Chain Length $n = 11$.]
-)
-
-== BEN
-
-#figure(
-    include("listings/ben/significance_test_ben_chain-3.typ"),
-    caption: [BEN, Chain Length $n = 3$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/ben/significance_test_ben_chain-5.typ"),
-    caption: [BEN, Chain Length $n = 5$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/ben/significance_test_ben_chain-7.typ"),
-    caption: [BEN, Chain Length $n = 7$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/ben/significance_test_ben_chain-9.typ"),
-    caption: [BEN, Chain Length $n = 9$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/ben/significance_test_ben_chain-11.typ"),
-    caption: [BEN, Chain Length $n = 11$.]
-)
+//= Statistical Significance Tests
+//
+//#show figure: set block(breakable: true)
+//
+//== GFlowNet
+//
+//#figure(
+//    include("listings/gflownet/significance_test_gflownet_chain-3.typ"),
+//    caption: [GFlowNet, Chain Length $n = 3$.]
+//)
+//
+//#v(1em)
+//
+//#figure(
+//    include("listings/gflownet/significance_test_gflownet_chain-5.typ"),
+//    caption: [GFlowNet, Chain Length $n = 5$.]
+//)
+//
+//#v(1em)
+//
+//#figure(
+//    include("listings/gflownet/significance_test_gflownet_chain-7.typ"),
+//    caption: [GFlowNet, Chain Length $n = 7$.]
+//)
+//
+//#v(1em)
+//
+//#figure(
+//    include("listings/gflownet/significance_test_gflownet_chain-9.typ"),
+//    caption: [GFlowNet, Chain Length $n = 9$.]
+//)
+//
+//#v(1em)
+//
+//#figure(
+//    include("listings/gflownet/significance_test_gflownet_chain-11.typ"),
+//    caption: [GFlowNet, Chain Length $n = 11$.]
+//)
+//
+//== BEN
+//
+//#figure(
+//    include("listings/ben/significance_test_ben_chain-3.typ"),
+//    caption: [BEN, Chain Length $n = 3$.]
+//)
+//
+//#v(1em)
+//
+//#figure(
+//    include("listings/ben/significance_test_ben_chain-5.typ"),
+//    caption: [BEN, Chain Length $n = 5$.]
+//)
+//
+//#v(1em)
+//
+//#figure(
+//    include("listings/ben/significance_test_ben_chain-7.typ"),
+//    caption: [BEN, Chain Length $n = 7$.]
+//)
+//
+//#v(1em)
+//
+//#figure(
+//    include("listings/ben/significance_test_ben_chain-9.typ"),
+//    caption: [BEN, Chain Length $n = 9$.]
+//)
+//
+//#v(1em)
+//
+//#figure(
+//    include("listings/ben/significance_test_ben_chain-11.typ"),
+//    caption: [BEN, Chain Length $n = 11$.]
+//)
