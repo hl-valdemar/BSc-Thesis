@@ -769,7 +769,7 @@ We evaluate each algorithm through the following experiment.
 
 For each configuration, we conduct 10 independent trials with different random seeds to minimize the impact of statistical variance.
 We then apply the framework discussed in @analytical_framework on the results of these three configurations for analysis.
-
+For an insight into the sort of statistical test data used, we refer to @statistical_significance_tests_appendix.
 
 == Implementation Details
 
@@ -1166,23 +1166,23 @@ Lastly, our current difficulties with training suggest the need for more extensi
     caption: [Quality assessment by KL divergence between true and observed reward distributions.]
 )
 
-= Statistical Significance Tests
+= Statistical Significance Tests <statistical_significance_tests_appendix>
 
 #show figure: set block(breakable: true)
 
 == GFlowNet
 
-#figure(
-    include("listings/gflownet/significance_test_gflownet_chain-3.typ"),
-    caption: [GFlowNet, Chain Length $n = 3$.]
-)
+//#figure(
+//    include("listings/gflownet/significance_test_gflownet_chain-3.typ"),
+//    caption: [GFlowNet, Chain Length $n = 3$.]
+//)
 
-#v(1em)
-
-#figure(
-    include("listings/gflownet/significance_test_gflownet_chain-5.typ"),
-    caption: [GFlowNet, Chain Length $n = 5$.]
-)
+//#v(1em)
+//
+//#figure(
+//    include("listings/gflownet/significance_test_gflownet_chain-5.typ"),
+//    caption: [GFlowNet, Chain Length $n = 5$.]
+//)
 
 #v(1em)
 
@@ -1191,33 +1191,33 @@ Lastly, our current difficulties with training suggest the need for more extensi
     caption: [GFlowNet, Chain Length $n = 7$.]
 )
 
-#v(1em)
+//#v(1em)
+//
+//#figure(
+//    include("listings/gflownet/significance_test_gflownet_chain-9.typ"),
+//    caption: [GFlowNet, Chain Length $n = 9$.]
+//)
 
-#figure(
-    include("listings/gflownet/significance_test_gflownet_chain-9.typ"),
-    caption: [GFlowNet, Chain Length $n = 9$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/gflownet/significance_test_gflownet_chain-11.typ"),
-    caption: [GFlowNet, Chain Length $n = 11$.]
-)
+//#v(1em)
+//
+//#figure(
+//    include("listings/gflownet/significance_test_gflownet_chain-11.typ"),
+//    caption: [GFlowNet, Chain Length $n = 11$.]
+//)
 
 == BEN
 
-#figure(
-    include("listings/ben/significance_test_ben_chain-3.typ"),
-    caption: [BEN, Chain Length $n = 3$.]
-)
+//#figure(
+//    include("listings/ben/significance_test_ben_chain-3.typ"),
+//    caption: [BEN, Chain Length $n = 3$.]
+//)
 
-#v(1em)
-
-#figure(
-    include("listings/ben/significance_test_ben_chain-5.typ"),
-    caption: [BEN, Chain Length $n = 5$.]
-)
+//#v(1em)
+//
+//#figure(
+//    include("listings/ben/significance_test_ben_chain-5.typ"),
+//    caption: [BEN, Chain Length $n = 5$.]
+//)
 
 #v(1em)
 
@@ -1226,16 +1226,16 @@ Lastly, our current difficulties with training suggest the need for more extensi
     caption: [BEN, Chain Length $n = 7$.]
 )
 
-#v(1em)
+//#v(1em)
+//
+//#figure(
+//    include("listings/ben/significance_test_ben_chain-9.typ"),
+//    caption: [BEN, Chain Length $n = 9$.]
+//)
 
-#figure(
-    include("listings/ben/significance_test_ben_chain-9.typ"),
-    caption: [BEN, Chain Length $n = 9$.]
-)
-
-#v(1em)
-
-#figure(
-    include("listings/ben/significance_test_ben_chain-11.typ"),
-    caption: [BEN, Chain Length $n = 11$.]
-)
+//#v(1em)
+//
+//#figure(
+//    include("listings/ben/significance_test_ben_chain-11.typ"),
+//    caption: [BEN, Chain Length $n = 11$.]
+//)
