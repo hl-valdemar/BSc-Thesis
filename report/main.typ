@@ -162,7 +162,7 @@
 //    - Making the reward for reaching a terminal state random following a pre-determined distribution (by sampling the rewards from pre-determined distributions corresponding to each terminal state, we can still make assumptions about the desired behavior --- bigger mean rewards $=>$ higher desired sample rates for trained model).
 //]
 
-#let title = "Flow Networks versus Bayesian Exploration: A Comparative Study in Delayed-Reward Environments"
+#let title = "Sequential Decision Making with Delayed and Sparse Rewards"
 #let authors = (
     "Valdemar H. Lorenzen",
 )
